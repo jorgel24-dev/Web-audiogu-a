@@ -4,7 +4,7 @@ import '../models/noticia_model.dart';
 class NoticiasProvider extends ChangeNotifier {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  List<Noticia> _noticias = Noticia.ejemplos;
+  final List<Noticia> _noticias = Noticia.ejemplos;
 
   Noticia? _noticiaSeleccionada;
 
