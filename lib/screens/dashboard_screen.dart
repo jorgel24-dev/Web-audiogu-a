@@ -26,7 +26,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: cardColor,
       body: Row(
         children: [
-          const MenuLateral(rutaActual: '/'),
+          MenuLateral(rutaActual: '/', isDarkMode: isDarkMode),
           Expanded(
             child: Container(
               color: bgColor,

@@ -17,24 +17,37 @@ class NoticiasPage extends StatelessWidget {
   }
 }
 
-class _NoticiasView extends StatelessWidget {
+class _NoticiasView extends StatefulWidget {
   const _NoticiasView({Key? key}) : super(key: key);
 
   @override
+  State<_NoticiasView> createState() => _NoticiasViewState();
+}
+
+class _NoticiasViewState extends State<_NoticiasView> {
+  bool isDarkMode = false;
+
+  @override
   Widget build(BuildContext context) {
+    final bgColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
+    final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: bgColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: _AppBarNoticias(),
+        child: _AppBarNoticias(
+          isDarkMode: isDarkMode,
+          onToggle: () => setState(() => isDarkMode = !isDarkMode),
+        ),
       ),
       body: Row(
         children: [
-          const MenuLateral(rutaActual: '/noticias'),
-          VerticalDivider(width: 1, color: Colors.grey[200]),
-          const Expanded(flex: 2, child: _PanelLista()),
-          VerticalDivider(width: 1, color: Colors.grey[200]),
-          const Expanded(flex: 4, child: _PanelEditor()),
+          MenuLateral(rutaActual: '/noticias', isDarkMode: isDarkMode),
+          VerticalDivider(width: 1, color: dividerColor),
+          Expanded(flex: 2, child: _PanelLista(isDarkMode: isDarkMode)),
+          VerticalDivider(width: 1, color: dividerColor),
+          Expanded(flex: 4, child: _PanelEditor(isDarkMode: isDarkMode)),
         ],
       ),
     );
@@ -42,13 +55,24 @@ class _NoticiasView extends StatelessWidget {
 }
 
 class _AppBarNoticias extends StatelessWidget {
+  final bool isDarkMode;
+  final VoidCallback onToggle;
+
+  const _AppBarNoticias({
+    required this.isDarkMode,
+    required this.onToggle,
+  });
+
   @override
   Widget build(BuildContext context) {
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black87;
+    final iconColor = isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
 
     return Container(
       height: 60,
-      color: Colors.white,
+      color: cardColor,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
@@ -58,16 +82,24 @@ class _AppBarNoticias extends StatelessWidget {
             color: Color(0xFF2D6A4F),
           ),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Text(
               'Editor de Noticias y Actualidades',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: textColor,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.dark_mode_outlined, size: 20),
-            onPressed: () {},
+            icon: Icon(
+              isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              size: 20,
+              color: iconColor,
+            ),
+            onPressed: onToggle,
             tooltip: 'Cambiar tema',
           ),
           const SizedBox(width: 4),
@@ -122,14 +154,20 @@ class _AppBarNoticias extends StatelessWidget {
 }
 
 class _PanelLista extends StatelessWidget {
-  const _PanelLista({Key? key}) : super(key: key);
+  final bool isDarkMode;
+
+  const _PanelLista({Key? key, required this.isDarkMode}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final inputBg = isDarkMode ? const Color(0xFF2A2A2A) : Colors.white;
+    final hintColor = isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
+    final borderColor = isDarkMode ? Colors.white12 : Colors.grey[300]!;
 
     return Container(
-      color: Colors.white,
+      color: cardColor,
       child: Column(
         children: [
           Padding(
@@ -137,12 +175,14 @@ class _PanelLista extends StatelessWidget {
             child: TextField(
               onChanged: (value) => noticiasProvider.setBusqueda(value),
               decoration: InputDecoration(
+                filled: true,
+                fillColor: inputBg,
                 hintText: 'Buscar noticias...',
-                hintStyle: TextStyle(fontSize: 13, color: Colors.grey[400]),
+                hintStyle: TextStyle(fontSize: 13, color: hintColor),
                 prefixIcon: Icon(
                   Icons.search,
                   size: 18,
-                  color: Colors.grey[400],
+                  color: hintColor,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -150,11 +190,11 @@ class _PanelLista extends StatelessWidget {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: borderColor),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: borderColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -241,7 +281,9 @@ class _PanelLista extends StatelessWidget {
 
 
 class _PanelEditor extends StatefulWidget {
-  const _PanelEditor({Key? key}) : super(key: key);
+  final bool isDarkMode;
+
+  const _PanelEditor({Key? key, required this.isDarkMode}) : super(key: key);
 
   @override
   State<_PanelEditor> createState() => _PanelEditorState();
@@ -262,6 +304,7 @@ class _PanelEditorState extends State<_PanelEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = widget.isDarkMode;
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
     final noticia = noticiasProvider.noticiaSeleccionada;
     if (noticia != null) {
@@ -282,7 +325,7 @@ class _PanelEditorState extends State<_PanelEditor> {
     }
 
     return Container(
-      color: const Color(0xFFF8F9FA),
+      color: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       child: !noticiasProvider.editorActivo
           ? const _EditorVacio()
           : Form(
@@ -294,7 +337,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.grey[200]!),
                       ),

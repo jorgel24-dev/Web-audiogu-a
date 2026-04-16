@@ -22,17 +22,28 @@ const _itemsMenu = [
 
 class MenuLateral extends StatelessWidget {
   final String rutaActual;
+  final bool isDarkMode;
 
-  const MenuLateral({Key? key, required this.rutaActual}) : super(key: key);
+  const MenuLateral({
+    Key? key,
+    required this.rutaActual,
+    this.isDarkMode = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
+    final titleColor = isDarkMode ? Colors.white : Colors.black87;
+    final subColor = isDarkMode ? Colors.grey[500]! : Colors.grey;
+    final logoutColor = isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
+
     return Container(
       width: 200,
-      color: Colors.white,
+      color: bgColor,
       child: Column(
         children: [
-          Container(
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Row(
               children: [
@@ -50,7 +61,7 @@ class MenuLateral extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -58,33 +69,31 @@ class MenuLateral extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
+                        color: titleColor,
                       ),
                     ),
                     Text(
                       'Panel de Administración',
-                      style: TextStyle(fontSize: 10, color: Colors.grey),
+                      style: TextStyle(fontSize: 10, color: subColor),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-
-          const Divider(height: 1),
+          Divider(height: 1, color: dividerColor),
           const SizedBox(height: 8),
-
           ..._itemsMenu.map(
             (item) => _ItemMenuLateral(
               icon: item.icon,
               label: item.label,
               seleccionado: rutaActual == item.ruta,
               onTap: () => context.go(item.ruta),
+              isDarkMode: isDarkMode,
             ),
           ),
-
           const Spacer(),
-
-          const Divider(height: 1),
+          Divider(height: 1, color: dividerColor),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -98,7 +107,7 @@ class MenuLateral extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -107,17 +116,18 @@ class MenuLateral extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
+                          color: titleColor,
                         ),
                       ),
                       Text(
                         'admin@martosguia.com',
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
+                        style: TextStyle(fontSize: 10, color: subColor),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.logout, size: 16, color: Colors.grey[400]),
+                Icon(Icons.logout, size: 16, color: logoutColor),
               ],
             ),
           ),
@@ -132,32 +142,40 @@ class _ItemMenuLateral extends StatelessWidget {
   final String label;
   final bool seleccionado;
   final VoidCallback onTap;
+  final bool isDarkMode;
 
   const _ItemMenuLateral({
     required this.icon,
     required this.label,
     required this.seleccionado,
     required this.onTap,
+    this.isDarkMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    const activeColor = Color(0xFF2D6A4F);
+    final inactiveIconColor = isDarkMode ? Colors.grey[500] : Colors.grey[600];
+    final inactiveTextColor = isDarkMode ? Colors.grey[300] : Colors.grey[800];
+
     return ListTile(
       leading: Icon(
         icon,
         size: 18,
-        color: seleccionado ? const Color(0xFF2D6A4F) : Colors.grey[600],
+        color: seleccionado ? activeColor : inactiveIconColor,
       ),
       title: Text(
         label,
         style: TextStyle(
           fontSize: 13,
           fontWeight: seleccionado ? FontWeight.w600 : FontWeight.normal,
-          color: seleccionado ? const Color(0xFF2D6A4F) : Colors.grey[800],
+          color: seleccionado ? activeColor : inactiveTextColor,
         ),
       ),
       selected: seleccionado,
-      selectedTileColor: const Color(0xFF2D6A4F).withValues(alpha: 0.08),
+      selectedTileColor: activeColor.withValues(
+        alpha: isDarkMode ? 0.15 : 0.08,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       dense: true,
