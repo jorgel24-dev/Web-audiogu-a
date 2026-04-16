@@ -4,6 +4,8 @@ import '../providers/noticias_provider.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
 import '../widgets/editor_toolbar.dart';
+import '../widgets/chip_filtro.dart';
+import '../widgets/label_campo.dart';
 
 class NoticiasPage extends StatelessWidget {
   const NoticiasPage({Key? key}) : super(key: key);
@@ -166,21 +168,21 @@ class _PanelLista extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _ChipFiltro(
+                  ChipFiltro(
                     label: 'Todos',
                     valor: 'todos',
                     filtroActivo: noticiasProvider.filtroActivo,
                     onSelected: () => noticiasProvider.setFiltro('todos'),
                   ),
                   const SizedBox(width: 6),
-                  _ChipFiltro(
+                  ChipFiltro(
                     label: 'Publicados',
                     valor: 'publicado',
                     filtroActivo: noticiasProvider.filtroActivo,
                     onSelected: () => noticiasProvider.setFiltro('publicado'),
                   ),
                   const SizedBox(width: 6),
-                  _ChipFiltro(
+                  ChipFiltro(
                     label: 'Borradores',
                     valor: 'borrador',
                     filtroActivo: noticiasProvider.filtroActivo,
@@ -236,37 +238,6 @@ class _PanelLista extends StatelessWidget {
   }
 }
 
-class _ChipFiltro extends StatelessWidget {
-  final String label;
-  final String valor;
-  final String filtroActivo;
-  final VoidCallback onSelected;
-
-  const _ChipFiltro({
-    required this.label,
-    required this.valor,
-    required this.filtroActivo,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final estaActivo = filtroActivo == valor;
-    return ChoiceChip(
-      label: Text(label, style: const TextStyle(fontSize: 12)),
-      selected: estaActivo,
-      onSelected: (_) => onSelected(),
-      selectedColor: const Color(0xFF2D6A4F),
-      labelStyle: TextStyle(
-        color: estaActivo ? Colors.white : Colors.grey[700],
-        fontWeight: estaActivo ? FontWeight.w600 : FontWeight.normal,
-      ),
-      backgroundColor: Colors.grey[100],
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      visualDensity: VisualDensity.compact,
-    );
-  }
-}
 
 class _PanelEditor extends StatefulWidget {
   const _PanelEditor({Key? key}) : super(key: key);
@@ -334,7 +305,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _LabelCampo(label: 'Titular de la Noticia'),
+                                LabelCampo(label: 'Titular de la Noticia'),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _titularController,
@@ -355,7 +326,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-                                _LabelCampo(label: 'Subtítulo / Entradilla'),
+                                LabelCampo(label: 'Subtítulo / Entradilla'),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _subtituloController,
@@ -381,7 +352,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          _LabelCampo(label: 'Categoría'),
+                                          LabelCampo(label: 'Categoría'),
                                           const SizedBox(height: 6),
                                           DropdownButtonFormField<String>(
                                             initialValue:
@@ -438,7 +409,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          _LabelCampo(
+                                          LabelCampo(
                                             label: 'Fecha de Publicación',
                                           ),
                                           const SizedBox(height: 6),
@@ -588,20 +559,3 @@ class _EditorVacio extends StatelessWidget {
   }
 }
 
-class _LabelCampo extends StatelessWidget {
-  final String label;
-
-  const _LabelCampo({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: Colors.grey[700],
-      ),
-    );
-  }
-}

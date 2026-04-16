@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:audioguia_web/widgets/barra_lateral.dart';
+import 'package:audioguia_web/widgets/menu_lateral.dart';
 import 'package:audioguia_web/widgets/tarjeta_estadisticas.dart';
 import 'package:audioguia_web/widgets/tarjeta_modulo.dart';
 
@@ -26,81 +26,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: cardColor,
       body: Row(
         children: [
-          Container(
-            width: 240,
-            decoration: BoxDecoration(
-              color: cardColor,
-              border: Border(
-                right: BorderSide(
-                  color: isDarkMode ? Colors.white10 : Colors.grey[200]!,
-                ),
-              ),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 24,
-                    horizontal: 20,
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.map_rounded,
-                        color: Color(0xFF00796B),
-                        size: 26,
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Martos Guía',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: textColor,
-                            ),
-                          ),
-                          Text(
-                            'Admin Panel',
-                            style: TextStyle(fontSize: 10, color: subTextColor),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                BarraLateral(
-                  icono: Icons.grid_view_rounded,
-                  titulo: 'Panel Principal',
-                  estaSeleccionado: true,
-                  alPulsar: () {},
-                  isDarkMode: isDarkMode,
-                ),
-                BarraLateral(
-                  icono: Icons.account_balance_rounded,
-                  titulo: 'Monumentos',
-                  alPulsar: () {},
-                  isDarkMode: isDarkMode,
-                ),
-                BarraLateral(
-                  icono: Icons.article_rounded,
-                  titulo: 'Noticias',
-                  alPulsar: () {},
-                  isDarkMode: isDarkMode,
-                ),
-                BarraLateral(
-                  icono: Icons.settings_rounded,
-                  titulo: 'Configuración',
-                  alPulsar: () {},
-                  isDarkMode: isDarkMode,
-                ),
-                const Spacer(),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
+          const MenuLateral(rutaActual: '/'),
           Expanded(
             child: Container(
               color: bgColor,
