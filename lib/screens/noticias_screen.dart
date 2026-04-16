@@ -25,7 +25,9 @@ class _NoticiasView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<TemaProvider>().isDarkMode;
-    final bgColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
+    final bgColor = isDarkMode
+        ? const Color(0xFF121212)
+        : const Color(0xFFF8F9FA);
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
@@ -34,10 +36,8 @@ class _NoticiasView extends StatelessWidget {
         isDarkMode: isDarkMode,
         onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
         icono: Icons.article_outlined,
-        acciones: [
-          const SizedBox(width: 4),
-          _BotonGuardar(),
-        ],
+        titulo: 'Editor de noticias',
+        acciones: [const SizedBox(width: 4), _BotonGuardar()],
       ),
       body: Row(
         children: [
@@ -51,7 +51,6 @@ class _NoticiasView extends StatelessWidget {
     );
   }
 }
-
 
 class _PanelLista extends StatelessWidget {
   final bool isDarkMode;
@@ -79,11 +78,7 @@ class _PanelLista extends StatelessWidget {
                 fillColor: inputBg,
                 hintText: 'Buscar noticias...',
                 hintStyle: TextStyle(fontSize: 13, color: hintColor),
-                prefixIcon: Icon(
-                  Icons.search,
-                  size: 18,
-                  color: hintColor,
-                ),
+                prefixIcon: Icon(Icons.search, size: 18, color: hintColor),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 10,
@@ -179,7 +174,6 @@ class _PanelLista extends StatelessWidget {
   }
 }
 
-
 class _PanelEditor extends StatefulWidget {
   final bool isDarkMode;
 
@@ -237,7 +231,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
+                        color: isDarkMode
+                            ? const Color(0xFF1E2A3A)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.grey[200]!),
                       ),
@@ -441,78 +437,80 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ],
                       ),
                     ),
-                    if (noticiasProvider.noticiaSeleccionada != null) ...
-                      [
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.tune,
-                                size: 16,
-                                color: Color(0xFF2D6A4F),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Estado:',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              _BotonEstado(
-                                label: 'Borrador',
-                                color: Colors.orange,
-                                activo: noticiasProvider.estadoEditor ==
-                                    EstadoNoticia.borrador,
-                                onTap: () => noticiasProvider
-                                    .cambiarEstado(EstadoNoticia.borrador),
-                              ),
-                              const SizedBox(width: 8),
-                              _BotonEstado(
-                                label: 'Publicado',
-                                color: Colors.green,
-                                activo: noticiasProvider.estadoEditor ==
-                                    EstadoNoticia.publicado,
-                                onTap: () => noticiasProvider
-                                    .cambiarEstado(EstadoNoticia.publicado),
-                              ),
-                              const Spacer(),
-                              OutlinedButton.icon(
-                                onPressed: () =>
-                                    _mostrarDialogoEliminar(context, noticiasProvider),
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  size: 16,
-                                ),
-                                label: const Text('Eliminar'),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red[700],
-                                  side: BorderSide(color: Colors.red[300]!),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                    if (noticiasProvider.noticiaSeleccionada != null) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-                      ],
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.tune,
+                              size: 16,
+                              color: Color(0xFF2D6A4F),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Estado:',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            _BotonEstado(
+                              label: 'Borrador',
+                              color: Colors.orange,
+                              activo:
+                                  noticiasProvider.estadoEditor ==
+                                  EstadoNoticia.borrador,
+                              onTap: () => noticiasProvider.cambiarEstado(
+                                EstadoNoticia.borrador,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _BotonEstado(
+                              label: 'Publicado',
+                              color: Colors.green,
+                              activo:
+                                  noticiasProvider.estadoEditor ==
+                                  EstadoNoticia.publicado,
+                              onTap: () => noticiasProvider.cambiarEstado(
+                                EstadoNoticia.publicado,
+                              ),
+                            ),
+                            const Spacer(),
+                            OutlinedButton.icon(
+                              onPressed: () => _mostrarDialogoEliminar(
+                                context,
+                                noticiasProvider,
+                              ),
+                              icon: const Icon(Icons.delete_outline, size: 16),
+                              label: const Text('Eliminar'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red[700],
+                                side: BorderSide(color: Colors.red[300]!),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -680,8 +678,7 @@ class _BotonGuardar extends StatelessWidget {
                           ? '✓ Noticia guardada correctamente'
                           : '✗ Revisa los campos obligatorios',
                     ),
-                    backgroundColor:
-                        guardado ? Colors.green : Colors.red[700],
+                    backgroundColor: guardado ? Colors.green : Colors.red[700],
                     duration: const Duration(seconds: 2),
                   ),
                 );
