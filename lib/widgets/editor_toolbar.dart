@@ -17,21 +17,18 @@ class EditorToolbar extends StatelessWidget {
             icon: Icons.format_bold,
             tooltip: 'Negrita',
             onPressed: () {
-              // TODO: aplicar negrita al texto seleccionado
             },
           ),
           _ToolbarButton(
             icon: Icons.format_italic,
             tooltip: 'Cursiva',
             onPressed: () {
-              // TODO: aplicar cursiva
             },
           ),
           _ToolbarButton(
             icon: Icons.format_underline,
             tooltip: 'Subrayado',
             onPressed: () {
-              // TODO: aplicar subrayado
             },
           ),
           const _Separador(),

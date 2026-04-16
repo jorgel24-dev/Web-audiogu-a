@@ -8,6 +8,7 @@
       "version": "0.1.0",
       "dependencies": [
         "flutter",
+        "flutter_localizations",
         "go_router",
         "http",
         "provider"
@@ -70,6 +71,15 @@
         "http_parser",
         "meta",
         "web"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "path"
       ]
     },
     {
@@ -213,6 +223,15 @@
       "dependencies": [
         "collection",
         "meta"
+      ]
+    },
+    {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
       ]
     },
     {

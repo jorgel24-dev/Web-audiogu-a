@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/noticias_provider.dart';
+import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
 import '../widgets/editor_toolbar.dart';
 
@@ -9,10 +10,7 @@ class NoticiasPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => NoticiasProvider(),
-      child: const _NoticiasView(),
-    );
+    return const _NoticiasView();
   }
 }
 
@@ -23,28 +21,16 @@ class _NoticiasView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: _AppBarNoticias(),
+      ),
       body: Row(
         children: [
-          // ── 1ª COLUMNA: Menú lateral ──────────────────────────────────
-          const _MenuLateral(),
-
-          // ── 2ª COLUMNA: Panel lista de noticias ───────────────────────
-          Expanded(
-            flex: 2,
-            child: Column(
-              children: [
-                // AppBar personalizado con título y botón Guardar
-                _AppBarNoticias(),
-                // Panel con buscador, filtros y lista
-                const Expanded(child: _PanelLista()),
-              ],
-            ),
-          ),
-
-          // Divisor vertical
+          const MenuLateral(rutaActual: '/noticias'),
           VerticalDivider(width: 1, color: Colors.grey[200]),
-
-          // ── 3ª COLUMNA: Editor de contenido ───────────────────────────
+          const Expanded(flex: 2, child: _PanelLista()),
+          VerticalDivider(width: 1, color: Colors.grey[200]),
           const Expanded(flex: 4, child: _PanelEditor()),
         ],
       ),
@@ -52,177 +38,9 @@ class _NoticiasView extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// MENÚ LATERAL (1ª columna) — estructura estándar del proyecto
-// ════════════════════════════════════════════════════════
-
-class _MenuLateral extends StatelessWidget {
-  const _MenuLateral({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 200,
-      color: Colors.white,
-      child: Column(
-        children: [
-          // Header: logo + nombre app
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2D6A4F),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Icon(
-                    Icons.square,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Martos Guía',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Text(
-                      'Panel de Administración',
-                      style: TextStyle(fontSize: 10, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          const SizedBox(height: 8),
-          // Items del menú
-          _MenuItemLateral(
-            icon: Icons.grid_view,
-            label: 'Panel Principal',
-            seleccionado: false,
-            onTap: () {},
-          ),
-          _MenuItemLateral(
-            icon: Icons.account_balance,
-            label: 'Monumentos',
-            seleccionado: false,
-            onTap: () {},
-          ),
-          _MenuItemLateral(
-            icon: Icons.article,
-            label: 'Noticias',
-            seleccionado: true,
-            onTap: () {},
-          ),
-          _MenuItemLateral(
-            icon: Icons.settings,
-            label: 'Configuración',
-            seleccionado: false,
-            onTap: () {},
-          ),
-          const Spacer(),
-          // Footer usuario
-          const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Color(0xFF2D6A4F),
-                  child: Text(
-                    'A',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Administrador',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        'admin@martosguia.com',
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(Icons.logout, size: 16, color: Colors.grey[400]),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MenuItemLateral extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool seleccionado;
-  final VoidCallback onTap;
-
-  const _MenuItemLateral({
-    required this.icon,
-    required this.label,
-    required this.seleccionado,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        size: 18,
-        color: seleccionado ? const Color(0xFF2D6A4F) : Colors.grey[600],
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: seleccionado ? FontWeight.w600 : FontWeight.normal,
-          color: seleccionado ? const Color(0xFF2D6A4F) : Colors.grey[800],
-        ),
-      ),
-      selected: seleccionado,
-      selectedTileColor: const Color(0xFF2D6A4F).withOpacity(0.08),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-      dense: true,
-      onTap: onTap,
-    );
-  }
-}
-
-// ════════════════════════════════════════════════════════
-// APP BAR PERSONALIZADO
-// ════════════════════════════════════════════════════════
-
 class _AppBarNoticias extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Recuperamos la info del provider (igual que el profesor)
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
 
     return Container(
@@ -237,19 +55,19 @@ class _AppBarNoticias extends StatelessWidget {
             color: Color(0xFF2D6A4F),
           ),
           const SizedBox(width: 8),
-          const Text(
-            'Editor de Noticias y Actualidades',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          const Expanded(
+            child: Text(
+              'Editor de Noticias y Actualidades',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          const Spacer(),
-          // Botón modo oscuro
           IconButton(
             icon: const Icon(Icons.dark_mode_outlined, size: 20),
             onPressed: () {},
             tooltip: 'Cambiar tema',
           ),
-          const SizedBox(width: 8),
-          // Botón Guardar Cambios — dispara validación (patrón del profesor)
+          const SizedBox(width: 4),
           ElevatedButton.icon(
             onPressed: noticiasProvider.cargando
                 ? null
@@ -300,23 +118,17 @@ class _AppBarNoticias extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// PANEL LISTA (2ª columna)
-// ════════════════════════════════════════════════════════
-
 class _PanelLista extends StatelessWidget {
   const _PanelLista({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Recuperamos la info del provider
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
 
     return Container(
       color: Colors.white,
       child: Column(
         children: [
-          // Buscador
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
             child: TextField(
@@ -348,36 +160,37 @@ class _PanelLista extends StatelessWidget {
               ),
             ),
           ),
-          // Filtros con ChoiceChip (Todos, Publicados, Borradores)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                _ChipFiltro(
-                  label: 'Todos',
-                  valor: 'todos',
-                  filtroActivo: noticiasProvider.filtroActivo,
-                  onSelected: () => noticiasProvider.setFiltro('todos'),
-                ),
-                const SizedBox(width: 6),
-                _ChipFiltro(
-                  label: 'Publicados',
-                  valor: 'publicado',
-                  filtroActivo: noticiasProvider.filtroActivo,
-                  onSelected: () => noticiasProvider.setFiltro('publicado'),
-                ),
-                const SizedBox(width: 6),
-                _ChipFiltro(
-                  label: 'Borradores',
-                  valor: 'borrador',
-                  filtroActivo: noticiasProvider.filtroActivo,
-                  onSelected: () => noticiasProvider.setFiltro('borrador'),
-                ),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _ChipFiltro(
+                    label: 'Todos',
+                    valor: 'todos',
+                    filtroActivo: noticiasProvider.filtroActivo,
+                    onSelected: () => noticiasProvider.setFiltro('todos'),
+                  ),
+                  const SizedBox(width: 6),
+                  _ChipFiltro(
+                    label: 'Publicados',
+                    valor: 'publicado',
+                    filtroActivo: noticiasProvider.filtroActivo,
+                    onSelected: () => noticiasProvider.setFiltro('publicado'),
+                  ),
+                  const SizedBox(width: 6),
+                  _ChipFiltro(
+                    label: 'Borradores',
+                    valor: 'borrador',
+                    filtroActivo: noticiasProvider.filtroActivo,
+                    onSelected: () => noticiasProvider.setFiltro('borrador'),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          // Botón crear nueva noticia
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: SizedBox(
@@ -401,7 +214,6 @@ class _PanelLista extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          // Lista de noticias
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -424,7 +236,6 @@ class _PanelLista extends StatelessWidget {
   }
 }
 
-// Chip de filtro reutilizable
 class _ChipFiltro extends StatelessWidget {
   final String label;
   final String valor;
@@ -457,10 +268,6 @@ class _ChipFiltro extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// PANEL EDITOR (3ª columna)
-// ════════════════════════════════════════════════════════
-
 class _PanelEditor extends StatefulWidget {
   const _PanelEditor({Key? key}) : super(key: key);
 
@@ -469,7 +276,6 @@ class _PanelEditor extends StatefulWidget {
 }
 
 class _PanelEditorState extends State<_PanelEditor> {
-  // Controladores para actualizar los campos cuando se selecciona una noticia
   final _titularController = TextEditingController();
   final _subtituloController = TextEditingController();
   final _cuerpoController = TextEditingController();
@@ -484,10 +290,7 @@ class _PanelEditorState extends State<_PanelEditor> {
 
   @override
   Widget build(BuildContext context) {
-    // Recuperamos la info del provider (igual que el profesor)
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
-
-    // Sincronizar controladores cuando cambia la noticia seleccionada
     final noticia = noticiasProvider.noticiaSeleccionada;
     if (noticia != null) {
       if (_titularController.text != noticiasProvider.titular) {
@@ -508,9 +311,7 @@ class _PanelEditorState extends State<_PanelEditor> {
 
     return Container(
       color: const Color(0xFFF8F9FA),
-      child:
-          noticiasProvider.noticiaSeleccionada == null &&
-              noticiasProvider.titular.isEmpty
+      child: !noticiasProvider.editorActivo
           ? const _EditorVacio()
           : Form(
               key: noticiasProvider.formKey,
@@ -519,7 +320,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Contenedor blanco del editor
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -534,13 +334,10 @@ class _PanelEditorState extends State<_PanelEditor> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // ── Titular ──────────────────────────────
                                 _LabelCampo(label: 'Titular de la Noticia'),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _titularController,
-                                  // onChanged conecta el campo con el provider
-                                  // (igual que el profesor: onChanged: (value) => provider.campo = value)
                                   onChanged: (value) =>
                                       noticiasProvider.setTitular(value),
                                   style: const TextStyle(
@@ -558,8 +355,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
-                                // ── Subtítulo / Entradilla ────────────────
                                 _LabelCampo(label: 'Subtítulo / Entradilla'),
                                 const SizedBox(height: 6),
                                 TextFormField(
@@ -579,8 +374,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
-                                // ── Fila: Categoría + Fecha ───────────────
                                 Row(
                                   children: [
                                     Expanded(
@@ -591,7 +384,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                           _LabelCampo(label: 'Categoría'),
                                           const SizedBox(height: 6),
                                           DropdownButtonFormField<String>(
-                                            value:
+                                            initialValue:
                                                 noticiasProvider
                                                     .categoria
                                                     .isEmpty
@@ -624,7 +417,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                 child: Text('Deportes'),
                                               ),
                                             ],
-                                            // onChanged conecta con el provider
                                             onChanged: (value) =>
                                                 noticiasProvider.setCategoria(
                                                   value ?? '',
@@ -650,7 +442,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                                             label: 'Fecha de Publicación',
                                           ),
                                           const SizedBox(height: 6),
-                                          // readOnly: true — al hacer tap abre showDatePicker
                                           TextFormField(
                                             readOnly: true,
                                             controller: TextEditingController(
@@ -674,7 +465,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                   ),
                                                 ),
                                             onTap: () async {
-                                              // showDatePicker como indica la especificación
                                               final fecha =
                                                   await showDatePicker(
                                                     context: context,
@@ -704,11 +494,8 @@ class _PanelEditorState extends State<_PanelEditor> {
                             ),
                           ),
 
-                          // ── Editor de texto enriquecido ─────────────────
                           const Divider(height: 1),
-                          // Toolbar de formato (widget reutilizable)
                           const EditorToolbar(),
-                          // Área de texto con maxLines: null (como indica la especificación)
                           Padding(
                             padding: const EdgeInsets.all(16),
                             child: TextFormField(
@@ -775,7 +562,6 @@ class _PanelEditorState extends State<_PanelEditor> {
   }
 }
 
-// Estado vacío del editor cuando no hay noticia seleccionada
 class _EditorVacio extends StatelessWidget {
   const _EditorVacio();
 
@@ -802,7 +588,6 @@ class _EditorVacio extends StatelessWidget {
   }
 }
 
-// Widget reutilizable: etiqueta de campo de formulario
 class _LabelCampo extends StatelessWidget {
   final String label;
 

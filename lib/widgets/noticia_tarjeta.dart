@@ -20,7 +20,7 @@ class NoticiaTarjeta extends StatelessWidget {
       child: Card(
         elevation: seleccionada ? 3 : 1,
         color: seleccionada
-            ? Theme.of(context).colorScheme.primary.withOpacity(0.08)
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
             : null,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -36,7 +36,6 @@ class NoticiaTarjeta extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Fila: etiqueta de estado + fecha
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -48,7 +47,6 @@ class NoticiaTarjeta extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 6),
-              // Titular
               Text(
                 noticia.titular,
                 style: const TextStyle(
@@ -59,7 +57,6 @@ class NoticiaTarjeta extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-              // Extracto
               Text(
                 noticia.subtitulo,
                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
@@ -92,7 +89,6 @@ class NoticiaTarjeta extends StatelessWidget {
   }
 }
 
-// Widget interno: etiqueta de color según estado
 class _EtiquetaEstado extends StatelessWidget {
   final EstadoNoticia estado;
 
@@ -100,28 +96,16 @@ class _EtiquetaEstado extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color;
-    String texto;
-
-    switch (estado) {
-      case EstadoNoticia.borrador:
-        color = Colors.orange;
-        texto = 'BORRADOR';
-        break;
-      case EstadoNoticia.publicado:
-        color = Colors.green;
-        texto = 'PUBLICADO';
-        break;
-      case EstadoNoticia.archivado:
-        color = Colors.grey;
-        texto = 'ARCHIVADO';
-        break;
-    }
+    final (Color color, String texto) = switch (estado) {
+      EstadoNoticia.borrador  => (Colors.orange, 'BORRADOR'),
+      EstadoNoticia.publicado => (Colors.green,  'PUBLICADO'),
+      EstadoNoticia.archivado => (Colors.grey,   'ARCHIVADO'),
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(

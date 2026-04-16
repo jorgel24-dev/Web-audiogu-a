@@ -19,7 +19,6 @@ class Noticia {
     this.estado = EstadoNoticia.borrador,
   });
 
-  // Para simular datos de ejemplo
   static List<Noticia> get ejemplos => [
     Noticia(
       id: '1',
