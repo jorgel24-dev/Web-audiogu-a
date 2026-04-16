@@ -146,4 +146,26 @@ class NoticiasProvider extends ChangeNotifier {
 
     return true;
   }
+
+  void cambiarEstado(EstadoNoticia nuevoEstado) {
+    estadoEditor = nuevoEstado;
+    if (_noticiaSeleccionada != null) {
+      _noticiaSeleccionada!.estado = nuevoEstado;
+    }
+    notifyListeners();
+  }
+
+  void eliminarNoticia() {
+    if (_noticiaSeleccionada == null) return;
+    _noticias.removeWhere((n) => n.id == _noticiaSeleccionada!.id);
+    _noticiaSeleccionada = null;
+    _modoCreacion = false;
+    titular = '';
+    subtitulo = '';
+    categoria = '';
+    cuerpo = '';
+    fechaPublicacion = null;
+    estadoEditor = EstadoNoticia.borrador;
+    notifyListeners();
+  }
 }

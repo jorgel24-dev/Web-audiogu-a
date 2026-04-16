@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/noticia_model.dart';
 import '../providers/noticias_provider.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
@@ -497,10 +498,126 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ],
                       ),
                     ),
+                    if (noticiasProvider.noticiaSeleccionada != null) ...
+                      [
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[200]!),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.tune,
+                                size: 16,
+                                color: Color(0xFF2D6A4F),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Estado:',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              _BotonEstado(
+                                label: 'Borrador',
+                                color: Colors.orange,
+                                activo: noticiasProvider.estadoEditor ==
+                                    EstadoNoticia.borrador,
+                                onTap: () => noticiasProvider
+                                    .cambiarEstado(EstadoNoticia.borrador),
+                              ),
+                              const SizedBox(width: 8),
+                              _BotonEstado(
+                                label: 'Publicado',
+                                color: Colors.green,
+                                activo: noticiasProvider.estadoEditor ==
+                                    EstadoNoticia.publicado,
+                                onTap: () => noticiasProvider
+                                    .cambiarEstado(EstadoNoticia.publicado),
+                              ),
+                              const Spacer(),
+                              OutlinedButton.icon(
+                                onPressed: () =>
+                                    _mostrarDialogoEliminar(context, noticiasProvider),
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  size: 16,
+                                ),
+                                label: const Text('Eliminar'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red[700],
+                                  side: BorderSide(color: Colors.red[300]!),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  void _mostrarDialogoEliminar(
+    BuildContext context,
+    NoticiasProvider noticiasProvider,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 22),
+            SizedBox(width: 8),
+            Text('Eliminar noticia', style: TextStyle(fontSize: 17)),
+          ],
+        ),
+        content: Text(
+          '¿Estás seguro de que quieres eliminar "${noticiasProvider.titular}"?\n\nEsta acción no se puede deshacer.',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              noticiasProvider.eliminarNoticia();
+            },
+            icon: const Icon(Icons.delete_outline, size: 16),
+            label: const Text('Eliminar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[700],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -559,3 +676,43 @@ class _EditorVacio extends StatelessWidget {
   }
 }
 
+class _BotonEstado extends StatelessWidget {
+  final String label;
+  final Color color;
+  final bool activo;
+  final VoidCallback onTap;
+
+  const _BotonEstado({
+    required this.label,
+    required this.color,
+    required this.activo,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: activo ? color.withValues(alpha: 0.15) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: activo ? color : Colors.grey[300]!,
+            width: activo ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: activo ? FontWeight.w700 : FontWeight.normal,
+            color: activo ? color : Colors.grey[600],
+          ),
+        ),
+      ),
+    );
+  }
+}
