@@ -37,7 +37,6 @@ class _NoticiasView extends StatelessWidget {
         onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
         icono: Icons.article_outlined,
         titulo: 'Editor de noticias',
-        acciones: [const SizedBox(width: 4), _BotonGuardar()],
       ),
       body: Row(
         children: [
@@ -437,7 +436,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ],
                       ),
                     ),
-                    if (noticiasProvider.noticiaSeleccionada != null) ...[
+                    if (noticiasProvider.editorActivo) ...[
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -445,68 +444,84 @@ class _PanelEditorState extends State<_PanelEditor> {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDarkMode
+                              ? const Color(0xFF1E2A3A)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[200]!),
+                          border: Border.all(
+                            color: isDarkMode
+                                ? Colors.white12
+                                : Colors.grey[200]!,
+                          ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.tune,
-                              size: 16,
-                              color: Color(0xFF2D6A4F),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Estado:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[700],
+                            if (noticiasProvider.noticiaSeleccionada !=
+                                null) ...[
+                              const Icon(
+                                Icons.tune,
+                                size: 16,
+                                color: Color(0xFF2D6A4F),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            _BotonEstado(
-                              label: 'Borrador',
-                              color: Colors.orange,
-                              activo:
-                                  noticiasProvider.estadoEditor ==
+                              const SizedBox(width: 8),
+                              Text(
+                                'Estado:',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDarkMode
+                                      ? Colors.grey[400]
+                                      : Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              _BotonEstado(
+                                label: 'Borrador',
+                                color: Colors.orange,
+                                activo:
+                                    noticiasProvider.estadoEditor ==
+                                    EstadoNoticia.borrador,
+                                onTap: () => noticiasProvider.cambiarEstado(
                                   EstadoNoticia.borrador,
-                              onTap: () => noticiasProvider.cambiarEstado(
-                                EstadoNoticia.borrador,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            _BotonEstado(
-                              label: 'Publicado',
-                              color: Colors.green,
-                              activo:
-                                  noticiasProvider.estadoEditor ==
+                              const SizedBox(width: 8),
+                              _BotonEstado(
+                                label: 'Publicado',
+                                color: Colors.green,
+                                activo:
+                                    noticiasProvider.estadoEditor ==
+                                    EstadoNoticia.publicado,
+                                onTap: () => noticiasProvider.cambiarEstado(
                                   EstadoNoticia.publicado,
-                              onTap: () => noticiasProvider.cambiarEstado(
-                                EstadoNoticia.publicado,
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              OutlinedButton.icon(
+                                onPressed: () => _mostrarDialogoEliminar(
+                                  context,
+                                  noticiasProvider,
+                                ),
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  size: 16,
+                                ),
+                                label: const Text('Eliminar'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red[700],
+                                  side: BorderSide(color: Colors.red[300]!),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
                             const Spacer(),
-                            OutlinedButton.icon(
-                              onPressed: () => _mostrarDialogoEliminar(
-                                context,
-                                noticiasProvider,
-                              ),
-                              icon: const Icon(Icons.delete_outline, size: 16),
-                              label: const Text('Eliminar'),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.red[700],
-                                side: BorderSide(color: Colors.red[300]!),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 10,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
+                            _BotonGuardar(),
                           ],
                         ),
                       ),
