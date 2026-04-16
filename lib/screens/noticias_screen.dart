@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/noticia_model.dart';
 import '../providers/noticias_provider.dart';
 import '../providers/tema_provider.dart';
+import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
 import '../widgets/editor_toolbar.dart';
@@ -29,12 +30,14 @@ class _NoticiasView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: _AppBarNoticias(
-          isDarkMode: isDarkMode,
-          onToggle: () => context.read<TemaProvider>().toggleDarkMode(),
-        ),
+      appBar: AppBarPrincipal(
+        isDarkMode: isDarkMode,
+        onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
+        icono: Icons.article_outlined,
+        acciones: [
+          const SizedBox(width: 4),
+          _BotonGuardar(),
+        ],
       ),
       body: Row(
         children: [
@@ -49,93 +52,6 @@ class _NoticiasView extends StatelessWidget {
   }
 }
 
-class _AppBarNoticias extends StatelessWidget {
-  final bool isDarkMode;
-  final VoidCallback onToggle;
-
-  const _AppBarNoticias({
-    required this.isDarkMode,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
-    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
-    final iconColor = isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
-
-    return Container(
-      height: 60,
-      color: cardColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.article_outlined,
-            size: 20,
-            color: Color(0xFF2D6A4F),
-          ),
-          const SizedBox(width: 8),
-          const Spacer(),
-          IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-              size: 20,
-              color: iconColor,
-            ),
-            onPressed: onToggle,
-            tooltip: 'Cambiar tema',
-          ),
-          const SizedBox(width: 4),
-          ElevatedButton.icon(
-            onPressed: noticiasProvider.cargando
-                ? null
-                : () async {
-                    final guardado = await noticiasProvider.guardarCambios();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            guardado
-                                ? '✓ Noticia guardada correctamente'
-                                : '✗ Revisa los campos obligatorios',
-                          ),
-                          backgroundColor: guardado
-                              ? Colors.green
-                              : Colors.red[700],
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  },
-            icon: noticiasProvider.cargando
-                ? const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Icon(Icons.save, size: 16),
-            label: const Text(
-              'Guardar Cambios',
-              style: TextStyle(fontSize: 13),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2D6A4F),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _PanelLista extends StatelessWidget {
   final bool isDarkMode;
@@ -739,6 +655,54 @@ class _BotonEstado extends StatelessWidget {
             color: activo ? color : Colors.grey[600],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BotonGuardar extends StatelessWidget {
+  const _BotonGuardar();
+
+  @override
+  Widget build(BuildContext context) {
+    final noticiasProvider = Provider.of<NoticiasProvider>(context);
+
+    return ElevatedButton.icon(
+      onPressed: noticiasProvider.cargando
+          ? null
+          : () async {
+              final guardado = await noticiasProvider.guardarCambios();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      guardado
+                          ? '✓ Noticia guardada correctamente'
+                          : '✗ Revisa los campos obligatorios',
+                    ),
+                    backgroundColor:
+                        guardado ? Colors.green : Colors.red[700],
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+      icon: noticiasProvider.cargando
+          ? const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : const Icon(Icons.save, size: 16),
+      label: const Text('Guardar Cambios', style: TextStyle(fontSize: 13)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF2D6A4F),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

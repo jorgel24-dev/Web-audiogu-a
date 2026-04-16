@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:audioguia_web/providers/tema_provider.dart';
+import 'package:audioguia_web/widgets/app_bar_principal.dart';
 import 'package:audioguia_web/widgets/menu_lateral.dart';
 import 'package:audioguia_web/widgets/tarjeta_estadisticas.dart';
 import 'package:audioguia_web/widgets/tarjeta_modulo.dart';
@@ -22,12 +23,11 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: _AppBarDashboard(
-          isDarkMode: isDarkMode,
-          onToggle: () => context.read<TemaProvider>().toggleDarkMode(),
-        ),
+      appBar: AppBarPrincipal(
+        isDarkMode: isDarkMode,
+        onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
+        icono: Icons.dashboard_rounded,
+        titulo: 'Panel de Control',
       ),
       body: Row(
         children: [
@@ -240,53 +240,5 @@ class DashboardScreen extends StatelessWidget {
 
   List<Widget> _buildAvatarStack() {
     return [const Icon(Icons.people_outline, size: 16, color: Colors.grey)];
-  }
-}
-
-class _AppBarDashboard extends StatelessWidget {
-  final bool isDarkMode;
-  final VoidCallback onToggle;
-
-  const _AppBarDashboard({
-    required this.isDarkMode,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
-    final iconColor = isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
-
-    return Container(
-      height: 60,
-      color: cardColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.dashboard_rounded,
-            size: 20,
-            color: Color(0xFF2D6A4F),
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              'Panel de Control',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-              size: 20,
-              color: iconColor,
-            ),
-            onPressed: onToggle,
-            tooltip: 'Cambiar tema',
-          ),
-        ],
-      ),
-    );
   }
 }
