@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:audioguia_web/providers/tema_provider.dart';
 import 'package:audioguia_web/widgets/menu_lateral.dart';
 import 'package:audioguia_web/widgets/tarjeta_estadisticas.dart';
 import 'package:audioguia_web/widgets/tarjeta_modulo.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
-}
-
-class _DashboardScreenState extends State<DashboardScreen> {
-  bool isDarkMode = false;
-
-  @override
   Widget build(BuildContext context) {
+    final temaProvider = context.watch<TemaProvider>();
+    final isDarkMode = temaProvider.isDarkMode;
+
     final bgColor = isDarkMode
         ? const Color(0xFF121212)
         : const Color(0xFFF8F9FA);
-    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final subTextColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
 
     return Scaffold(
-      backgroundColor: cardColor,
+      backgroundColor: bgColor,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: _AppBarDashboard(
+          isDarkMode: isDarkMode,
+          onToggle: () => context.read<TemaProvider>().toggleDarkMode(),
+        ),
+      ),
       body: Row(
         children: [
           MenuLateral(rutaActual: '/', isDarkMode: isDarkMode),
@@ -38,7 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildHeader(textColor, subTextColor),
+                        _buildHeader(textColor, subTextColor, cardColor),
                         const SizedBox(height: 30),
                         Row(
                           children: [
@@ -186,7 +191,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildHeader(Color textColor, Color? subTextColor) {
+  Widget _buildHeader(
+    Color textColor,
+    Color? subTextColor,
+    Color cardColor,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -208,56 +217,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
-        Row(
-          children: [
-            _buildIconButton(Icons.notifications_none_rounded),
-            const SizedBox(width: 10),
-            _buildIconButton(
-              isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_outlined,
-              onTap: () => setState(() => isDarkMode = !isDarkMode),
+        ElevatedButton.icon(
+          onPressed: () {},
+          icon: const Icon(Icons.add, size: 18),
+          label: const Text('Nuevo'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF00796B),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
             ),
-            const SizedBox(width: 20),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Nuevo'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00796B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-          ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildIconButton(IconData icon, {VoidCallback? onTap}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.white10 : Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: IconButton(
-        onPressed: onTap ?? () {},
-        icon: Icon(
-          icon,
-          color: isDarkMode ? Colors.white70 : Colors.grey[700],
-          size: 20,
-        ),
-      ),
-    );
-  }
-
   List<Widget> _buildAvatarStack() {
     return [const Icon(Icons.people_outline, size: 16, color: Colors.grey)];
+  }
+}
+
+class _AppBarDashboard extends StatelessWidget {
+  final bool isDarkMode;
+  final VoidCallback onToggle;
+
+  const _AppBarDashboard({
+    required this.isDarkMode,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+    final iconColor = isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
+
+    return Container(
+      height: 60,
+      color: cardColor,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.dashboard_rounded,
+            size: 20,
+            color: Color(0xFF2D6A4F),
+          ),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              'Panel de Control',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              size: 20,
+              color: iconColor,
+            ),
+            onPressed: onToggle,
+            tooltip: 'Cambiar tema',
+          ),
+        ],
+      ),
+    );
   }
 }

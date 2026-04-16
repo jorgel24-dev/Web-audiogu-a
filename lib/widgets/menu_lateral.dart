@@ -32,7 +32,7 @@ class MenuLateral extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDarkMode ? const Color(0xFF1A2332) : Colors.white;
+    final bgColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
     final titleColor = isDarkMode ? Colors.white : Colors.black87;
     final subColor = isDarkMode ? Colors.grey[500]! : Colors.grey;

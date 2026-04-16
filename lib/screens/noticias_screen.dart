@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/noticia_model.dart';
 import '../providers/noticias_provider.dart';
+import '../providers/tema_provider.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
 import '../widgets/editor_toolbar.dart';
@@ -17,19 +18,13 @@ class NoticiasPage extends StatelessWidget {
   }
 }
 
-class _NoticiasView extends StatefulWidget {
+class _NoticiasView extends StatelessWidget {
   const _NoticiasView({Key? key}) : super(key: key);
 
   @override
-  State<_NoticiasView> createState() => _NoticiasViewState();
-}
-
-class _NoticiasViewState extends State<_NoticiasView> {
-  bool isDarkMode = false;
-
-  @override
   Widget build(BuildContext context) {
-    final bgColor = isDarkMode ? const Color(0xFF0D1520) : const Color(0xFFF8F9FA);
+    final isDarkMode = context.watch<TemaProvider>().isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
@@ -38,7 +33,7 @@ class _NoticiasViewState extends State<_NoticiasView> {
         preferredSize: const Size.fromHeight(60),
         child: _AppBarNoticias(
           isDarkMode: isDarkMode,
-          onToggle: () => setState(() => isDarkMode = !isDarkMode),
+          onToggle: () => context.read<TemaProvider>().toggleDarkMode(),
         ),
       ),
       body: Row(
@@ -67,7 +62,6 @@ class _AppBarNoticias extends StatelessWidget {
   Widget build(BuildContext context) {
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
     final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.black87;
     final iconColor = isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
 
     return Container(
@@ -82,17 +76,7 @@ class _AppBarNoticias extends StatelessWidget {
             color: Color(0xFF2D6A4F),
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Editor de Noticias y Actualidades',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-                color: textColor,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
+          const Spacer(),
           IconButton(
             icon: Icon(
               isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
@@ -325,7 +309,7 @@ class _PanelEditorState extends State<_PanelEditor> {
     }
 
     return Container(
-      color: isDarkMode ? const Color(0xFF0D1520) : const Color(0xFFF8F9FA),
+      color: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       child: !noticiasProvider.editorActivo
           ? const _EditorVacio()
           : Form(
