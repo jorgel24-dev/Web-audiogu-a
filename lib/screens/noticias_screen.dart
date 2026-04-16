@@ -29,7 +29,7 @@ class _NoticiasViewState extends State<_NoticiasView> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
+    final bgColor = isDarkMode ? const Color(0xFF0D1520) : const Color(0xFFF8F9FA);
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
@@ -66,7 +66,7 @@ class _AppBarNoticias extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
-    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final iconColor = isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
 
@@ -161,8 +161,8 @@ class _PanelLista extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
-    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
-    final inputBg = isDarkMode ? const Color(0xFF2A2A2A) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+    final inputBg = isDarkMode ? const Color(0xFF1A2332) : Colors.white;
     final hintColor = isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
     final borderColor = isDarkMode ? Colors.white12 : Colors.grey[300]!;
 
@@ -325,7 +325,7 @@ class _PanelEditorState extends State<_PanelEditor> {
     }
 
     return Container(
-      color: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      color: isDarkMode ? const Color(0xFF0D1520) : const Color(0xFFF8F9FA),
       child: !noticiasProvider.editorActivo
           ? const _EditorVacio()
           : Form(
@@ -337,7 +337,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+                        color: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.grey[200]!),
                       ),
