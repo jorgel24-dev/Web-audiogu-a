@@ -1,6 +1,7 @@
 import 'package:audioguia_web/providers/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:provider/provider.dart';
 import 'package:audioguia_web/routes/go_router.dart';
 import 'package:audioguia_web/providers/noticias_provider.dart';
@@ -34,6 +35,7 @@ class MainApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
       ],
       supportedLocales: const [Locale('es', 'ES'), Locale('en', 'US')],
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,

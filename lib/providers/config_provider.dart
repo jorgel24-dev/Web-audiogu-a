@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 
+class _Defaults {
+  static const rutasTuristicas = true;
+  static const asistenteIA = true;
+  static const mapasInteractivos = true;
+  static const notificacionesPush = false;
+  static const audioGuias = true;
+  static const creditos = true;
+}
+
 class ConfiguracionProvider extends ChangeNotifier {
-  bool rutasTuristicas = true;
-  bool asistenteIA = true;
-  bool mapasInteractivos = true;
-  bool notificacionesPush = false;
-  bool audioGuias = true;
-  bool creditos = true;
+  bool rutasTuristicas = _Defaults.rutasTuristicas;
+  bool asistenteIA = _Defaults.asistenteIA;
+  bool mapasInteractivos = _Defaults.mapasInteractivos;
+  bool notificacionesPush = _Defaults.notificacionesPush;
+  bool audioGuias = _Defaults.audioGuias;
+  bool creditos = _Defaults.creditos;
 
   bool _hayPendientes = false;
   bool _cargando = false;
@@ -39,12 +48,12 @@ class ConfiguracionProvider extends ChangeNotifier {
   }
 
   void descartarCambios() {
-    rutasTuristicas = true;
-    asistenteIA = true;
-    mapasInteractivos = true;
-    notificacionesPush = false;
-    audioGuias = true;
-    creditos = true;
+    rutasTuristicas = _Defaults.rutasTuristicas;
+    asistenteIA = _Defaults.asistenteIA;
+    mapasInteractivos = _Defaults.mapasInteractivos;
+    notificacionesPush = _Defaults.notificacionesPush;
+    audioGuias = _Defaults.audioGuias;
+    creditos = _Defaults.creditos;
     _hayPendientes = false;
     notifyListeners();
   }

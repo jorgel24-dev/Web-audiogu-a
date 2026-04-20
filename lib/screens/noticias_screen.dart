@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +57,7 @@ class _PanelLista extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<NoticiasProvider>(context);
+    final provider = context.watch<NoticiasProvider>();
     final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final inputBg = isDarkMode ? const Color(0xFF1A2332) : Colors.white;
     final hintColor = isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
@@ -179,68 +180,114 @@ class _PanelEditor extends StatefulWidget {
 }
 
 class _PanelEditorState extends State<_PanelEditor> {
+  final _formKey = GlobalKey<FormState>();
   final _titularController = TextEditingController();
   final _subtituloController = TextEditingController();
+  final _fechaController = TextEditingController();
   late QuillController _quillController;
   final _quillFocus = FocusNode();
   final _quillScrollController = ScrollController();
+
+  String? _ultimaNoticiaId;
 
   @override
   void initState() {
     super.initState();
     _quillController = QuillController.basic();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NoticiasProvider>().addListener(_onProviderChange);
+    });
   }
 
   @override
   void dispose() {
+    context.read<NoticiasProvider>().removeListener(_onProviderChange);
     _titularController.dispose();
     _subtituloController.dispose();
+    _fechaController.dispose();
     _quillController.dispose();
     _quillFocus.dispose();
     _quillScrollController.dispose();
     super.dispose();
   }
 
-  String _quillToPlainText() {
-    return _quillController.document.toPlainText().trim();
+  void _onProviderChange() {
+    if (!mounted) return;
+    final provider = context.read<NoticiasProvider>();
+    final noticia = provider.noticiaSeleccionada;
+    final nuevaId = noticia?.id;
+
+    if (nuevaId != _ultimaNoticiaId) {
+      _ultimaNoticiaId = nuevaId;
+      _titularController.text = provider.editor.titular;
+      _subtituloController.text = provider.editor.subtitulo;
+      _fechaController.text = provider.editor.fechaPublicacion != null
+          ? _fmtFecha(provider.editor.fechaPublicacion!)
+          : '';
+      _cargarQuill(provider.editor.cuerpoJson);
+    }
   }
 
-  void _loadCuerpo(String texto) {
-    final doc = Document()..insert(0, texto);
-    _quillController = QuillController(
-      document: doc,
-      selection: const TextSelection.collapsed(offset: 0),
-    );
+  void _cargarQuill(String json) {
+    try {
+      final delta = json.isNotEmpty
+          ? Document.fromJson(jsonDecode(json))
+          : Document();
+      setState(() {
+        _quillController.dispose();
+        _quillController = QuillController(
+          document: delta,
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      });
+    } catch (_) {
+      setState(() {
+        _quillController.dispose();
+        _quillController = QuillController.basic();
+      });
+    }
   }
+
+  String _quillToJson() {
+    return jsonEncode(_quillController.document.toDelta().toJson());
+  }
+
+  String _fmtFecha(DateTime f) =>
+      '${f.month.toString().padLeft(2, '0')}/${f.day.toString().padLeft(2, '0')}/${f.year}';
+
+  InputDecoration _inputDeco({required String hint}) => InputDecoration(
+    hintText: hint,
+    hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey[300]!),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey[300]!),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Color(0xFF2D6A4F)),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.red),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = widget.isDarkMode;
-    final provider = Provider.of<NoticiasProvider>(context);
-    final noticia = provider.noticiaSeleccionada;
-
-    if (noticia != null) {
-      if (_titularController.text != provider.titular) {
-        _titularController.text = provider.titular;
-      }
-      if (_subtituloController.text != provider.subtitulo) {
-        _subtituloController.text = provider.subtitulo;
-      }
-      if (_quillToPlainText() != provider.cuerpo) {
-        _loadCuerpo(provider.cuerpo);
-      }
-    } else if (provider.titular.isEmpty && _titularController.text.isNotEmpty) {
-      _titularController.clear();
-      _subtituloController.clear();
-      _quillController = QuillController.basic();
-    }
+    final provider = context.watch<NoticiasProvider>();
 
     return Container(
       color: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       child: !provider.editorActivo
           ? const _EditorVacio()
           : Form(
-              key: provider.formKey,
+              key: _formKey,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -308,10 +355,13 @@ class _PanelEditorState extends State<_PanelEditor> {
                                           const LabelCampo(label: 'Categoría'),
                                           const SizedBox(height: 6),
                                           DropdownButtonFormField<String>(
-                                            initialValue:
-                                                provider.categoria.isEmpty
+                                            value:
+                                                provider
+                                                    .editor
+                                                    .categoria
+                                                    .isEmpty
                                                 ? null
-                                                : provider.categoria,
+                                                : provider.editor.categoria,
                                             decoration: _inputDeco(
                                               hint: 'Seleccionar...',
                                             ),
@@ -361,16 +411,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                           const SizedBox(height: 6),
                                           TextFormField(
                                             readOnly: true,
-                                            controller: TextEditingController(
-                                              text:
-                                                  provider.fechaPublicacion !=
-                                                      null
-                                                  ? _fmtFecha(
-                                                      provider
-                                                          .fechaPublicacion!,
-                                                    )
-                                                  : '',
-                                            ),
+                                            controller: _fechaController,
                                             decoration:
                                                 _inputDeco(
                                                   hint: 'mm/dd/yyyy',
@@ -386,6 +427,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                     context: context,
                                                     initialDate:
                                                         provider
+                                                            .editor
                                                             .fechaPublicacion ??
                                                         DateTime.now(),
                                                     firstDate: DateTime(2020),
@@ -399,6 +441,8 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                 provider.setFechaPublicacion(
                                                   fecha,
                                                 );
+                                                _fechaController.text =
+                                                    _fmtFecha(fecha);
                                               }
                                             },
                                           ),
@@ -410,16 +454,15 @@ class _PanelEditorState extends State<_PanelEditor> {
                               ],
                             ),
                           ),
-
                           const Divider(height: 1),
-
                           EditorToolbar(controller: _quillController),
-
                           Padding(
                             padding: const EdgeInsets.all(16),
                             child: FormField<String>(
                               validator: (_) {
-                                final text = _quillToPlainText();
+                                final text = _quillController.document
+                                    .toPlainText()
+                                    .trim();
                                 return text.isEmpty
                                     ? 'El cuerpo de la noticia no puede estar vacío'
                                     : null;
@@ -456,98 +499,92 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ],
                       ),
                     ),
-
-                    if (provider.editorActivo) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDarkMode
+                            ? const Color(0xFF1E2A3A)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
                           color: isDarkMode
-                              ? const Color(0xFF1E2A3A)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDarkMode
-                                ? Colors.white12
-                                : Colors.grey[200]!,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            if (provider.noticiaSeleccionada != null) ...[
-                              const Icon(
-                                Icons.tune,
-                                size: 16,
-                                color: Color(0xFF2D6A4F),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Estado:',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDarkMode
-                                      ? Colors.grey[400]
-                                      : Colors.grey[700],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              _BotonEstado(
-                                label: 'Borrador',
-                                color: Colors.orange,
-                                activo:
-                                    provider.estadoEditor ==
-                                    EstadoNoticia.borrador,
-                                onTap: () => provider.cambiarEstado(
-                                  EstadoNoticia.borrador,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              _BotonEstado(
-                                label: 'Publicado',
-                                color: Colors.green,
-                                activo:
-                                    provider.estadoEditor ==
-                                    EstadoNoticia.publicado,
-                                onTap: () => provider.cambiarEstado(
-                                  EstadoNoticia.publicado,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              OutlinedButton.icon(
-                                onPressed: () =>
-                                    _dialEliminar(context, provider),
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  size: 16,
-                                ),
-                                label: const Text('Eliminar'),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red[700],
-                                  side: BorderSide(color: Colors.red[300]!),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ],
-                            const Spacer(),
-                            _BotonGuardar(
-                              onGuardar: () {
-                                provider.setCuerpo(_quillToPlainText());
-                              },
-                            ),
-                          ],
+                              ? Colors.white12
+                              : Colors.grey[200]!,
                         ),
                       ),
-                    ],
+                      child: Row(
+                        children: [
+                          if (provider.noticiaSeleccionada != null) ...[
+                            const Icon(
+                              Icons.tune,
+                              size: 16,
+                              color: Color(0xFF2D6A4F),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Estado:',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: isDarkMode
+                                    ? Colors.grey[400]
+                                    : Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            _BotonEstado(
+                              label: 'Borrador',
+                              color: Colors.orange,
+                              activo:
+                                  provider.editor.estadoNoticia ==
+                                  EstadoNoticia.borrador,
+                              onTap: () => provider.cambiarEstado(
+                                EstadoNoticia.borrador,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _BotonEstado(
+                              label: 'Publicado',
+                              color: Colors.green,
+                              activo:
+                                  provider.editor.estadoNoticia ==
+                                  EstadoNoticia.publicado,
+                              onTap: () => provider.cambiarEstado(
+                                EstadoNoticia.publicado,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            OutlinedButton.icon(
+                              onPressed: () => _dialEliminar(context, provider),
+                              icon: const Icon(Icons.delete_outline, size: 16),
+                              label: const Text('Eliminar'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red[700],
+                                side: BorderSide(color: Colors.red[300]!),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                          const Spacer(),
+                          _BotonGuardar(
+                            onGuardar: () async {
+                              provider.setCuerpoJson(_quillToJson());
+                              return provider.guardarCambios(_formKey);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -568,7 +605,7 @@ class _PanelEditorState extends State<_PanelEditor> {
           ],
         ),
         content: Text(
-          '¿Estás seguro de que quieres eliminar "${provider.titular}"?\n\nEsta acción no se puede deshacer.',
+          '¿Estás seguro de que quieres eliminar "${provider.editor.titular}"?\n\nEsta acción no se puede deshacer.',
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
@@ -595,31 +632,6 @@ class _PanelEditorState extends State<_PanelEditor> {
       ),
     );
   }
-
-  String _fmtFecha(DateTime f) =>
-      '${f.month.toString().padLeft(2, '0')}/${f.day.toString().padLeft(2, '0')}/${f.year}';
-
-  InputDecoration _inputDeco({required String hint}) => InputDecoration(
-    hintText: hint,
-    hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.grey[300]!),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.grey[300]!),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Color(0xFF2D6A4F)),
-    ),
-    errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.red),
-    ),
-  );
 }
 
 class _EditorVacio extends StatelessWidget {
@@ -690,19 +702,18 @@ class _BotonEstado extends StatelessWidget {
 }
 
 class _BotonGuardar extends StatelessWidget {
-  final VoidCallback onGuardar;
+  final Future<bool> Function() onGuardar;
   const _BotonGuardar({required this.onGuardar});
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<NoticiasProvider>(context);
+    final provider = context.watch<NoticiasProvider>();
 
     return ElevatedButton.icon(
       onPressed: provider.cargando
           ? null
           : () async {
-              onGuardar();
-              final ok = await provider.guardarCambios();
+              final ok = await onGuardar();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

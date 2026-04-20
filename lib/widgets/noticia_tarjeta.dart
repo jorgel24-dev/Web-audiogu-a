@@ -74,12 +74,21 @@ class NoticiaTarjeta extends StatelessWidget {
     if (fecha == null) return '';
     final ahora = DateTime.now();
     final diferencia = ahora.difference(fecha);
+    final esHoy =
+        ahora.year == fecha.year &&
+        ahora.month == fecha.month &&
+        ahora.day == fecha.day;
+    final esAyer =
+        ahora.subtract(const Duration(days: 1)).day == fecha.day &&
+        ahora.subtract(const Duration(days: 1)).month == fecha.month &&
+        ahora.subtract(const Duration(days: 1)).year == fecha.year;
 
-    if (diferencia.inMinutes < 60) {
-      return 'Hoy, ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')} AM';
-    } else if (diferencia.inDays == 0) {
-      return 'Hoy';
-    } else if (diferencia.inDays == 1) {
+    if (esHoy) {
+      final hora = fecha.hour.toString().padLeft(2, '0');
+      final minuto = fecha.minute.toString().padLeft(2, '0');
+      final periodo = fecha.hour < 12 ? 'AM' : 'PM';
+      return 'Hoy, $hora:$minuto $periodo';
+    } else if (esAyer) {
       return 'Ayer';
     } else if (diferencia.inDays < 7) {
       return 'Hace ${diferencia.inDays} días';

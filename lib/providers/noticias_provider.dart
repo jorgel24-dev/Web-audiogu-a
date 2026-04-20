@@ -1,35 +1,71 @@
 import 'package:flutter/material.dart';
 import '../models/noticia_model.dart';
 
-class NoticiasProvider extends ChangeNotifier {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+class EditorState {
+  final String titular;
+  final String subtitulo;
+  final String categoria;
+  final String cuerpoJson;
+  final DateTime? fechaPublicacion;
+  final EstadoNoticia estadoNoticia;
 
-  final List<Noticia> _noticias = Noticia.ejemplos;
+  const EditorState({
+    this.titular = '',
+    this.subtitulo = '',
+    this.categoria = '',
+    this.cuerpoJson = '',
+    this.fechaPublicacion,
+    this.estadoNoticia = EstadoNoticia.borrador,
+  });
+
+  EditorState copyWith({
+    String? titular,
+    String? subtitulo,
+    String? categoria,
+    String? cuerpoJson,
+    DateTime? fechaPublicacion,
+    EstadoNoticia? estadoNoticia,
+  }) {
+    return EditorState(
+      titular: titular ?? this.titular,
+      subtitulo: subtitulo ?? this.subtitulo,
+      categoria: categoria ?? this.categoria,
+      cuerpoJson: cuerpoJson ?? this.cuerpoJson,
+      fechaPublicacion: fechaPublicacion ?? this.fechaPublicacion,
+      estadoNoticia: estadoNoticia ?? this.estadoNoticia,
+    );
+  }
+
+  static EditorState fromNoticia(Noticia n) => EditorState(
+    titular: n.titular,
+    subtitulo: n.subtitulo,
+    categoria: n.categoria,
+    cuerpoJson: n.cuerpoJson,
+    fechaPublicacion: n.fechaPublicacion,
+    estadoNoticia: n.estado,
+  );
+
+  static const empty = EditorState();
+}
+
+class NoticiasProvider extends ChangeNotifier {
+  final List<Noticia> _noticias = List.from(Noticia.ejemplos);
 
   Noticia? _noticiaSeleccionada;
-
-  String _filtroActivo = 'todos';
-
-  String _textoBusqueda = '';
-
-  bool _cargando = false;
   bool _modoCreacion = false;
-
-  String titular = '';
-  String subtitulo = '';
-  String categoria = '';
-  String cuerpo = '';
-  DateTime? fechaPublicacion;
-  EstadoNoticia estadoEditor = EstadoNoticia.borrador;
+  bool _cargando = false;
+  String _filtroActivo = 'todos';
+  String _textoBusqueda = '';
+  EditorState _editor = EditorState.empty;
 
   bool get cargando => _cargando;
   String get filtroActivo => _filtroActivo;
   Noticia? get noticiaSeleccionada => _noticiaSeleccionada;
   bool get editorActivo => _noticiaSeleccionada != null || _modoCreacion;
+  EditorState get editor => _editor;
 
   List<Noticia> get noticiasFiltradas {
-    List<Noticia> resultado = List.from(_noticias);
-
+    var resultado = List<Noticia>.from(_noticias);
     if (_textoBusqueda.isNotEmpty) {
       resultado = resultado
           .where(
@@ -38,7 +74,6 @@ class NoticiasProvider extends ChangeNotifier {
           )
           .toList();
     }
-
     if (_filtroActivo == 'publicado') {
       resultado = resultado
           .where((n) => n.estado == EstadoNoticia.publicado)
@@ -48,29 +83,28 @@ class NoticiasProvider extends ChangeNotifier {
           .where((n) => n.estado == EstadoNoticia.borrador)
           .toList();
     }
-
     return resultado;
   }
 
-  void setTitular(String value) {
-    titular = value;
+  void setTitular(String v) {
+    _editor = _editor.copyWith(titular: v);
   }
 
-  void setSubtitulo(String value) {
-    subtitulo = value;
+  void setSubtitulo(String v) {
+    _editor = _editor.copyWith(subtitulo: v);
   }
 
-  void setCategoria(String value) {
-    categoria = value;
+  void setCategoria(String v) {
+    _editor = _editor.copyWith(categoria: v);
     notifyListeners();
   }
 
-  void setCuerpo(String value) {
-    cuerpo = value;
+  void setCuerpoJson(String json) {
+    _editor = _editor.copyWith(cuerpoJson: json);
   }
 
   void setFechaPublicacion(DateTime? fecha) {
-    fechaPublicacion = fecha;
+    _editor = _editor.copyWith(fechaPublicacion: fecha);
     notifyListeners();
   }
 
@@ -87,32 +121,18 @@ class NoticiasProvider extends ChangeNotifier {
   void seleccionarNoticia(Noticia noticia) {
     _noticiaSeleccionada = noticia;
     _modoCreacion = false;
-    titular = noticia.titular;
-    subtitulo = noticia.subtitulo;
-    categoria = noticia.categoria;
-    cuerpo = noticia.cuerpo;
-    fechaPublicacion = noticia.fechaPublicacion;
-    estadoEditor = noticia.estado;
-
+    _editor = EditorState.fromNoticia(noticia);
     notifyListeners();
   }
 
   void nuevaNoticia() {
     _noticiaSeleccionada = null;
     _modoCreacion = true;
-    titular = '';
-    subtitulo = '';
-    categoria = '';
-    cuerpo = '';
-    fechaPublicacion = null;
-    estadoEditor = EstadoNoticia.borrador;
-
-    formKey = GlobalKey<FormState>();
-
+    _editor = EditorState.empty;
     notifyListeners();
   }
 
-  Future<bool> guardarCambios() async {
+  Future<bool> guardarCambios(GlobalKey<FormState> formKey) async {
     final esValido = formKey.currentState?.validate() ?? false;
     if (!esValido) return false;
 
@@ -122,21 +142,27 @@ class NoticiasProvider extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 1));
 
     if (_noticiaSeleccionada != null) {
-      _noticiaSeleccionada!.titular = titular;
-      _noticiaSeleccionada!.subtitulo = subtitulo;
-      _noticiaSeleccionada!.categoria = categoria;
-      _noticiaSeleccionada!.cuerpo = cuerpo;
-      _noticiaSeleccionada!.fechaPublicacion = fechaPublicacion;
-      _noticiaSeleccionada!.estado = estadoEditor;
+      final idx = _noticias.indexWhere((n) => n.id == _noticiaSeleccionada!.id);
+      if (idx != -1) {
+        _noticias[idx] = _noticiaSeleccionada!.copyWith(
+          titular: _editor.titular,
+          subtitulo: _editor.subtitulo,
+          categoria: _editor.categoria,
+          cuerpoJson: _editor.cuerpoJson,
+          fechaPublicacion: _editor.fechaPublicacion,
+          estado: _editor.estadoNoticia,
+        );
+        _noticiaSeleccionada = _noticias[idx];
+      }
     } else {
       final nueva = Noticia(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        titular: titular,
-        subtitulo: subtitulo,
-        categoria: categoria,
-        cuerpo: cuerpo,
-        fechaPublicacion: fechaPublicacion,
-        estado: estadoEditor,
+        titular: _editor.titular,
+        subtitulo: _editor.subtitulo,
+        categoria: _editor.categoria,
+        cuerpoJson: _editor.cuerpoJson,
+        fechaPublicacion: _editor.fechaPublicacion,
+        estado: _editor.estadoNoticia,
       );
       _noticias.insert(0, nueva);
       _noticiaSeleccionada = nueva;
@@ -144,14 +170,17 @@ class NoticiasProvider extends ChangeNotifier {
 
     _cargando = false;
     notifyListeners();
-
     return true;
   }
 
   void cambiarEstado(EstadoNoticia nuevoEstado) {
-    estadoEditor = nuevoEstado;
+    _editor = _editor.copyWith(estadoNoticia: nuevoEstado);
     if (_noticiaSeleccionada != null) {
-      _noticiaSeleccionada!.estado = nuevoEstado;
+      final idx = _noticias.indexWhere((n) => n.id == _noticiaSeleccionada!.id);
+      if (idx != -1) {
+        _noticias[idx] = _noticias[idx].copyWith(estado: nuevoEstado);
+        _noticiaSeleccionada = _noticias[idx];
+      }
     }
     notifyListeners();
   }
@@ -161,12 +190,7 @@ class NoticiasProvider extends ChangeNotifier {
     _noticias.removeWhere((n) => n.id == _noticiaSeleccionada!.id);
     _noticiaSeleccionada = null;
     _modoCreacion = false;
-    titular = '';
-    subtitulo = '';
-    categoria = '';
-    cuerpo = '';
-    fechaPublicacion = null;
-    estadoEditor = EstadoNoticia.borrador;
+    _editor = EditorState.empty;
     notifyListeners();
   }
 }

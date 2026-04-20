@@ -9,12 +9,7 @@ class ConfiguracionPage extends StatelessWidget {
   const ConfiguracionPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ConfiguracionProvider(),
-      child: const _ConfiguracionView(),
-    );
-  }
+  Widget build(BuildContext context) => const _ConfiguracionView();
 }
 
 class _ConfiguracionView extends StatelessWidget {
@@ -67,7 +62,7 @@ class _BotonesAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = Provider.of<ConfiguracionProvider>(context);
+    final config = context.watch<ConfiguracionProvider>();
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -171,7 +166,7 @@ class _CardConfiguracion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = Provider.of<ConfiguracionProvider>(context);
+    final config = context.watch<ConfiguracionProvider>();
     final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final dividerColor = isDarkMode ? Colors.white10 : Colors.grey[200]!;
 
