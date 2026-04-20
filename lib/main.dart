@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:audioguia_web/services/go_router.dart';
+import 'package:audioguia_web/routes/go_router.dart';
 import 'package:audioguia_web/providers/noticias_provider.dart';
 import 'package:audioguia_web/providers/tema_provider.dart';
 
