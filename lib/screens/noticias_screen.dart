@@ -1,7 +1,5 @@
-// lib/screens/noticias_screen.dart
-// Usa RichEditorController para el cuerpo — formato real estilo Word
-
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:provider/provider.dart';
 import '../models/noticia_model.dart';
 import '../providers/noticias_provider.dart';
@@ -9,7 +7,7 @@ import '../providers/tema_provider.dart';
 import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
-import '../widgets/editor_toolbar.dart'; // exporta también RichEditorController
+import '../widgets/editor_toolbar.dart';
 import '../widgets/chip_filtro.dart';
 import '../widgets/label_campo.dart';
 
@@ -51,10 +49,6 @@ class _NoticiasView extends StatelessWidget {
     );
   }
 }
-
-// ════════════════════════════════════════════════════════
-// PANEL LISTA — igual que el original
-// ════════════════════════════════════════════════════════
 
 class _PanelLista extends StatelessWidget {
   final bool isDarkMode;
@@ -176,10 +170,6 @@ class _PanelLista extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// PANEL EDITOR — usa RichEditorController
-// ════════════════════════════════════════════════════════
-
 class _PanelEditor extends StatefulWidget {
   final bool isDarkMode;
   const _PanelEditor({Key? key, required this.isDarkMode}) : super(key: key);
@@ -191,33 +181,36 @@ class _PanelEditor extends StatefulWidget {
 class _PanelEditorState extends State<_PanelEditor> {
   final _titularController = TextEditingController();
   final _subtituloController = TextEditingController();
-
-  // RichEditorController para el cuerpo — soporta formato real
-  final _cuerpoController = RichEditorController();
-  final _cuerpoFocus = FocusNode();
-
-  TextAlign _alineacion = TextAlign.left;
+  late QuillController _quillController;
+  final _quillFocus = FocusNode();
+  final _quillScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Sincronizar botones activos cuando el cursor se mueve
-    _cuerpoController.addListener(_onCursorMove);
-  }
-
-  void _onCursorMove() {
-    // Solo sincronizamos si hay cambio de posición (no de texto)
-    _cuerpoController.syncActiveFmtsFromCursor();
+    _quillController = QuillController.basic();
   }
 
   @override
   void dispose() {
     _titularController.dispose();
     _subtituloController.dispose();
-    _cuerpoController.removeListener(_onCursorMove);
-    _cuerpoController.dispose();
-    _cuerpoFocus.dispose();
+    _quillController.dispose();
+    _quillFocus.dispose();
+    _quillScrollController.dispose();
     super.dispose();
+  }
+
+  String _quillToPlainText() {
+    return _quillController.document.toPlainText().trim();
+  }
+
+  void _loadCuerpo(String texto) {
+    final doc = Document()..insert(0, texto);
+    _quillController = QuillController(
+      document: doc,
+      selection: const TextSelection.collapsed(offset: 0),
+    );
   }
 
   @override
@@ -226,7 +219,6 @@ class _PanelEditorState extends State<_PanelEditor> {
     final provider = Provider.of<NoticiasProvider>(context);
     final noticia = provider.noticiaSeleccionada;
 
-    // Sincronizar campos al seleccionar noticia
     if (noticia != null) {
       if (_titularController.text != provider.titular) {
         _titularController.text = provider.titular;
@@ -234,17 +226,13 @@ class _PanelEditorState extends State<_PanelEditor> {
       if (_subtituloController.text != provider.subtitulo) {
         _subtituloController.text = provider.subtitulo;
       }
-      // Para el cuerpo solo actualizamos el texto sin tocar los spans
-      if (_cuerpoController.text != provider.cuerpo) {
-        _cuerpoController.value = TextEditingValue(
-          text: provider.cuerpo,
-          selection: TextSelection.collapsed(offset: provider.cuerpo.length),
-        );
+      if (_quillToPlainText() != provider.cuerpo) {
+        _loadCuerpo(provider.cuerpo);
       }
     } else if (provider.titular.isEmpty && _titularController.text.isNotEmpty) {
       _titularController.clear();
       _subtituloController.clear();
-      _cuerpoController.clear();
+      _quillController = QuillController.basic();
     }
 
     return Container(
@@ -258,7 +246,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Card principal del editor ──────────────────────
                     Container(
                       decoration: BoxDecoration(
                         color: isDarkMode
@@ -275,7 +262,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                LabelCampo(label: 'Titular de la Noticia'),
+                                const LabelCampo(
+                                  label: 'Titular de la Noticia',
+                                ),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _titularController,
@@ -292,7 +281,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                                       : null,
                                 ),
                                 const SizedBox(height: 16),
-                                LabelCampo(label: 'Subtítulo / Entradilla'),
+                                const LabelCampo(
+                                  label: 'Subtítulo / Entradilla',
+                                ),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _subtituloController,
@@ -314,7 +305,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          LabelCampo(label: 'Categoría'),
+                                          const LabelCampo(label: 'Categoría'),
                                           const SizedBox(height: 6),
                                           DropdownButtonFormField<String>(
                                             initialValue:
@@ -364,7 +355,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          LabelCampo(
+                                          const LabelCampo(
                                             label: 'Fecha de Publicación',
                                           ),
                                           const SizedBox(height: 6),
@@ -422,45 +413,50 @@ class _PanelEditorState extends State<_PanelEditor> {
 
                           const Divider(height: 1),
 
-                          // ── Toolbar con RichEditorController ────────────
-                          EditorToolbar(
-                            controller: _cuerpoController,
-                            alineacionActual: _alineacion,
-                            onAlineacionChanged: (a) =>
-                                setState(() => _alineacion = a),
-                          ),
+                          EditorToolbar(controller: _quillController),
 
-                          // ── Área de escritura con formato real ───────────
                           Padding(
                             padding: const EdgeInsets.all(16),
-                            child: TextFormField(
-                              controller: _cuerpoController,
-                              focusNode: _cuerpoFocus,
-                              onChanged: provider.setCuerpo,
-                              maxLines: null,
-                              keyboardType: TextInputType.multiline,
-                              minLines: 12,
-                              textAlign: _alineacion,
-                              style: const TextStyle(fontSize: 14, height: 1.6),
-                              decoration: const InputDecoration(
-                                hintText: 'Escribe el cuerpo de la noticia...',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
+                            child: FormField<String>(
+                              validator: (_) {
+                                final text = _quillToPlainText();
+                                return text.isEmpty
+                                    ? 'El cuerpo de la noticia no puede estar vacío'
+                                    : null;
+                              },
+                              builder: (field) => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  QuillEditor(
+                                    controller: _quillController,
+                                    focusNode: _quillFocus,
+                                    scrollController: _quillScrollController,
+                                    config: const QuillEditorConfig(
+                                      minHeight: 200,
+                                      placeholder:
+                                          'Escribe el cuerpo de la noticia...',
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                  if (field.hasError)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6),
+                                      child: Text(
+                                        field.errorText!,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
-                              validator: (v) => (v == null || v.isEmpty)
-                                  ? 'El cuerpo de la noticia no puede estar vacío'
-                                  : null,
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    // ── Barra inferior: estado + guardar ─────────────────
                     if (provider.editorActivo) ...[
                       const SizedBox(height: 16),
                       Container(
@@ -543,7 +539,11 @@ class _PanelEditorState extends State<_PanelEditor> {
                               ),
                             ],
                             const Spacer(),
-                            const _BotonGuardar(),
+                            _BotonGuardar(
+                              onGuardar: () {
+                                provider.setCuerpo(_quillToPlainText());
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -622,8 +622,6 @@ class _PanelEditorState extends State<_PanelEditor> {
   );
 }
 
-// ── Widgets auxiliares ───────────────────────────────────────────────────────
-
 class _EditorVacio extends StatelessWidget {
   const _EditorVacio();
 
@@ -692,7 +690,8 @@ class _BotonEstado extends StatelessWidget {
 }
 
 class _BotonGuardar extends StatelessWidget {
-  const _BotonGuardar();
+  final VoidCallback onGuardar;
+  const _BotonGuardar({required this.onGuardar});
 
   @override
   Widget build(BuildContext context) {
@@ -702,6 +701,7 @@ class _BotonGuardar extends StatelessWidget {
       onPressed: provider.cargando
           ? null
           : () async {
+              onGuardar();
               final ok = await provider.guardarCambios();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(

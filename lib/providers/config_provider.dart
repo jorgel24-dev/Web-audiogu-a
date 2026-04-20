@@ -1,5 +1,3 @@
-// lib/providers/configuracion_provider.dart
-
 import 'package:flutter/material.dart';
 
 class ConfiguracionProvider extends ChangeNotifier {
@@ -8,7 +6,7 @@ class ConfiguracionProvider extends ChangeNotifier {
   bool mapasInteractivos = true;
   bool notificacionesPush = false;
   bool audioGuias = true;
-  bool creditos = true; // nueva opción
+  bool creditos = true;
 
   bool _hayPendientes = false;
   bool _cargando = false;

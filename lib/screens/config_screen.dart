@@ -1,5 +1,3 @@
-// lib/screens/configuracion_screen.dart
-
 import 'package:audioguia_web/providers/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,11 +39,8 @@ class _ConfiguracionView extends StatelessWidget {
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── 1ª SECCIÓN: Menú lateral ─────────────────────────────────
           MenuLateral(rutaActual: '/configuracion', isDarkMode: isDarkMode),
           VerticalDivider(width: 1, color: dividerColor),
-
-          // ── 2ª SECCIÓN: Contenido central ────────────────────────────
           Expanded(
             child: SingleChildScrollView(
               child: Container(
@@ -66,10 +61,6 @@ class _ConfiguracionView extends StatelessWidget {
     );
   }
 }
-
-// ════════════════════════════════════════════════════════
-// BOTONES DEL APPBAR
-// ════════════════════════════════════════════════════════
 
 class _BotonesAppBar extends StatelessWidget {
   const _BotonesAppBar();
@@ -144,10 +135,6 @@ class _BotonesAppBar extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// HEADER CONFIG — título + descripción
-// ════════════════════════════════════════════════════════
-
 class _HeaderConfig extends StatelessWidget {
   final bool isDarkMode;
   const _HeaderConfig({required this.isDarkMode});
@@ -178,10 +165,6 @@ class _HeaderConfig extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// CARD CONFIGURACIÓN — solo Funcionalidades Principales
-// ════════════════════════════════════════════════════════
-
 class _CardConfiguracion extends StatelessWidget {
   final bool isDarkMode;
   const _CardConfiguracion({required this.isDarkMode});
@@ -203,7 +186,6 @@ class _CardConfiguracion extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Cabecera de la card
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
             child: Row(
@@ -222,8 +204,6 @@ class _CardConfiguracion extends StatelessWidget {
             ),
           ),
           Divider(height: 1, color: dividerColor),
-
-          // ── ConfigItem: Rutas Turísticas ──────────────────────────────
           ConfigItem(
             isDarkMode: isDarkMode,
             color: const Color(0xFF4CAF50),
@@ -235,8 +215,6 @@ class _CardConfiguracion extends StatelessWidget {
             onChanged: config.toggleRutas,
           ),
           Divider(height: 1, color: dividerColor),
-
-          // ── ConfigItem: Asistente IA ──────────────────────────────────
           ConfigItem(
             isDarkMode: isDarkMode,
             color: Colors.red[400]!,
@@ -249,8 +227,6 @@ class _CardConfiguracion extends StatelessWidget {
             onChanged: config.toggleAsistenteIA,
           ),
           Divider(height: 1, color: dividerColor),
-
-          // ── ConfigItem: Mapas Interactivos ────────────────────────────
           ConfigItem(
             isDarkMode: isDarkMode,
             color: const Color(0xFF2196F3),
@@ -262,8 +238,6 @@ class _CardConfiguracion extends StatelessWidget {
             onChanged: config.toggleMapas,
           ),
           Divider(height: 1, color: dividerColor),
-
-          // ── ConfigItem: Notificaciones Push ───────────────────────────
           ConfigItem(
             isDarkMode: isDarkMode,
             color: Colors.grey[500]!,
@@ -275,8 +249,6 @@ class _CardConfiguracion extends StatelessWidget {
             onChanged: config.toggleNotificaciones,
           ),
           Divider(height: 1, color: dividerColor),
-
-          // ── ConfigItem: Audio Guías ───────────────────────────────────
           ConfigItem(
             isDarkMode: isDarkMode,
             color: const Color(0xFF00BCD4),
@@ -288,8 +260,6 @@ class _CardConfiguracion extends StatelessWidget {
             onChanged: config.toggleAudioGuias,
           ),
           Divider(height: 1, color: dividerColor),
-
-          // ── ConfigItem: Créditos ──────────────────────────────────────
           ConfigItem(
             isDarkMode: isDarkMode,
             color: Colors.purple,
@@ -300,8 +270,6 @@ class _CardConfiguracion extends StatelessWidget {
             value: config.creditos,
             onChanged: config.toggleCreditos,
           ),
-
-          // Pie de la card
           Divider(height: 1, color: dividerColor),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -315,11 +283,6 @@ class _CardConfiguracion extends StatelessWidget {
     );
   }
 }
-
-// ════════════════════════════════════════════════════════
-// ConfigItem — fila con CircleAvatar, Column y Switch
-// Widget extraído a clase pública por si se reutiliza
-// ════════════════════════════════════════════════════════
 
 class ConfigItem extends StatelessWidget {
   final bool isDarkMode;
@@ -353,15 +316,12 @@ class ConfigItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // CircleAvatar con icono
           CircleAvatar(
             radius: 22,
             backgroundColor: color.withValues(alpha: 0.15),
             child: Icon(icono, size: 20, color: color),
           ),
           const SizedBox(width: 16),
-
-          // Título + descripción + advertencia opcional
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,8 +350,6 @@ class ConfigItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-
-          // Switch con value + onChanged
           Switch(
             value: value,
             onChanged: onChanged,
