@@ -16,20 +16,17 @@ class EditorToolbar extends StatelessWidget {
           _ToolbarButton(
             icon: Icons.format_bold,
             tooltip: 'Negrita',
-            onPressed: () {
-            },
+            onPressed: () {},
           ),
           _ToolbarButton(
             icon: Icons.format_italic,
             tooltip: 'Cursiva',
-            onPressed: () {
-            },
+            onPressed: () {},
           ),
           _ToolbarButton(
             icon: Icons.format_underline,
             tooltip: 'Subrayado',
-            onPressed: () {
-            },
+            onPressed: () {},
           ),
           const _Separador(),
           _ToolbarButton(

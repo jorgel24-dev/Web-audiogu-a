@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/noticia_model.dart';
 import '../providers/noticias_provider.dart';
+import '../providers/tema_provider.dart';
+import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
 import '../widgets/editor_toolbar.dart';
+import '../widgets/chip_filtro.dart';
+import '../widgets/label_campo.dart';
 
 class NoticiasPage extends StatelessWidget {
   const NoticiasPage({Key? key}) : super(key: key);
@@ -19,99 +24,27 @@ class _NoticiasView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.watch<TemaProvider>().isDarkMode;
+    final bgColor = isDarkMode
+        ? const Color(0xFF121212)
+        : const Color(0xFFF8F9FA);
+    final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: _AppBarNoticias(),
+      backgroundColor: bgColor,
+      appBar: AppBarPrincipal(
+        isDarkMode: isDarkMode,
+        onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
+        icono: Icons.article_outlined,
+        titulo: 'Editor de noticias',
       ),
       body: Row(
         children: [
-          const MenuLateral(rutaActual: '/noticias'),
-          VerticalDivider(width: 1, color: Colors.grey[200]),
-          const Expanded(flex: 2, child: _PanelLista()),
-          VerticalDivider(width: 1, color: Colors.grey[200]),
-          const Expanded(flex: 4, child: _PanelEditor()),
-        ],
-      ),
-    );
-  }
-}
-
-class _AppBarNoticias extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
-
-    return Container(
-      height: 60,
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.article_outlined,
-            size: 20,
-            color: Color(0xFF2D6A4F),
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              'Editor de Noticias y Actualidades',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.dark_mode_outlined, size: 20),
-            onPressed: () {},
-            tooltip: 'Cambiar tema',
-          ),
-          const SizedBox(width: 4),
-          ElevatedButton.icon(
-            onPressed: noticiasProvider.cargando
-                ? null
-                : () async {
-                    final guardado = await noticiasProvider.guardarCambios();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            guardado
-                                ? '✓ Noticia guardada correctamente'
-                                : '✗ Revisa los campos obligatorios',
-                          ),
-                          backgroundColor: guardado
-                              ? Colors.green
-                              : Colors.red[700],
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  },
-            icon: noticiasProvider.cargando
-                ? const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Icon(Icons.save, size: 16),
-            label: const Text(
-              'Guardar Cambios',
-              style: TextStyle(fontSize: 13),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2D6A4F),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
+          MenuLateral(rutaActual: '/noticias', isDarkMode: isDarkMode),
+          VerticalDivider(width: 1, color: dividerColor),
+          Expanded(flex: 2, child: _PanelLista(isDarkMode: isDarkMode)),
+          VerticalDivider(width: 1, color: dividerColor),
+          Expanded(flex: 4, child: _PanelEditor(isDarkMode: isDarkMode)),
         ],
       ),
     );
@@ -119,14 +52,20 @@ class _AppBarNoticias extends StatelessWidget {
 }
 
 class _PanelLista extends StatelessWidget {
-  const _PanelLista({Key? key}) : super(key: key);
+  final bool isDarkMode;
+
+  const _PanelLista({Key? key, required this.isDarkMode}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+    final inputBg = isDarkMode ? const Color(0xFF1A2332) : Colors.white;
+    final hintColor = isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
+    final borderColor = isDarkMode ? Colors.white12 : Colors.grey[300]!;
 
     return Container(
-      color: Colors.white,
+      color: cardColor,
       child: Column(
         children: [
           Padding(
@@ -134,24 +73,22 @@ class _PanelLista extends StatelessWidget {
             child: TextField(
               onChanged: (value) => noticiasProvider.setBusqueda(value),
               decoration: InputDecoration(
+                filled: true,
+                fillColor: inputBg,
                 hintText: 'Buscar noticias...',
-                hintStyle: TextStyle(fontSize: 13, color: Colors.grey[400]),
-                prefixIcon: Icon(
-                  Icons.search,
-                  size: 18,
-                  color: Colors.grey[400],
-                ),
+                hintStyle: TextStyle(fontSize: 13, color: hintColor),
+                prefixIcon: Icon(Icons.search, size: 18, color: hintColor),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 10,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: borderColor),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: borderColor),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -166,21 +103,21 @@ class _PanelLista extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _ChipFiltro(
+                  ChipFiltro(
                     label: 'Todos',
                     valor: 'todos',
                     filtroActivo: noticiasProvider.filtroActivo,
                     onSelected: () => noticiasProvider.setFiltro('todos'),
                   ),
                   const SizedBox(width: 6),
-                  _ChipFiltro(
+                  ChipFiltro(
                     label: 'Publicados',
                     valor: 'publicado',
                     filtroActivo: noticiasProvider.filtroActivo,
                     onSelected: () => noticiasProvider.setFiltro('publicado'),
                   ),
                   const SizedBox(width: 6),
-                  _ChipFiltro(
+                  ChipFiltro(
                     label: 'Borradores',
                     valor: 'borrador',
                     filtroActivo: noticiasProvider.filtroActivo,
@@ -236,40 +173,10 @@ class _PanelLista extends StatelessWidget {
   }
 }
 
-class _ChipFiltro extends StatelessWidget {
-  final String label;
-  final String valor;
-  final String filtroActivo;
-  final VoidCallback onSelected;
-
-  const _ChipFiltro({
-    required this.label,
-    required this.valor,
-    required this.filtroActivo,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final estaActivo = filtroActivo == valor;
-    return ChoiceChip(
-      label: Text(label, style: const TextStyle(fontSize: 12)),
-      selected: estaActivo,
-      onSelected: (_) => onSelected(),
-      selectedColor: const Color(0xFF2D6A4F),
-      labelStyle: TextStyle(
-        color: estaActivo ? Colors.white : Colors.grey[700],
-        fontWeight: estaActivo ? FontWeight.w600 : FontWeight.normal,
-      ),
-      backgroundColor: Colors.grey[100],
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      visualDensity: VisualDensity.compact,
-    );
-  }
-}
-
 class _PanelEditor extends StatefulWidget {
-  const _PanelEditor({Key? key}) : super(key: key);
+  final bool isDarkMode;
+
+  const _PanelEditor({Key? key, required this.isDarkMode}) : super(key: key);
 
   @override
   State<_PanelEditor> createState() => _PanelEditorState();
@@ -290,6 +197,7 @@ class _PanelEditorState extends State<_PanelEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = widget.isDarkMode;
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
     final noticia = noticiasProvider.noticiaSeleccionada;
     if (noticia != null) {
@@ -310,7 +218,7 @@ class _PanelEditorState extends State<_PanelEditor> {
     }
 
     return Container(
-      color: const Color(0xFFF8F9FA),
+      color: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       child: !noticiasProvider.editorActivo
           ? const _EditorVacio()
           : Form(
@@ -322,7 +230,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDarkMode
+                            ? const Color(0xFF1E2A3A)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.grey[200]!),
                       ),
@@ -334,7 +244,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _LabelCampo(label: 'Titular de la Noticia'),
+                                LabelCampo(label: 'Titular de la Noticia'),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _titularController,
@@ -355,7 +265,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                   },
                                 ),
                                 const SizedBox(height: 16),
-                                _LabelCampo(label: 'Subtítulo / Entradilla'),
+                                LabelCampo(label: 'Subtítulo / Entradilla'),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _subtituloController,
@@ -381,7 +291,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          _LabelCampo(label: 'Categoría'),
+                                          LabelCampo(label: 'Categoría'),
                                           const SizedBox(height: 6),
                                           DropdownButtonFormField<String>(
                                             initialValue:
@@ -438,7 +348,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          _LabelCampo(
+                                          LabelCampo(
                                             label: 'Fecha de Publicación',
                                           ),
                                           const SizedBox(height: 6),
@@ -526,10 +436,144 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ],
                       ),
                     ),
+                    if (noticiasProvider.editorActivo) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDarkMode
+                              ? const Color(0xFF1E2A3A)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDarkMode
+                                ? Colors.white12
+                                : Colors.grey[200]!,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            if (noticiasProvider.noticiaSeleccionada !=
+                                null) ...[
+                              const Icon(
+                                Icons.tune,
+                                size: 16,
+                                color: Color(0xFF2D6A4F),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Estado:',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDarkMode
+                                      ? Colors.grey[400]
+                                      : Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              _BotonEstado(
+                                label: 'Borrador',
+                                color: Colors.orange,
+                                activo:
+                                    noticiasProvider.estadoEditor ==
+                                    EstadoNoticia.borrador,
+                                onTap: () => noticiasProvider.cambiarEstado(
+                                  EstadoNoticia.borrador,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              _BotonEstado(
+                                label: 'Publicado',
+                                color: Colors.green,
+                                activo:
+                                    noticiasProvider.estadoEditor ==
+                                    EstadoNoticia.publicado,
+                                onTap: () => noticiasProvider.cambiarEstado(
+                                  EstadoNoticia.publicado,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              OutlinedButton.icon(
+                                onPressed: () => _mostrarDialogoEliminar(
+                                  context,
+                                  noticiasProvider,
+                                ),
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  size: 16,
+                                ),
+                                label: const Text('Eliminar'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red[700],
+                                  side: BorderSide(color: Colors.red[300]!),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                            const Spacer(),
+                            _BotonGuardar(),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  void _mostrarDialogoEliminar(
+    BuildContext context,
+    NoticiasProvider noticiasProvider,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 22),
+            SizedBox(width: 8),
+            Text('Eliminar noticia', style: TextStyle(fontSize: 17)),
+          ],
+        ),
+        content: Text(
+          '¿Estás seguro de que quieres eliminar "${noticiasProvider.titular}"?\n\nEsta acción no se puede deshacer.',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              noticiasProvider.eliminarNoticia();
+            },
+            icon: const Icon(Icons.delete_outline, size: 16),
+            label: const Text('Eliminar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[700],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -588,19 +632,89 @@ class _EditorVacio extends StatelessWidget {
   }
 }
 
-class _LabelCampo extends StatelessWidget {
+class _BotonEstado extends StatelessWidget {
   final String label;
+  final Color color;
+  final bool activo;
+  final VoidCallback onTap;
 
-  const _LabelCampo({required this.label});
+  const _BotonEstado({
+    required this.label,
+    required this.color,
+    required this.activo,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: Colors.grey[700],
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: activo ? color.withValues(alpha: 0.15) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: activo ? color : Colors.grey[300]!,
+            width: activo ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: activo ? FontWeight.w700 : FontWeight.normal,
+            color: activo ? color : Colors.grey[600],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BotonGuardar extends StatelessWidget {
+  const _BotonGuardar();
+
+  @override
+  Widget build(BuildContext context) {
+    final noticiasProvider = Provider.of<NoticiasProvider>(context);
+
+    return ElevatedButton.icon(
+      onPressed: noticiasProvider.cargando
+          ? null
+          : () async {
+              final guardado = await noticiasProvider.guardarCambios();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      guardado
+                          ? '✓ Noticia guardada correctamente'
+                          : '✗ Revisa los campos obligatorios',
+                    ),
+                    backgroundColor: guardado ? Colors.green : Colors.red[700],
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+      icon: noticiasProvider.cargando
+          ? const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : const Icon(Icons.save, size: 16),
+      label: const Text('Guardar Cambios', style: TextStyle(fontSize: 13)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF2D6A4F),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
