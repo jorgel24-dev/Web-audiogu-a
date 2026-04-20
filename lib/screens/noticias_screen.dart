@@ -1,3 +1,6 @@
+// lib/screens/noticias_screen.dart
+// Usa RichEditorController para el cuerpo — formato real estilo Word
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/noticia_model.dart';
@@ -6,7 +9,7 @@ import '../providers/tema_provider.dart';
 import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/noticia_tarjeta.dart';
-import '../widgets/editor_toolbar.dart';
+import '../widgets/editor_toolbar.dart'; // exporta también RichEditorController
 import '../widgets/chip_filtro.dart';
 import '../widgets/label_campo.dart';
 
@@ -14,9 +17,7 @@ class NoticiasPage extends StatelessWidget {
   const NoticiasPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const _NoticiasView();
-  }
+  Widget build(BuildContext context) => const _NoticiasView();
 }
 
 class _NoticiasView extends StatelessWidget {
@@ -51,14 +52,17 @@ class _NoticiasView extends StatelessWidget {
   }
 }
 
+// ════════════════════════════════════════════════════════
+// PANEL LISTA — igual que el original
+// ════════════════════════════════════════════════════════
+
 class _PanelLista extends StatelessWidget {
   final bool isDarkMode;
-
   const _PanelLista({Key? key, required this.isDarkMode}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final provider = Provider.of<NoticiasProvider>(context);
     final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final inputBg = isDarkMode ? const Color(0xFF1A2332) : Colors.white;
     final hintColor = isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
@@ -71,7 +75,7 @@ class _PanelLista extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
             child: TextField(
-              onChanged: (value) => noticiasProvider.setBusqueda(value),
+              onChanged: provider.setBusqueda,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: inputBg,
@@ -106,22 +110,22 @@ class _PanelLista extends StatelessWidget {
                   ChipFiltro(
                     label: 'Todos',
                     valor: 'todos',
-                    filtroActivo: noticiasProvider.filtroActivo,
-                    onSelected: () => noticiasProvider.setFiltro('todos'),
+                    filtroActivo: provider.filtroActivo,
+                    onSelected: () => provider.setFiltro('todos'),
                   ),
                   const SizedBox(width: 6),
                   ChipFiltro(
                     label: 'Publicados',
                     valor: 'publicado',
-                    filtroActivo: noticiasProvider.filtroActivo,
-                    onSelected: () => noticiasProvider.setFiltro('publicado'),
+                    filtroActivo: provider.filtroActivo,
+                    onSelected: () => provider.setFiltro('publicado'),
                   ),
                   const SizedBox(width: 6),
                   ChipFiltro(
                     label: 'Borradores',
                     valor: 'borrador',
-                    filtroActivo: noticiasProvider.filtroActivo,
-                    onSelected: () => noticiasProvider.setFiltro('borrador'),
+                    filtroActivo: provider.filtroActivo,
+                    onSelected: () => provider.setFiltro('borrador'),
                   ),
                 ],
               ),
@@ -133,7 +137,7 @@ class _PanelLista extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => noticiasProvider.nuevaNoticia(),
+                onPressed: provider.nuevaNoticia,
                 icon: const Icon(Icons.add_circle_outline, size: 16),
                 label: const Text(
                   'Crear nueva noticia',
@@ -154,15 +158,14 @@ class _PanelLista extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: noticiasProvider.noticiasFiltradas.length,
+              itemCount: provider.noticiasFiltradas.length,
               separatorBuilder: (_, __) => const SizedBox(height: 6),
               itemBuilder: (context, index) {
-                final noticia = noticiasProvider.noticiasFiltradas[index];
+                final noticia = provider.noticiasFiltradas[index];
                 return NoticiaTarjeta(
                   noticia: noticia,
-                  seleccionada:
-                      noticiasProvider.noticiaSeleccionada?.id == noticia.id,
-                  onTap: () => noticiasProvider.seleccionarNoticia(noticia),
+                  seleccionada: provider.noticiaSeleccionada?.id == noticia.id,
+                  onTap: () => provider.seleccionarNoticia(noticia),
                 );
               },
             ),
@@ -173,9 +176,12 @@ class _PanelLista extends StatelessWidget {
   }
 }
 
+// ════════════════════════════════════════════════════════
+// PANEL EDITOR — usa RichEditorController
+// ════════════════════════════════════════════════════════
+
 class _PanelEditor extends StatefulWidget {
   final bool isDarkMode;
-
   const _PanelEditor({Key? key, required this.isDarkMode}) : super(key: key);
 
   @override
@@ -185,33 +191,57 @@ class _PanelEditor extends StatefulWidget {
 class _PanelEditorState extends State<_PanelEditor> {
   final _titularController = TextEditingController();
   final _subtituloController = TextEditingController();
-  final _cuerpoController = TextEditingController();
+
+  // RichEditorController para el cuerpo — soporta formato real
+  final _cuerpoController = RichEditorController();
+  final _cuerpoFocus = FocusNode();
+
+  TextAlign _alineacion = TextAlign.left;
+
+  @override
+  void initState() {
+    super.initState();
+    // Sincronizar botones activos cuando el cursor se mueve
+    _cuerpoController.addListener(_onCursorMove);
+  }
+
+  void _onCursorMove() {
+    // Solo sincronizamos si hay cambio de posición (no de texto)
+    _cuerpoController.syncActiveFmtsFromCursor();
+  }
 
   @override
   void dispose() {
     _titularController.dispose();
     _subtituloController.dispose();
+    _cuerpoController.removeListener(_onCursorMove);
     _cuerpoController.dispose();
+    _cuerpoFocus.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = widget.isDarkMode;
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
-    final noticia = noticiasProvider.noticiaSeleccionada;
+    final provider = Provider.of<NoticiasProvider>(context);
+    final noticia = provider.noticiaSeleccionada;
+
+    // Sincronizar campos al seleccionar noticia
     if (noticia != null) {
-      if (_titularController.text != noticiasProvider.titular) {
-        _titularController.text = noticiasProvider.titular;
+      if (_titularController.text != provider.titular) {
+        _titularController.text = provider.titular;
       }
-      if (_subtituloController.text != noticiasProvider.subtitulo) {
-        _subtituloController.text = noticiasProvider.subtitulo;
+      if (_subtituloController.text != provider.subtitulo) {
+        _subtituloController.text = provider.subtitulo;
       }
-      if (_cuerpoController.text != noticiasProvider.cuerpo) {
-        _cuerpoController.text = noticiasProvider.cuerpo;
+      // Para el cuerpo solo actualizamos el texto sin tocar los spans
+      if (_cuerpoController.text != provider.cuerpo) {
+        _cuerpoController.value = TextEditingValue(
+          text: provider.cuerpo,
+          selection: TextSelection.collapsed(offset: provider.cuerpo.length),
+        );
       }
-    } else if (noticiasProvider.titular.isEmpty &&
-        _titularController.text.isNotEmpty) {
+    } else if (provider.titular.isEmpty && _titularController.text.isNotEmpty) {
       _titularController.clear();
       _subtituloController.clear();
       _cuerpoController.clear();
@@ -219,15 +249,16 @@ class _PanelEditorState extends State<_PanelEditor> {
 
     return Container(
       color: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
-      child: !noticiasProvider.editorActivo
+      child: !provider.editorActivo
           ? const _EditorVacio()
           : Form(
-              key: noticiasProvider.formKey,
+              key: provider.formKey,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ── Card principal del editor ──────────────────────
                     Container(
                       decoration: BoxDecoration(
                         color: isDarkMode
@@ -248,40 +279,32 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _titularController,
-                                  onChanged: (value) =>
-                                      noticiasProvider.setTitular(value),
+                                  onChanged: provider.setTitular,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  decoration: _inputDecoration(
+                                  decoration: _inputDeco(
                                     hint: 'Festival de la Aceituna 2024',
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'El titular no puede estar vacío';
-                                    }
-                                    return null;
-                                  },
+                                  validator: (v) => (v == null || v.isEmpty)
+                                      ? 'El titular no puede estar vacío'
+                                      : null,
                                 ),
                                 const SizedBox(height: 16),
                                 LabelCampo(label: 'Subtítulo / Entradilla'),
                                 const SizedBox(height: 6),
                                 TextFormField(
                                   controller: _subtituloController,
-                                  onChanged: (value) =>
-                                      noticiasProvider.setSubtitulo(value),
+                                  onChanged: provider.setSubtitulo,
                                   maxLines: 2,
-                                  decoration: _inputDecoration(
+                                  decoration: _inputDeco(
                                     hint:
                                         'Breve descripción introductoria de la noticia...',
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'El subtítulo no puede estar vacío';
-                                    }
-                                    return null;
-                                  },
+                                  validator: (v) => (v == null || v.isEmpty)
+                                      ? 'El subtítulo no puede estar vacío'
+                                      : null,
                                 ),
                                 const SizedBox(height: 16),
                                 Row(
@@ -295,12 +318,10 @@ class _PanelEditorState extends State<_PanelEditor> {
                                           const SizedBox(height: 6),
                                           DropdownButtonFormField<String>(
                                             initialValue:
-                                                noticiasProvider
-                                                    .categoria
-                                                    .isEmpty
+                                                provider.categoria.isEmpty
                                                 ? null
-                                                : noticiasProvider.categoria,
-                                            decoration: _inputDecoration(
+                                                : provider.categoria,
+                                            decoration: _inputDeco(
                                               hint: 'Seleccionar...',
                                             ),
                                             items: const [
@@ -327,17 +348,12 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                 child: Text('Deportes'),
                                               ),
                                             ],
-                                            onChanged: (value) =>
-                                                noticiasProvider.setCategoria(
-                                                  value ?? '',
-                                                ),
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Selecciona una categoría';
-                                              }
-                                              return null;
-                                            },
+                                            onChanged: (v) =>
+                                                provider.setCategoria(v ?? ''),
+                                            validator: (v) =>
+                                                (v == null || v.isEmpty)
+                                                ? 'Selecciona una categoría'
+                                                : null,
                                           ),
                                         ],
                                       ),
@@ -356,17 +372,16 @@ class _PanelEditorState extends State<_PanelEditor> {
                                             readOnly: true,
                                             controller: TextEditingController(
                                               text:
-                                                  noticiasProvider
-                                                          .fechaPublicacion !=
+                                                  provider.fechaPublicacion !=
                                                       null
-                                                  ? _formatearFecha(
-                                                      noticiasProvider
+                                                  ? _fmtFecha(
+                                                      provider
                                                           .fechaPublicacion!,
                                                     )
                                                   : '',
                                             ),
                                             decoration:
-                                                _inputDecoration(
+                                                _inputDeco(
                                                   hint: 'mm/dd/yyyy',
                                                 ).copyWith(
                                                   suffixIcon: const Icon(
@@ -379,7 +394,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                   await showDatePicker(
                                                     context: context,
                                                     initialDate:
-                                                        noticiasProvider
+                                                        provider
                                                             .fechaPublicacion ??
                                                         DateTime.now(),
                                                     firstDate: DateTime(2020),
@@ -390,8 +405,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                     ),
                                                   );
                                               if (fecha != null) {
-                                                noticiasProvider
-                                                    .setFechaPublicacion(fecha);
+                                                provider.setFechaPublicacion(
+                                                  fecha,
+                                                );
                                               }
                                             },
                                           ),
@@ -405,16 +421,27 @@ class _PanelEditorState extends State<_PanelEditor> {
                           ),
 
                           const Divider(height: 1),
-                          const EditorToolbar(),
+
+                          // ── Toolbar con RichEditorController ────────────
+                          EditorToolbar(
+                            controller: _cuerpoController,
+                            alineacionActual: _alineacion,
+                            onAlineacionChanged: (a) =>
+                                setState(() => _alineacion = a),
+                          ),
+
+                          // ── Área de escritura con formato real ───────────
                           Padding(
                             padding: const EdgeInsets.all(16),
                             child: TextFormField(
                               controller: _cuerpoController,
-                              onChanged: (value) =>
-                                  noticiasProvider.setCuerpo(value),
+                              focusNode: _cuerpoFocus,
+                              onChanged: provider.setCuerpo,
                               maxLines: null,
                               keyboardType: TextInputType.multiline,
                               minLines: 12,
+                              textAlign: _alineacion,
+                              style: const TextStyle(fontSize: 14, height: 1.6),
                               decoration: const InputDecoration(
                                 hintText: 'Escribe el cuerpo de la noticia...',
                                 hintStyle: TextStyle(
@@ -424,19 +451,17 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.zero,
                               ),
-                              style: const TextStyle(fontSize: 14, height: 1.6),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'El cuerpo de la noticia no puede estar vacío';
-                                }
-                                return null;
-                              },
+                              validator: (v) => (v == null || v.isEmpty)
+                                  ? 'El cuerpo de la noticia no puede estar vacío'
+                                  : null,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    if (noticiasProvider.editorActivo) ...[
+
+                    // ── Barra inferior: estado + guardar ─────────────────
+                    if (provider.editorActivo) ...[
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -456,8 +481,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ),
                         child: Row(
                           children: [
-                            if (noticiasProvider.noticiaSeleccionada !=
-                                null) ...[
+                            if (provider.noticiaSeleccionada != null) ...[
                               const Icon(
                                 Icons.tune,
                                 size: 16,
@@ -479,9 +503,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 label: 'Borrador',
                                 color: Colors.orange,
                                 activo:
-                                    noticiasProvider.estadoEditor ==
+                                    provider.estadoEditor ==
                                     EstadoNoticia.borrador,
-                                onTap: () => noticiasProvider.cambiarEstado(
+                                onTap: () => provider.cambiarEstado(
                                   EstadoNoticia.borrador,
                                 ),
                               ),
@@ -490,18 +514,16 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 label: 'Publicado',
                                 color: Colors.green,
                                 activo:
-                                    noticiasProvider.estadoEditor ==
+                                    provider.estadoEditor ==
                                     EstadoNoticia.publicado,
-                                onTap: () => noticiasProvider.cambiarEstado(
+                                onTap: () => provider.cambiarEstado(
                                   EstadoNoticia.publicado,
                                 ),
                               ),
                               const SizedBox(width: 12),
                               OutlinedButton.icon(
-                                onPressed: () => _mostrarDialogoEliminar(
-                                  context,
-                                  noticiasProvider,
-                                ),
+                                onPressed: () =>
+                                    _dialEliminar(context, provider),
                                 icon: const Icon(
                                   Icons.delete_outline,
                                   size: 16,
@@ -521,7 +543,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                               ),
                             ],
                             const Spacer(),
-                            _BotonGuardar(),
+                            const _BotonGuardar(),
                           ],
                         ),
                       ),
@@ -533,10 +555,7 @@ class _PanelEditorState extends State<_PanelEditor> {
     );
   }
 
-  void _mostrarDialogoEliminar(
-    BuildContext context,
-    NoticiasProvider noticiasProvider,
-  ) {
+  void _dialEliminar(BuildContext context, NoticiasProvider provider) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -549,7 +568,7 @@ class _PanelEditorState extends State<_PanelEditor> {
           ],
         ),
         content: Text(
-          '¿Estás seguro de que quieres eliminar "${noticiasProvider.titular}"?\n\nEsta acción no se puede deshacer.',
+          '¿Estás seguro de que quieres eliminar "${provider.titular}"?\n\nEsta acción no se puede deshacer.',
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
@@ -560,7 +579,7 @@ class _PanelEditorState extends State<_PanelEditor> {
           ElevatedButton.icon(
             onPressed: () {
               Navigator.of(ctx).pop();
-              noticiasProvider.eliminarNoticia();
+              provider.eliminarNoticia();
             },
             icon: const Icon(Icons.delete_outline, size: 16),
             label: const Text('Eliminar'),
@@ -577,34 +596,33 @@ class _PanelEditorState extends State<_PanelEditor> {
     );
   }
 
-  String _formatearFecha(DateTime fecha) {
-    return '${fecha.month.toString().padLeft(2, '0')}/${fecha.day.toString().padLeft(2, '0')}/${fecha.year}';
-  }
+  String _fmtFecha(DateTime f) =>
+      '${f.month.toString().padLeft(2, '0')}/${f.day.toString().padLeft(2, '0')}/${f.year}';
 
-  InputDecoration _inputDecoration({required String hint}) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFF2D6A4F)),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.red),
-      ),
-    );
-  }
+  InputDecoration _inputDeco({required String hint}) => InputDecoration(
+    hintText: hint,
+    hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey[300]!),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey[300]!),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Color(0xFF2D6A4F)),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.red),
+    ),
+  );
 }
+
+// ── Widgets auxiliares ───────────────────────────────────────────────────────
 
 class _EditorVacio extends StatelessWidget {
   const _EditorVacio();
@@ -678,28 +696,28 @@ class _BotonGuardar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final provider = Provider.of<NoticiasProvider>(context);
 
     return ElevatedButton.icon(
-      onPressed: noticiasProvider.cargando
+      onPressed: provider.cargando
           ? null
           : () async {
-              final guardado = await noticiasProvider.guardarCambios();
+              final ok = await provider.guardarCambios();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      guardado
+                      ok
                           ? '✓ Noticia guardada correctamente'
                           : '✗ Revisa los campos obligatorios',
                     ),
-                    backgroundColor: guardado ? Colors.green : Colors.red[700],
+                    backgroundColor: ok ? Colors.green : Colors.red[700],
                     duration: const Duration(seconds: 2),
                   ),
                 );
               }
             },
-      icon: noticiasProvider.cargando
+      icon: provider.cargando
           ? const SizedBox(
               width: 14,
               height: 14,

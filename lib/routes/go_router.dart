@@ -1,3 +1,4 @@
+import 'package:audioguia_web/screens/config_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:audioguia_web/screens/noticias_screen.dart';
 
@@ -8,6 +9,11 @@ final appRouter = GoRouter(
       path: '/noticias',
       name: 'noticias',
       builder: (context, state) => const NoticiasPage(),
+    ),
+    GoRoute(
+      path: '/configuracion',
+      name: 'configuracion',
+      builder: (context, state) => const ConfiguracionPage(),
     ),
   ],
 );
