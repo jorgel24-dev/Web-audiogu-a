@@ -4,15 +4,8 @@ import 'package:audioguia_web/router/go_router.dart';
 
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        // ChangeNotifierProvider(create: (_) => NoticiasProvider()),
-        // ChangeNotifierProvider(create: (_) => ConfigProvider()),
-      ],
-      child: const MainApp(),
-    ),
-  );
+  
+  runApp( const MainApp());
 }
 
 class MainApp extends StatelessWidget {
