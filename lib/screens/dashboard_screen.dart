@@ -31,7 +31,7 @@ class DashboardScreen extends StatelessWidget {
       ),
       body: Row(
         children: [
-          MenuLateral(rutaActual: '/', isDarkMode: isDarkMode),
+          MenuLateral(rutaActual: '/dashboard', isDarkMode: isDarkMode),
           Expanded(
             child: Container(
               color: bgColor,

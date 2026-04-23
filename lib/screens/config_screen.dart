@@ -23,8 +23,9 @@ class _ConfiguracionView extends StatelessWidget {
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
-      backgroundColor:
-          isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: isDarkMode
+          ? const Color(0xFF121212)
+          : const Color(0xFFF8F9FA),
       appBar: AppBarPrincipal(
         isDarkMode: isDarkMode,
         onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
@@ -70,7 +71,10 @@ class _BotonesAppBar extends StatelessWidget {
         if (config.hayPendientes)
           TextButton(
             onPressed: config.cargando ? null : config.descartarCambios,
-            child: const Text('Descartar', style: TextStyle(color: Colors.grey)),
+            child: const Text(
+              'Descartar',
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
         const SizedBox(width: 8),
         ElevatedButton.icon(
@@ -79,22 +83,37 @@ class _BotonesAppBar extends StatelessWidget {
               : () async {
                   final ok = await config.guardarConfiguracion();
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(ok ? '✓ Configuración guardada' : '✗ Error al guardar'),
-                      backgroundColor: ok ? Colors.green : Colors.red,
-                      duration: const Duration(seconds: 2),
-                    ));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          ok
+                              ? '✓ Configuración guardada'
+                              : '✗ Error al guardar',
+                        ),
+                        backgroundColor: ok ? Colors.green : Colors.red,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   }
                 },
           icon: config.cargando
-              ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
               : const Icon(Icons.save, size: 16),
           label: const Text('Guardar', style: TextStyle(fontSize: 13)),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF2D6A4F),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         ),
       ],
@@ -111,14 +130,21 @@ class _HeaderConfig extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Configuración de la App',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black87)),
+        Text(
+          'Configuración de la App',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
         const SizedBox(height: 4),
         Text(
           'Gestiona las funcionalidades activas y la experiencia de usuario en la aplicación móvil.',
-          style: TextStyle(fontSize: 13,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+          style: TextStyle(
+            fontSize: 13,
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
         ),
       ],
     );
@@ -139,56 +165,95 @@ class _CardConfiguracion extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDarkMode ? Colors.white10 : Colors.grey[200]!),
+        border: Border.all(
+          color: isDarkMode ? Colors.white10 : Colors.grey[200]!,
+        ),
       ),
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-            child: Row(children: [
-              Icon(Icons.tune, size: 18, color: Colors.grey[600]),
-              const SizedBox(width: 8),
-              Text('Funcionalidades Principales',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
-                      color: isDarkMode ? Colors.white : Colors.black87)),
-            ]),
+            child: Row(
+              children: [
+                Icon(Icons.tune, size: 18, color: Colors.grey[600]),
+                const SizedBox(width: 8),
+                Text(
+                  'Funcionalidades Principales',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
           ),
           Divider(height: 1, color: dividerColor),
-          ConfigItem(isDarkMode: isDarkMode, color: const Color(0xFF4CAF50),
-              icono: Icons.hiking, titulo: 'Rutas Turísticas',
-              descripcion: 'Habilita la sección de rutas recomendadas. Permite a los usuarios visualizar, seguir y descargar itinerarios turísticos predefinidos.',
-              value: config.rutasTuristicas, onChanged: config.toggleRutas),
+          ConfigItem(
+            isDarkMode: isDarkMode,
+            color: const Color(0xFF4CAF50),
+            icono: Icons.hiking,
+            titulo: 'Rutas Turísticas',
+            descripcion:
+                'Habilita la sección de rutas recomendadas. Permite a los usuarios visualizar, seguir y descargar itinerarios turísticos predefinidos.',
+            value: config.rutasTuristicas,
+            onChanged: config.toggleRutas,
+          ),
           Divider(height: 1, color: dividerColor),
-          ConfigItem(isDarkMode: isDarkMode, color: Colors.red[400]!,
-              icono: Icons.smart_toy_outlined, titulo: 'Asistente IA',
-              descripcion: 'Activa el chatbot inteligente basado en IA generativa. Responde preguntas sobre historia local, horarios de monumentos y ofrece recomendaciones personalizadas.',
-              advertencia: '⚠ Consume tokens de API adicionales.',
-              value: config.asistenteIA, onChanged: config.toggleAsistenteIA),
+          ConfigItem(
+            isDarkMode: isDarkMode,
+            color: Colors.red[400]!,
+            icono: Icons.smart_toy_outlined,
+            titulo: 'Asistente IA',
+            descripcion:
+                'Activa el chatbot inteligente basado en IA generativa. Responde preguntas sobre historia local, horarios de monumentos y ofrece recomendaciones personalizadas.',
+            advertencia: '⚠ Consume tokens de API adicionales.',
+            value: config.asistenteIA,
+            onChanged: config.toggleAsistenteIA,
+          ),
           Divider(height: 1, color: dividerColor),
-          ConfigItem(isDarkMode: isDarkMode, color: const Color(0xFF2196F3),
-              icono: Icons.map_outlined, titulo: 'Mapas Interactivos',
-              descripcion: 'Muestra el mapa detallado con puntos de interés (POIs), geolocalización del usuario y filtros por categorías.',
-              value: config.mapasInteractivos, onChanged: config.toggleMapas),
+          ConfigItem(
+            isDarkMode: isDarkMode,
+            color: const Color(0xFF2196F3),
+            icono: Icons.map_outlined,
+            titulo: 'Mapas Interactivos',
+            descripcion:
+                'Muestra el mapa detallado con puntos de interés (POIs), geolocalización del usuario y filtros por categorías.',
+            value: config.mapasInteractivos,
+            onChanged: config.toggleMapas,
+          ),
           Divider(height: 1, color: dividerColor),
-          ConfigItem(isDarkMode: isDarkMode, color: Colors.grey[500]!,
-              icono: Icons.notifications_outlined, titulo: 'Notificaciones Push',
-              descripcion: 'Envío de alertas sobre eventos locales, proximidad a monumentos importantes y actualizaciones de rutas.',
-              value: config.notificacionesPush, onChanged: config.toggleNotificaciones),
+          ConfigItem(
+            isDarkMode: isDarkMode,
+            color: Colors.grey[500]!,
+            icono: Icons.notifications_outlined,
+            titulo: 'Notificaciones Push',
+            descripcion:
+                'Envío de alertas sobre eventos locales, proximidad a monumentos importantes y actualizaciones de rutas.',
+            value: config.notificacionesPush,
+            onChanged: config.toggleNotificaciones,
+          ),
           Divider(height: 1, color: dividerColor),
-          ConfigItem(isDarkMode: isDarkMode, color: const Color(0xFF00BCD4),
-              icono: Icons.headphones_outlined, titulo: 'Audio Guías',
-              descripcion: 'Habilita la reproducción de narraciones de voz para monumentos y puntos de interés. Requiere descarga de paquetes de audio.',
-              value: config.audioGuias, onChanged: config.toggleAudioGuias),
+          ConfigItem(
+            isDarkMode: isDarkMode,
+            color: const Color(0xFF00BCD4),
+            icono: Icons.headphones_outlined,
+            titulo: 'Audio Guías',
+            descripcion:
+                'Habilita la reproducción de narraciones de voz para monumentos y puntos de interés. Requiere descarga de paquetes de audio.',
+            value: config.audioGuias,
+            onChanged: config.toggleAudioGuias,
+          ),
           Divider(height: 1, color: dividerColor),
-          ConfigItem(isDarkMode: isDarkMode, color: Colors.purple,
-              icono: Icons.info_outline, titulo: 'Créditos',
-              descripcion: 'Muestra la sección de créditos en la aplicación móvil con información sobre el equipo de desarrollo, licencias y versión.',
-              value: config.creditos, onChanged: config.toggleCreditos),
-          Divider(height: 1, color: dividerColor),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Text('Última actualización: hace 2 horas por Admin',
-                style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+          ConfigItem(
+            isDarkMode: isDarkMode,
+            color: Colors.purple,
+            icono: Icons.info_outline,
+            titulo: 'Créditos',
+            descripcion:
+                'Muestra la sección de créditos en la aplicación móvil con información sobre el equipo de desarrollo, licencias y versión.',
+            value: config.creditos,
+            onChanged: config.toggleCreditos,
           ),
         ],
       ),
@@ -239,18 +304,35 @@ class ConfigItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(titulo, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: titleColor)),
+                Text(
+                  titulo,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: titleColor,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(descripcion, style: TextStyle(fontSize: 12, color: descColor)),
+                Text(
+                  descripcion,
+                  style: TextStyle(fontSize: 12, color: descColor),
+                ),
                 if (advertencia != null) ...[
                   const SizedBox(height: 4),
-                  Text(advertencia!, style: const TextStyle(fontSize: 11, color: Colors.orange)),
+                  Text(
+                    advertencia!,
+                    style: const TextStyle(fontSize: 11, color: Colors.orange),
+                  ),
                 ],
               ],
             ),
           ),
           const SizedBox(width: 16),
-          Switch(value: value, onChanged: onChanged, activeThumbColor: const Color(0xFF2D6A4F)),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: const Color(0xFF2D6A4F),
+          ),
         ],
       ),
     );
