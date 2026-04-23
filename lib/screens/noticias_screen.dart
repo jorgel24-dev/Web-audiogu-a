@@ -11,7 +11,7 @@ import '../widgets/chip_filtro.dart';
 import '../widgets/label_campo.dart';
 
 class NoticiasPage extends StatelessWidget {
-  const NoticiasPage({Key? key}) : super(key: key);
+  const NoticiasPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class NoticiasPage extends StatelessWidget {
 }
 
 class _NoticiasView extends StatelessWidget {
-  const _NoticiasView({Key? key}) : super(key: key);
+  const _NoticiasView();
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class _NoticiasView extends StatelessWidget {
 class _PanelLista extends StatelessWidget {
   final bool isDarkMode;
 
-  const _PanelLista({Key? key, required this.isDarkMode}) : super(key: key);
+  const _PanelLista({required this.isDarkMode});
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +176,7 @@ class _PanelLista extends StatelessWidget {
 class _PanelEditor extends StatefulWidget {
   final bool isDarkMode;
 
-  const _PanelEditor({Key? key, required this.isDarkMode}) : super(key: key);
+  const _PanelEditor({required this.isDarkMode});
 
   @override
   State<_PanelEditor> createState() => _PanelEditorState();

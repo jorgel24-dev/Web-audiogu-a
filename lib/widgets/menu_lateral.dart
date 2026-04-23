@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'item_menu_lateral.dart';
 
 class _ItemMenu {
   final IconData icon;
@@ -13,22 +14,26 @@ class _ItemMenu {
   });
 }
 
+/// Ítems del menú lateral de navegación principal.
 const _itemsMenu = [
-  _ItemMenu(icon: Icons.grid_view,       label: 'Panel Principal', ruta: '/'),
-  _ItemMenu(icon: Icons.account_balance, label: 'Monumentos',      ruta: '/monumentos'),
+  _ItemMenu(icon: Icons.grid_view,       label: 'Panel Principal', ruta: '/dashboard'),
+  _ItemMenu(icon: Icons.account_balance, label: 'Monumentos',      ruta: '/monumentos/agregar'),
   _ItemMenu(icon: Icons.article,         label: 'Noticias',        ruta: '/noticias'),
+  _ItemMenu(icon: Icons.analytics,       label: 'Rendimiento',     ruta: '/rendimiento'),
   _ItemMenu(icon: Icons.settings,        label: 'Configuración',   ruta: '/configuracion'),
 ];
 
+/// Menú de navegación lateral compartido por todas las pantallas del panel.
+/// Usa [ItemMenuLateral] (widget público extraído) para cada ítem.
 class MenuLateral extends StatelessWidget {
   final String rutaActual;
   final bool isDarkMode;
 
   const MenuLateral({
-    Key? key,
+    super.key,
     required this.rutaActual,
     this.isDarkMode = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +89,7 @@ class MenuLateral extends StatelessWidget {
           Divider(height: 1, color: dividerColor),
           const SizedBox(height: 8),
           ..._itemsMenu.map(
-            (item) => _ItemMenuLateral(
+            (item) => ItemMenuLateral(
               icon: item.icon,
               label: item.label,
               seleccionado: rutaActual == item.ruta,
@@ -133,53 +138,6 @@ class MenuLateral extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ItemMenuLateral extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool seleccionado;
-  final VoidCallback onTap;
-  final bool isDarkMode;
-
-  const _ItemMenuLateral({
-    required this.icon,
-    required this.label,
-    required this.seleccionado,
-    required this.onTap,
-    this.isDarkMode = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    const activeColor = Color(0xFF2D6A4F);
-    final inactiveIconColor = isDarkMode ? Colors.grey[500] : Colors.grey[600];
-    final inactiveTextColor = isDarkMode ? Colors.grey[300] : Colors.grey[800];
-
-    return ListTile(
-      leading: Icon(
-        icon,
-        size: 18,
-        color: seleccionado ? activeColor : inactiveIconColor,
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: seleccionado ? FontWeight.w600 : FontWeight.normal,
-          color: seleccionado ? activeColor : inactiveTextColor,
-        ),
-      ),
-      selected: seleccionado,
-      selectedTileColor: activeColor.withValues(
-        alpha: isDarkMode ? 0.15 : 0.08,
-      ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-      dense: true,
-      onTap: onTap,
     );
   }
 }

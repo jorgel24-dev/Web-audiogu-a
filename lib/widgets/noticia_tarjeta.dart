@@ -7,11 +7,11 @@ class NoticiaTarjeta extends StatelessWidget {
   final VoidCallback onTap;
 
   const NoticiaTarjeta({
-    Key? key,
+    super.key,
     required this.noticia,
     required this.onTap,
     this.seleccionada = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
