@@ -41,7 +41,7 @@ class _AddMonumentPageState extends State<AgregaMonumento> {
             const SizedBox(height: 20),
             
             _buildLabel('Nombre del Monumento'),
-            _buildTextField(hint: 'Ej: Castillo de la Peña'),
+            _buildTextField(textoGuia: 'Ej: Castillo de la Peña'),
             const SizedBox(height: 20),
 
             Row(
@@ -70,7 +70,7 @@ class _AddMonumentPageState extends State<AgregaMonumento> {
             const SizedBox(height: 20),
 
             _buildLabel('Descripción'),
-            _buildTextField(hint: 'Descripción detallada del monumento...', maxLines: 4),
+            _buildTextField(textoGuia: 'Descripción detallada del monumento...', maxLines: 4),
             const Text(
               'Breve historia y detalles arquitectónicos.',
               style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -89,9 +89,9 @@ class _AddMonumentPageState extends State<AgregaMonumento> {
             _buildLabel('Ubicación'),
             Row(
               children: [
-                Expanded(child: _buildTextField(hint: '37.7214', prefix: 'Lat')),
+                Expanded(child: _buildTextField(textoGuia: '37.7214', prefix: 'Lat')),
                 const SizedBox(width: 16),
-                Expanded(child: _buildTextField(hint: '-4.0321', prefix: 'Lon')),
+                Expanded(child: _buildTextField(textoGuia: '-4.0321', prefix: 'Lon')),
               ],
             ),
             const SizedBox(height: 12),
@@ -130,7 +130,7 @@ class _AddMonumentPageState extends State<AgregaMonumento> {
     );
   }
 
-  Widget _buildTextField({required String hint, int maxLines = 1, String? prefix}) {
+  Widget _buildTextField({required String textoGuia, int maxLines = 1, String? prefix}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       child: TextFormField(
@@ -140,7 +140,7 @@ class _AddMonumentPageState extends State<AgregaMonumento> {
             padding: const EdgeInsets.all(12.0),
             child: Text(prefix, style: const TextStyle(color: Colors.grey)),
           ) : null,
-          hintText: hint,
+          hintText: textoGuia,
           hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
           filled: true,
           fillColor: const Color(0xFFF8F9FA),

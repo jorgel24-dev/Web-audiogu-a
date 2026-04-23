@@ -25,14 +25,14 @@ class RendimientoPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildKpiGrid(),
+                        _buildEstadisticas(),
                         const SizedBox(height: 24),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(flex: 2, child: _buildPopularMonuments()),
                             const SizedBox(width: 24),
-                            Expanded(flex: 1, child: _buildUsageChart()),
+                            Expanded(flex: 1, child: _buildDistribucionActividad()),
                           ],
                         ),
                       ],
@@ -132,19 +132,19 @@ class RendimientoPage extends StatelessWidget {
     );
   }
 
-  Widget _buildKpiGrid() {
+  Widget _buildEstadisticas() {
     return Row(
       children: [
-        _kpiCard('Total Usuarios', '12,450', '+12%', Icons.people_outline, Colors.blue),
+        _CardEstadistica('Total Usuarios', '12,450', '+12%', Icons.people_outline, Colors.blue),
         const SizedBox(width: 16),
-        _kpiCard('Rutas Completadas', '3,892', '+8.5%', Icons.directions_walk, Colors.green),
+        _CardEstadistica('Rutas Completadas', '3,892', '+8.5%', Icons.directions_walk, Colors.green),
         const SizedBox(width: 16),
-        _kpiCard('Consultas a la IA', '45,200', '+24%', Icons.smart_toy_outlined, Colors.red),
+        _CardEstadistica('Consultas a la IA', '45,200', '+24%', Icons.smart_toy_outlined, Colors.red),
       ],
     );
   }
 
-  Widget _kpiCard(String title, String value, String trend, IconData icon, Color color) {
+  Widget _CardEstadistica(String title, String value, String trend, IconData icon, Color color) {
     bool isNegative = trend.contains('-');
     return Expanded(
       child: Container(
@@ -238,7 +238,7 @@ class RendimientoPage extends StatelessWidget {
     );
   }
 
-  Widget _buildUsageChart() {
+  Widget _buildDistribucionActividad() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFF1F3F5))),
@@ -268,15 +268,15 @@ class RendimientoPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 40),
-          _chartLegend('Guía Mapa', '45%', const Color(0xFF008F68)),
-          _chartLegend('Asistente IA', '35%', Colors.redAccent),
-          _chartLegend('Audioguías', '20%', Colors.blueAccent),
+          _indicadorActividad('Guía Mapa', '45%', const Color(0xFF008F68)),
+          _indicadorActividad('Asistente IA', '35%', Colors.redAccent),
+          _indicadorActividad('Audioguías', '20%', Colors.blueAccent),
         ],
       ),
     );
   }
 
-  Widget _chartLegend(String label, String value, Color color) {
+  Widget _indicadorActividad(String label, String value, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
