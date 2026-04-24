@@ -5,9 +5,6 @@ import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 import '../widgets/label_campo.dart';
 
-/// Formulario para añadir un nuevo monumento al sistema.
-/// Integrado desde feature/dev_jl. Usa [LabelCampo] del sistema
-/// compartido en lugar del antiguo método privado _buildLabel.
 class AgregaMonumentoPage extends StatelessWidget {
   const AgregaMonumentoPage({super.key});
 
@@ -37,7 +34,7 @@ class AgregaMonumentoPage extends StatelessWidget {
                     child: _FormularioMonumento(isDarkMode: isDarkMode),
                   ),
                 ),
-                _buildFooter(context),
+                _buildFooter(context, isDarkMode), // ← pasar isDarkMode
               ],
             ),
           ),
@@ -46,12 +43,17 @@ class AgregaMonumentoPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
+  Widget _buildFooter(BuildContext context, bool isDarkMode) {
+    final footerBg = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+    final footerBorder = isDarkMode ? Colors.white12 : Colors.grey[200]!;
+    final cancelTextColor = isDarkMode ? Colors.grey[300]! : const Color(0xFF495057);
+    final cancelBorderColor = isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey[200]!)),
+        color: footerBg,
+        border: Border(top: BorderSide(color: footerBorder)),
       ),
       child: Row(
         children: [
@@ -60,10 +62,12 @@ class AgregaMonumentoPage extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                side: const BorderSide(color: Color(0xFFDEE2E6)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                side: BorderSide(color: cancelBorderColor),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              child: const Text('Cancelar', style: TextStyle(color: Color(0xFF495057))),
+              child: Text('Cancelar', style: TextStyle(color: cancelTextColor)),
             ),
           ),
           const SizedBox(width: 16),
@@ -73,10 +77,15 @@ class AgregaMonumentoPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008F68),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 elevation: 0,
               ),
-              child: const Text('Guardar Monumento', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Guardar Monumento',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ],
@@ -89,62 +98,82 @@ class _FormularioMonumento extends StatelessWidget {
   final bool isDarkMode;
   const _FormularioMonumento({required this.isDarkMode});
 
+  // Colores derivados del modo
+  Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
+  Color get _fieldBorder => isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
+  Color get _uploadBoxBg => isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+  Color get _mapBg => isDarkMode ? const Color(0xFF263040) : const Color(0xFFE9ECEF);
+  Color get _mapIconColor => isDarkMode ? Colors.grey[500]! : const Color(0xFF6C757D);
+  Color get _hintColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
+  Color get _subtextColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Imagen principal
         LabelCampo(label: 'Imagen Principal'),
         const SizedBox(height: 8),
-        _buildUploadBox(icon: Icons.image_outlined,
-            label: 'Subir un archivo o arrastrar y soltar',
-            sublabel: 'PNG, JPG, GIF hasta 10MB'),
+        _buildUploadBox(
+          icon: Icons.image_outlined,
+          label: 'Subir un archivo o arrastrar y soltar',
+          sublabel: 'PNG, JPG, GIF hasta 10MB',
+        ),
         const SizedBox(height: 20),
 
-        // Nombre
         LabelCampo(label: 'Nombre del Monumento'),
         const SizedBox(height: 8),
         _buildTextField(textoGuia: 'Ej: Castillo de la Peña'),
         const SizedBox(height: 20),
 
-        // Categoría y estado
         Row(
           children: [
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              LabelCampo(label: 'Categoría'),
-              const SizedBox(height: 8),
-              _buildDropdown(hint: 'Seleccionar...'),
-            ])),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LabelCampo(label: 'Categoría'),
+                  const SizedBox(height: 8),
+                  _buildDropdown(hint: 'Seleccionar...'),
+                ],
+              ),
+            ),
             const SizedBox(width: 16),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              LabelCampo(label: 'Estado'),
-              const SizedBox(height: 8),
-              _buildDropdown(hint: 'Publicado', value: 'Publicado'),
-            ])),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LabelCampo(label: 'Estado'),
+                  const SizedBox(height: 8),
+                  _buildDropdown(hint: 'Publicado', value: 'Publicado'),
+                ],
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 20),
 
-        // Descripción
         LabelCampo(label: 'Descripción'),
         const SizedBox(height: 8),
         _buildTextField(
-            textoGuia: 'Descripción detallada del monumento...', maxLines: 4),
-        const Text('Breve historia y detalles arquitectónicos.',
-            style: TextStyle(color: Colors.grey, fontSize: 12)),
+          textoGuia: 'Descripción detallada del monumento...',
+          maxLines: 4,
+        ),
+        Text(
+          'Breve historia y detalles arquitectónicos.',
+          style: TextStyle(color: _subtextColor, fontSize: 12),
+        ),
         const SizedBox(height: 24),
 
-        // Archivos de audio
         LabelCampo(label: 'Archivos de Audio'),
         const SizedBox(height: 8),
         _buildUploadBox(
-            icon: Icons.mic_none_outlined,
-            label: 'Subir audios o notas de voz',
-            sublabel: 'MP3, WAV hasta 20MB'),
+          icon: Icons.mic_none_outlined,
+          label: 'Subir audios o notas de voz',
+          sublabel: 'MP3, WAV hasta 20MB',
+        ),
         const SizedBox(height: 24),
 
-        // Ubicación
         LabelCampo(label: 'Ubicación'),
         const SizedBox(height: 8),
         Row(
@@ -159,15 +188,18 @@ class _FormularioMonumento extends StatelessWidget {
           height: 150,
           width: double.infinity,
           decoration: BoxDecoration(
-              color: const Color(0xFFE9ECEF),
-              borderRadius: BorderRadius.circular(8)),
-          child: const Column(
+            color: _mapBg,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.map_outlined, color: Color(0xFF6C757D), size: 30),
-              SizedBox(height: 8),
-              Text('Vista previa del mapa',
-                  style: TextStyle(color: Color(0xFF6C757D))),
+              Icon(Icons.map_outlined, color: _mapIconColor, size: 30),
+              const SizedBox(height: 8),
+              Text(
+                'Vista previa del mapa',
+                style: TextStyle(color: _mapIconColor),
+              ),
             ],
           ),
         ),
@@ -175,29 +207,39 @@ class _FormularioMonumento extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({required String textoGuia, int maxLines = 1, String? prefix}) {
+  Widget _buildTextField({
+    required String textoGuia,
+    int maxLines = 1,
+    String? prefix,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       child: TextFormField(
         maxLines: maxLines,
+        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
         decoration: InputDecoration(
           prefixIcon: prefix != null
               ? Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Text(prefix, style: const TextStyle(color: Colors.grey)),
+                  child: Text(
+                    prefix,
+                    style: TextStyle(color: _hintColor),
+                  ),
                 )
               : null,
           hintText: textoGuia,
-          hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+          hintStyle: TextStyle(color: _hintColor, fontSize: 14),
           filled: true,
-          fillColor: const Color(0xFFF8F9FA),
+          fillColor: _fieldFill,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDEE2E6))),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: _fieldBorder),
+          ),
           focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF008F68))),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFF008F68)),
+          ),
         ),
       ),
     );
@@ -205,48 +247,62 @@ class _FormularioMonumento extends StatelessWidget {
 
   Widget _buildDropdown({required String hint, String? value}) {
     return DropdownButtonFormField<String>(
-      items: value != null ? [DropdownMenuItem(value: value, child: Text(value))] : [],
+      dropdownColor: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
+      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
+      items: value != null
+          ? [DropdownMenuItem(value: value, child: Text(value))]
+          : [],
       onChanged: (val) {},
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+        hintStyle: TextStyle(color: _hintColor, fontSize: 14),
         filled: true,
-        fillColor: const Color(0xFFF8F9FA),
+        fillColor: _fieldFill,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFDEE2E6))),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: _fieldBorder),
+        ),
       ),
     );
   }
 
-  Widget _buildUploadBox({required IconData icon, required String label, required String sublabel}) {
+  Widget _buildUploadBox({
+    required IconData icon,
+    required String label,
+    required String sublabel,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 30),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _uploadBoxBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDEE2E6)),
+        border: Border.all(color: _fieldBorder),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.grey, size: 40),
+          Icon(icon, color: _hintColor, size: 40),
           const SizedBox(height: 12),
           RichText(
             text: TextSpan(
               children: [
                 const TextSpan(
-                    text: 'Subir un archivo ',
-                    style: TextStyle(color: Color(0xFF008F68), fontWeight: FontWeight.bold)),
+                  text: 'Subir un archivo ',
+                  style: TextStyle(
+                    color: Color(0xFF008F68),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 TextSpan(
-                    text: label.replaceFirst('Subir un archivo', ''),
-                    style: const TextStyle(color: Colors.grey)),
+                  text: label.replaceFirst('Subir un archivo', ''),
+                  style: TextStyle(color: _hintColor),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 4),
-          Text(sublabel, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+          Text(sublabel, style: TextStyle(color: _subtextColor, fontSize: 12)),
         ],
       ),
     );

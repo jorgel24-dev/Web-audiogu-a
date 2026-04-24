@@ -5,9 +5,6 @@ import '../widgets/menu_lateral.dart';
 import 'package:provider/provider.dart';
 import '../providers/tema_provider.dart';
 
-/// Pantalla de rendimiento y analítica de la aplicación.
-/// Integrada desde feature/dev_jl. Muestra estadísticas, monumentos
-/// populares y gráfico de uso por funcionalidad.
 class RendimientoPage extends StatelessWidget {
   const RendimientoPage({super.key});
 
@@ -45,6 +42,14 @@ class _RendimientoContenido extends StatelessWidget {
   final bool isDarkMode;
   const _RendimientoContenido({required this.isDarkMode});
 
+  Color get _cardBg => isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+  Color get _cardBorder => isDarkMode ? Colors.white12 : const Color(0xFFF1F3F5);
+  Color get _textPrimary => isDarkMode ? Colors.white : Colors.black87;
+  Color get _textSecondary => isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
+  Color get _textMuted => isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
+  Color get _progressBg => isDarkMode ? const Color(0xFF263040) : const Color(0xFFF1F3F5);
+  Color get _thumbnailBg => isDarkMode ? const Color(0xFF263040) : Colors.grey[200]!;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -70,13 +75,22 @@ class _RendimientoContenido extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Rendimiento', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 4),
-            Text('Análisis de actividad de los últimos 30 días.',
-                style: TextStyle(color: Colors.grey, fontSize: 13)),
+            Text(
+              'Rendimiento',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: _textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Análisis de actividad de los últimos 30 días.',
+              style: TextStyle(color: _textSecondary, fontSize: 13),
+            ),
           ],
         ),
         ElevatedButton.icon(
@@ -107,15 +121,21 @@ class _RendimientoContenido extends StatelessWidget {
     );
   }
 
-  Widget _cardEstadistica(String title, String value, String trend, IconData icon, Color color) {
+  Widget _cardEstadistica(
+    String title,
+    String value,
+    String trend,
+    IconData icon,
+    Color color,
+  ) {
     final isNegative = trend.contains('-');
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _cardBg,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFF1F3F5)),
+          border: Border.all(color: _cardBorder),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,29 +143,48 @@ class _RendimientoContenido extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                Text(title, style: TextStyle(color: _textSecondary, fontSize: 13)),
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Icon(icon, color: color, size: 20),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: _textPrimary,
+              ),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(isNegative ? Icons.south_east : Icons.north_east, size: 12,
-                    color: isNegative ? Colors.red : Colors.green),
+                Icon(
+                  isNegative ? Icons.south_east : Icons.north_east,
+                  size: 12,
+                  color: isNegative ? Colors.red : Colors.green,
+                ),
                 const SizedBox(width: 4),
-                Text(trend,
-                    style: TextStyle(
-                        color: isNegative ? Colors.red : Colors.green,
-                        fontWeight: FontWeight.bold, fontSize: 12)),
+                Text(
+                  trend,
+                  style: TextStyle(
+                    color: isNegative ? Colors.red : Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
                 const SizedBox(width: 4),
-                Text('vs mes anterior', style: TextStyle(color: Colors.grey[400], fontSize: 11)),
+                Text(
+                  'vs mes anterior',
+                  style: TextStyle(color: _textMuted, fontSize: 11),
+                ),
               ],
             ),
           ],
@@ -158,9 +197,9 @@ class _RendimientoContenido extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F3F5)),
+        border: Border.all(color: _cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,9 +207,18 @@ class _RendimientoContenido extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Monumentos más Populares',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              Text('Últimos 30 días', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+              Text(
+                'Monumentos más Populares',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: _textPrimary,
+                ),
+              ),
+              Text(
+                'Últimos 30 días',
+                style: TextStyle(color: _textMuted, fontSize: 12),
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -182,8 +230,10 @@ class _RendimientoContenido extends StatelessWidget {
           Center(
             child: TextButton(
               onPressed: () {},
-              child: const Text('Ver todos los monumentos',
-                  style: TextStyle(color: Color(0xFF008F68))),
+              child: const Text(
+                'Ver todos los monumentos',
+                style: TextStyle(color: Color(0xFF008F68)),
+              ),
             ),
           ),
         ],
@@ -191,23 +241,46 @@ class _RendimientoContenido extends StatelessWidget {
     );
   }
 
-  Widget _monumentRow(String rank, String name, String stats, double progress, String percent) {
+  Widget _monumentRow(
+    String rank,
+    String name,
+    String stats,
+    double progress,
+    String percent,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
         children: [
-          Text(rank, style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold)),
+          Text(
+            rank,
+            style: TextStyle(color: _textMuted, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(width: 16),
           Container(
-              width: 40, height: 40,
-              decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8))),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: _thumbnailBg,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text(stats, style: TextStyle(color: Colors.grey[500], fontSize: 11)),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: _textPrimary,
+                  ),
+                ),
+                Text(
+                  stats,
+                  style: TextStyle(color: _textSecondary, fontSize: 11),
+                ),
               ],
             ),
           ),
@@ -215,13 +288,21 @@ class _RendimientoContenido extends StatelessWidget {
           SizedBox(
             width: 100,
             child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: const Color(0xFFF1F3F5),
-                color: const Color(0xFF008F68),
-                minHeight: 6),
+              value: progress,
+              backgroundColor: _progressBg,
+              color: const Color(0xFF008F68),
+              minHeight: 6,
+            ),
           ),
           const SizedBox(width: 12),
-          Text(percent, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          Text(
+            percent,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              color: _textPrimary,
+            ),
+          ),
         ],
       ),
     );
@@ -231,15 +312,21 @@ class _RendimientoContenido extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F3F5)),
+        border: Border.all(color: _cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Uso por Funcionalidad',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(
+            'Uso por Funcionalidad',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: _textPrimary,
+            ),
+          ),
           const SizedBox(height: 40),
           Center(
             child: Stack(
@@ -250,9 +337,19 @@ class _RendimientoContenido extends StatelessWidget {
                   width: 140,
                   child: CustomPaint(painter: _GraficoDonutPainter()),
                 ),
-                const Column(children: [
-                  Text('100%', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                  Text('Actividad', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                Column(children: [
+                  Text(
+                    '100%',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: _textPrimary,
+                    ),
+                  ),
+                  Text(
+                    'Actividad',
+                    style: TextStyle(fontSize: 10, color: _textSecondary),
+                  ),
                 ]),
               ],
             ),
@@ -271,18 +368,28 @@ class _RendimientoContenido extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
           const SizedBox(width: 8),
-          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+          Text(label, style: TextStyle(color: _textSecondary, fontSize: 13)),
           const Spacer(),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              color: _textPrimary,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-/// CustomPainter que dibuja el gráfico de dona de actividad.
 class _GraficoDonutPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

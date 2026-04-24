@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:audioguia_web/providers/tema_provider.dart';
 import 'package:audioguia_web/widgets/app_bar_principal.dart';
@@ -120,7 +121,9 @@ class DashboardScreen extends StatelessWidget {
                               textoEstado: '14 Activos',
                               textoAccion: 'Gestionar',
                               widgetsInferiores: _buildAvatarStack(),
-                              alPulsarAccion: () {},
+                              alPulsarAccion: () {
+                                context.go( '/monumentos/agregar' );
+                              },
                               isDarkMode: isDarkMode,
                             ),
                             TarjetaModulo(
@@ -138,7 +141,9 @@ class DashboardScreen extends StatelessWidget {
                                   color: Colors.grey,
                                 ),
                               ],
-                              alPulsarAccion: () {},
+                              alPulsarAccion: () {
+                                context.go('/noticias');
+                              },
                               isDarkMode: isDarkMode,
                             ),
                             TarjetaModulo(
@@ -174,7 +179,9 @@ class DashboardScreen extends StatelessWidget {
                                   color: Colors.grey,
                                 ),
                               ],
-                              alPulsarAccion: () {},
+                              alPulsarAccion: () {
+                                context.go('/configuracion');
+                              },
                               isDarkMode: isDarkMode,
                             ),
                           ],
