@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\Users\Nitro\Downloads\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\Nitro\Web-audiogu-a\audioguia_web"
+export "FLUTTER_ROOT=C:\Users\Jl\Desktop\2DAM\PROGRAMACION_MOVIL\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\Jl\Desktop\2DAM\PROGRAMACION_MOVIL\TFG\Web-audiogu-a"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
