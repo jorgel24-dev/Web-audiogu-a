@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:provider/provider.dart';
 import '../models/noticia_model.dart';
 import '../providers/noticias_provider.dart';
@@ -38,14 +40,25 @@ class _NoticiasView extends StatelessWidget {
         icono: Icons.article_outlined,
         titulo: 'Editor de noticias',
       ),
-      body: Row(
-        children: [
-          MenuLateral(rutaActual: '/noticias', isDarkMode: isDarkMode),
-          VerticalDivider(width: 1, color: dividerColor),
-          Expanded(flex: 2, child: _PanelLista(isDarkMode: isDarkMode)),
-          VerticalDivider(width: 1, color: dividerColor),
-          Expanded(flex: 4, child: _PanelEditor(isDarkMode: isDarkMode)),
-        ],
+      body: Consumer<NoticiasProvider>(
+        builder: (context, noticiasProvider, _) {
+          return Row(
+            children: [
+              MenuLateral(rutaActual: '/noticias', isDarkMode: isDarkMode),
+              VerticalDivider(width: 1, color: dividerColor),
+              Expanded(flex: 2, child: _PanelLista(isDarkMode: isDarkMode)),
+              VerticalDivider(width: 1, color: dividerColor),
+              Expanded(
+                flex: 4,
+                child: _PanelEditor(
+                  key: ValueKey(noticiasProvider.editorKey),
+                  isDarkMode: isDarkMode,
+                  initialCuerpo: noticiasProvider.cuerpo,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -175,8 +188,13 @@ class _PanelLista extends StatelessWidget {
 
 class _PanelEditor extends StatefulWidget {
   final bool isDarkMode;
+  final String initialCuerpo;
 
-  const _PanelEditor({required this.isDarkMode});
+  const _PanelEditor({
+    super.key,
+    required this.isDarkMode,
+    this.initialCuerpo = '',
+  });
 
   @override
   State<_PanelEditor> createState() => _PanelEditorState();
@@ -185,13 +203,46 @@ class _PanelEditor extends StatefulWidget {
 class _PanelEditorState extends State<_PanelEditor> {
   final _titularController = TextEditingController();
   final _subtituloController = TextEditingController();
-  final _cuerpoController = TextEditingController();
+  late final quill.QuillController _quillController;
+
+  /// Crea un QuillController desde texto plano o JSON delta.
+  quill.QuillController _buildQuillController(String cuerpo) {
+    if (cuerpo.isEmpty) return quill.QuillController.basic();
+    try {
+      final delta = jsonDecode(cuerpo) as List;
+      return quill.QuillController(
+        document: quill.Document.fromJson(delta),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    } catch (_) {
+      // Si no es JSON, lo tratamos como texto plano
+      final doc = quill.Document();
+      doc.insert(0, cuerpo);
+      return quill.QuillController(
+        document: doc,
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _quillController = _buildQuillController(widget.initialCuerpo);
+    // Sincronizar cambios del editor con el provider
+    _quillController.addListener(() {
+      final delta = jsonEncode(
+        _quillController.document.toDelta().toJson(),
+      );
+      context.read<NoticiasProvider>().setCuerpo(delta);
+    });
+  }
 
   @override
   void dispose() {
     _titularController.dispose();
     _subtituloController.dispose();
-    _cuerpoController.dispose();
+    _quillController.dispose();
     super.dispose();
   }
 
@@ -207,14 +258,13 @@ class _PanelEditorState extends State<_PanelEditor> {
       if (_subtituloController.text != noticiasProvider.subtitulo) {
         _subtituloController.text = noticiasProvider.subtitulo;
       }
-      if (_cuerpoController.text != noticiasProvider.cuerpo) {
-        _cuerpoController.text = noticiasProvider.cuerpo;
+      if (_subtituloController.text != noticiasProvider.subtitulo) {
+        _subtituloController.text = noticiasProvider.subtitulo;
       }
     } else if (noticiasProvider.titular.isEmpty &&
         _titularController.text.isNotEmpty) {
       _titularController.clear();
       _subtituloController.clear();
-      _cuerpoController.clear();
     }
 
     return Container(
@@ -405,32 +455,20 @@ class _PanelEditorState extends State<_PanelEditor> {
                           ),
 
                           const Divider(height: 1),
-                          const EditorToolbar(),
+                          EditorToolbar(
+                            controller: _quillController,
+                            isDarkMode: isDarkMode,
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(16),
-                            child: TextFormField(
-                              controller: _cuerpoController,
-                              onChanged: (value) =>
-                                  noticiasProvider.setCuerpo(value),
-                              maxLines: null,
-                              keyboardType: TextInputType.multiline,
-                              minLines: 12,
-                              decoration: const InputDecoration(
-                                hintText: 'Escribe el cuerpo de la noticia...',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
+                            child: Container(
+                              height: 300,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.transparent),
                               ),
-                              style: const TextStyle(fontSize: 14, height: 1.6),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'El cuerpo de la noticia no puede estar vacío';
-                                }
-                                return null;
-                              },
+                              child: quill.QuillEditor.basic(
+                                controller: _quillController,
+                              ),
                             ),
                           ),
                         ],

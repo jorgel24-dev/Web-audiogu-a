@@ -8,6 +8,11 @@ class NoticiasProvider extends ChangeNotifier {
 
   Noticia? _noticiaSeleccionada;
 
+  /// Clave que cambia cada vez que se abre un editor distinto.
+  /// Permite reconstruir el estado del widget editor desde cero.
+  int _editorKey = 0;
+  int get editorKey => _editorKey;
+
   String _filtroActivo = 'todos';
 
   String _textoBusqueda = '';
@@ -93,7 +98,7 @@ class NoticiasProvider extends ChangeNotifier {
     cuerpo = noticia.cuerpo;
     fechaPublicacion = noticia.fechaPublicacion;
     estadoEditor = noticia.estado;
-
+    _editorKey++;
     notifyListeners();
   }
 
@@ -106,9 +111,8 @@ class NoticiasProvider extends ChangeNotifier {
     cuerpo = '';
     fechaPublicacion = null;
     estadoEditor = EstadoNoticia.borrador;
-
+    _editorKey++;
     formKey = GlobalKey<FormState>();
-
     notifyListeners();
   }
   Future<bool> guardarCambios() async {
@@ -166,6 +170,7 @@ class NoticiasProvider extends ChangeNotifier {
     cuerpo = '';
     fechaPublicacion = null;
     estadoEditor = EstadoNoticia.borrador;
+    _editorKey++;
     notifyListeners();
   }
 }
