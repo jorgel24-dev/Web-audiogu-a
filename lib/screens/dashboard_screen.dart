@@ -46,7 +46,7 @@ class DashboardScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildHeader(textColor, subTextColor, cardColor),
+                        _buildHeader(context, textColor, subTextColor, cardColor),
                         const SizedBox(height: 30),
                         Row(
                           children: [
@@ -201,6 +201,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(
+    BuildContext context,
     Color textColor,
     Color? subTextColor,
     Color cardColor,
@@ -227,7 +228,9 @@ class DashboardScreen extends StatelessWidget {
           ],
         ),
         ElevatedButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            context.go('/monumentos/agregar');
+          },
           icon: const Icon(Icons.add, size: 18),
           label: const Text('Nuevo'),
           style: ElevatedButton.styleFrom(

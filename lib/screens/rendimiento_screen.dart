@@ -93,18 +93,6 @@ class _RendimientoContenido extends StatelessWidget {
             ),
           ],
         ),
-        ElevatedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.download_outlined, size: 18),
-          label: const Text('Exportar'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF00796B),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        ),
       ],
     );
   }
