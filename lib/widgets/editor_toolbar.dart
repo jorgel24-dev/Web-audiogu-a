@@ -1,105 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
+/// Barra de herramientas del editor de noticias.
+/// Opera directamente sobre el [QuillController] del editor.
 class EditorToolbar extends StatelessWidget {
-  const EditorToolbar({Key? key}) : super(key: key);
+  final quill.QuillController controller;
+  final bool isDarkMode;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
-      ),
-      child: Row(
-        children: [
-          _ToolbarButton(
-            icon: Icons.format_bold,
-            tooltip: 'Negrita',
-            onPressed: () {
-            },
-          ),
-          _ToolbarButton(
-            icon: Icons.format_italic,
-            tooltip: 'Cursiva',
-            onPressed: () {
-            },
-          ),
-          _ToolbarButton(
-            icon: Icons.format_underline,
-            tooltip: 'Subrayado',
-            onPressed: () {
-            },
-          ),
-          const _Separador(),
-          _ToolbarButton(
-            icon: Icons.format_align_left,
-            tooltip: 'Alinear izquierda',
-            onPressed: () {},
-          ),
-          _ToolbarButton(
-            icon: Icons.format_align_center,
-            tooltip: 'Centrar',
-            onPressed: () {},
-          ),
-          _ToolbarButton(
-            icon: Icons.format_align_right,
-            tooltip: 'Alinear derecha',
-            onPressed: () {},
-          ),
-          const _Separador(),
-          _ToolbarButton(
-            icon: Icons.format_list_bulleted,
-            tooltip: 'Lista',
-            onPressed: () {},
-          ),
-          _ToolbarButton(
-            icon: Icons.format_list_numbered,
-            tooltip: 'Lista numerada',
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ToolbarButton extends StatelessWidget {
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onPressed;
-
-  const _ToolbarButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
+  const EditorToolbar({
+    super.key,
+    required this.controller,
+    this.isDarkMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: IconButton(
-        icon: Icon(icon, size: 18),
-        onPressed: onPressed,
-        visualDensity: VisualDensity.compact,
-        color: Colors.grey[700],
-        splashRadius: 16,
-      ),
-    );
-  }
-}
+    final bg = isDarkMode ? const Color(0xFF1A2332) : Colors.grey[50]!;
+    final border = isDarkMode ? Colors.white12 : const Color(0xFFE0E0E0);
 
-class _Separador extends StatelessWidget {
-  const _Separador();
-
-  @override
-  Widget build(BuildContext context) {
     return Container(
-      height: 20,
-      width: 1,
-      color: Colors.grey[300],
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        border: Border(bottom: BorderSide(color: border)),
+      ),
+      child: quill.QuillSimpleToolbar(
+        controller: controller,
+        config: quill.QuillSimpleToolbarConfig(
+          // Solo mostramos los botones que necesitamos
+          showBoldButton: true,
+          showItalicButton: true,
+          showUnderLineButton: true,
+          showStrikeThrough: false,
+          showListBullets: true,
+          showListNumbers: true,
+          showAlignmentButtons: true,
+          showHeaderStyle: true,
+          showColorButton: false,
+          showBackgroundColorButton: false,
+          showClearFormat: true,
+          showDividers: true,
+          showFontFamily: false,
+          showFontSize: false,
+          showCodeBlock: false,
+          showInlineCode: false,
+          showLink: false,
+          showSearchButton: false,
+          showSubscript: false,
+          showSuperscript: false,
+          showClipboardCopy: false,
+          showClipboardCut: false,
+          showClipboardPaste: false,
+          showUndo: true,
+          showRedo: true,
+          buttonOptions: quill.QuillSimpleToolbarButtonOptions(
+            base: quill.QuillToolbarBaseButtonOptions(
+              iconTheme: quill.QuillIconTheme(
+                iconButtonSelectedData: quill.IconButtonData(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      const Color(0xFF2D6A4F).withValues(alpha: 0.15),
+                    ),
+                  ),
+                ),
+                iconButtonUnselectedData: quill.IconButtonData(
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStatePropertyAll(
+                      isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

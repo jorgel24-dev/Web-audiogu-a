@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:audioguia_web/providers/tema_provider.dart';
-import 'package:audioguia_web/widgets/app_bar_principal.dart';
-import 'package:audioguia_web/widgets/menu_lateral.dart';
-import 'package:audioguia_web/widgets/tarjeta_estadisticas.dart';
-import 'package:audioguia_web/widgets/tarjeta_modulo.dart';
+import '../providers/tema_provider.dart';
+import '../widgets/app_bar_principal.dart';
+import '../widgets/menu_lateral.dart';
+import '../widgets/tarjeta_estadisticas.dart';
+import '../widgets/tarjeta_modulo.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -30,8 +31,10 @@ class DashboardScreen extends StatelessWidget {
         titulo: 'Panel de Control',
       ),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MenuLateral(rutaActual: '/', isDarkMode: isDarkMode),
+          MenuLateral(rutaActual: '/dashboard', isDarkMode: isDarkMode),
+          VerticalDivider(width: 1, color: isDarkMode ? Colors.white12 : Colors.grey[200]!),
           Expanded(
             child: Container(
               color: bgColor,
@@ -120,7 +123,9 @@ class DashboardScreen extends StatelessWidget {
                               textoEstado: '14 Activos',
                               textoAccion: 'Gestionar',
                               widgetsInferiores: _buildAvatarStack(),
-                              alPulsarAccion: () {},
+                              alPulsarAccion: () {
+                                context.go( '/monumentos/agregar' );
+                              },
                               isDarkMode: isDarkMode,
                             ),
                             TarjetaModulo(
@@ -138,7 +143,9 @@ class DashboardScreen extends StatelessWidget {
                                   color: Colors.grey,
                                 ),
                               ],
-                              alPulsarAccion: () {},
+                              alPulsarAccion: () {
+                                context.go('/noticias');
+                              },
                               isDarkMode: isDarkMode,
                             ),
                             TarjetaModulo(
@@ -174,7 +181,9 @@ class DashboardScreen extends StatelessWidget {
                                   color: Colors.grey,
                                 ),
                               ],
-                              alPulsarAccion: () {},
+                              alPulsarAccion: () {
+                                context.go('/configuracion');
+                              },
                               isDarkMode: isDarkMode,
                             ),
                           ],

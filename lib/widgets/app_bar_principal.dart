@@ -8,13 +8,13 @@ class AppBarPrincipal extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget> acciones;
 
   const AppBarPrincipal({
-    Key? key,
+    super.key,
     required this.isDarkMode,
     required this.onToggleDarkMode,
     required this.icono,
     this.titulo,
     this.acciones = const [],
-  }) : super(key: key);
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(60);

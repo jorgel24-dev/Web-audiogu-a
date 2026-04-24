@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:audioguia_web/services/go_router.dart';
+import 'package:audioguia_web/config/routes/app_router.dart';
 import 'package:audioguia_web/providers/noticias_provider.dart';
 import 'package:audioguia_web/providers/tema_provider.dart';
+import 'package:audioguia_web/providers/config_provider.dart';
 
 void main() {
   runApp(
@@ -11,6 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => NoticiasProvider()),
         ChangeNotifierProvider(create: (_) => TemaProvider()),
+        ChangeNotifierProvider(create: (_) => ConfiguracionProvider()),
       ],
       child: const MainApp(),
     ),
