@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/tema_provider.dart';
 import '../widgets/app_bar_principal.dart';
@@ -59,7 +60,7 @@ class AgregaMonumentoPage extends StatelessWidget {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.go('/dashboard'),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: BorderSide(color: cancelBorderColor),

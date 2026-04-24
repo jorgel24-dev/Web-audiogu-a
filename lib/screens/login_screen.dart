@@ -4,13 +4,26 @@ import '../widgets/boton_primario.dart';
 import '../widgets/input_campo.dart';
 
 /// Pantalla de inicio de sesión del panel de administración.
-/// Integrada desde feature/login, usa widgets compartidos [BotonPrimario]
-/// e [InputCampo] y navega al dashboard tras autenticación.
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+/// Usa widgets compartidos [BotonPrimario] e [InputCampo]
+/// y navega al dashboard tras autenticación.
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Liberamos los controllers para evitar fugas de memoria
+    _emailController.dispose();
+    _passController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

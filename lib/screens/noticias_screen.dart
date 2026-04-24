@@ -582,17 +582,22 @@ class _PanelEditorState extends State<_PanelEditor> {
   }
 
   InputDecoration _inputDecoration({required String hint}) {
+    final borderColor = widget.isDarkMode ? Colors.white24 : Colors.grey[300]!;
+    final hintColor = widget.isDarkMode ? Colors.grey[500]! : Colors.grey;
+    final fillColor = widget.isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+      hintStyle: TextStyle(color: hintColor, fontSize: 13),
+      filled: true,
+      fillColor: fillColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey[300]!),
+        borderSide: BorderSide(color: borderColor),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey[300]!),
+        borderSide: BorderSide(color: borderColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),

@@ -15,7 +15,7 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/login',
       name: 'login',
-      builder: (context, state) => LoginScreen(),
+      builder: (context, state) => const LoginScreen(),
     ),
 
     // Panel principal
