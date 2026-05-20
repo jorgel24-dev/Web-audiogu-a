@@ -252,7 +252,14 @@ class _FormularioMonumento extends StatelessWidget {
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
       items: value != null
           ? [DropdownMenuItem(value: value, child: Text(value))]
-          : [],
+          : [
+              'Castillo',
+              'Iglesia',
+              'Plaza',
+              'Monumento',
+              'Museo',
+              'Parque',
+            ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
       onChanged: (val) {},
       decoration: InputDecoration(
         hintText: hint,
