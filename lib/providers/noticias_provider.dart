@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import '../models/noticia_model.dart';
+import '../services/noticias_service.dart';
 
+/// Provider que gestiona el estado de la pantalla de noticias.
+/// Se conecta al backend a través de [NoticiasService].
 class NoticiasProvider extends ChangeNotifier {
+  final NoticiasService _noticiasService = NoticiasService();
+
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final List<Noticia> _noticias = Noticia.ejemplos;
+  final List<Noticia> _noticias = [];
 
   Noticia? _noticiaSeleccionada;
 
@@ -14,11 +19,13 @@ class NoticiasProvider extends ChangeNotifier {
   int get editorKey => _editorKey;
 
   String _filtroActivo = 'todos';
-
   String _textoBusqueda = '';
 
   bool _cargando = false;
   bool _modoCreacion = false;
+  bool _cargandoLista = false;
+
+  String? _error;
 
   String titular = '';
   String subtitulo = '';
@@ -28,6 +35,8 @@ class NoticiasProvider extends ChangeNotifier {
   EstadoNoticia estadoEditor = EstadoNoticia.borrador;
 
   bool get cargando => _cargando;
+  bool get cargandoLista => _cargandoLista;
+  String? get error => _error;
   String get filtroActivo => _filtroActivo;
   Noticia? get noticiaSeleccionada => _noticiaSeleccionada;
   bool get editorActivo => _noticiaSeleccionada != null || _modoCreacion;
@@ -45,17 +54,38 @@ class NoticiasProvider extends ChangeNotifier {
     }
 
     if (_filtroActivo == 'publicado') {
-      resultado = resultado
-          .where((n) => n.estado == EstadoNoticia.publicado)
-          .toList();
+      resultado =
+          resultado.where((n) => n.estado == EstadoNoticia.publicado).toList();
     } else if (_filtroActivo == 'borrador') {
-      resultado = resultado
-          .where((n) => n.estado == EstadoNoticia.borrador)
-          .toList();
+      resultado =
+          resultado.where((n) => n.estado == EstadoNoticia.borrador).toList();
     }
 
     return resultado;
   }
+
+  // ─── Carga inicial del backend ─────────────────────────────────────────────
+
+  Future<void> cargarNoticias() async {
+    _cargandoLista = true;
+    _error = null;
+    notifyListeners();
+
+    final lista = await _noticiasService.obtenerTodas();
+
+    if (lista != null) {
+      _noticias
+        ..clear()
+        ..addAll(lista);
+    } else {
+      _error = 'No se pudieron cargar las noticias del servidor.';
+    }
+
+    _cargandoLista = false;
+    notifyListeners();
+  }
+
+  // ─── Setters de campos del editor ─────────────────────────────────────────
 
   void setTitular(String value) {
     titular = value;
@@ -89,6 +119,8 @@ class NoticiasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ─── Selección y creación ──────────────────────────────────────────────────
+
   void seleccionarNoticia(Noticia noticia) {
     _noticiaSeleccionada = noticia;
     _modoCreacion = false;
@@ -115,41 +147,58 @@ class NoticiasProvider extends ChangeNotifier {
     formKey = GlobalKey<FormState>();
     notifyListeners();
   }
+
+  // ─── Guardar (crear o actualizar) ──────────────────────────────────────────
+
   Future<bool> guardarCambios() async {
     final esValido = formKey.currentState?.validate() ?? false;
     if (!esValido) return false;
 
     _cargando = true;
+    _error = null;
     notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 1));
+    final noticiaParaEnviar = Noticia(
+      id: _noticiaSeleccionada?.id ?? '',
+      titular: titular,
+      subtitulo: subtitulo,
+      categoria: categoria,
+      cuerpo: cuerpo,
+      fechaPublicacion: fechaPublicacion,
+      estado: estadoEditor,
+    );
+
+    bool exito = false;
 
     if (_noticiaSeleccionada != null) {
-      _noticiaSeleccionada!.titular = titular;
-      _noticiaSeleccionada!.subtitulo = subtitulo;
-      _noticiaSeleccionada!.categoria = categoria;
-      _noticiaSeleccionada!.cuerpo = cuerpo;
-      _noticiaSeleccionada!.fechaPublicacion = fechaPublicacion;
-      _noticiaSeleccionada!.estado = estadoEditor;
-    } else {
-      final nueva = Noticia(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        titular: titular,
-        subtitulo: subtitulo,
-        categoria: categoria,
-        cuerpo: cuerpo,
-        fechaPublicacion: fechaPublicacion,
-        estado: estadoEditor,
+      // Actualizar existente → PUT /admin/news/{id}
+      final actualizada = await _noticiasService.actualizar(
+        _noticiaSeleccionada!.id,
+        noticiaParaEnviar,
       );
-      _noticias.insert(0, nueva);
-      _noticiaSeleccionada = nueva;
+      if (actualizada != null) {
+        final index = _noticias.indexWhere((n) => n.id == actualizada.id);
+        if (index != -1) _noticias[index] = actualizada;
+        _noticiaSeleccionada = actualizada;
+        exito = true;
+      }
+    } else {
+      // Crear nueva → POST /admin/news
+      final creada = await _noticiasService.crear(noticiaParaEnviar);
+      if (creada != null) {
+        _noticias.insert(0, creada);
+        _noticiaSeleccionada = creada;
+        _modoCreacion = false;
+        exito = true;
+      }
     }
 
     _cargando = false;
     notifyListeners();
-
-    return true;
+    return exito;
   }
+
+  // ─── Cambiar estado ────────────────────────────────────────────────────────
 
   void cambiarEstado(EstadoNoticia nuevoEstado) {
     estadoEditor = nuevoEstado;
@@ -159,9 +208,24 @@ class NoticiasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void eliminarNoticia() {
+  // ─── Eliminar noticia ──────────────────────────────────────────────────────
+
+  Future<void> eliminarNoticia() async {
     if (_noticiaSeleccionada == null) return;
-    _noticias.removeWhere((n) => n.id == _noticiaSeleccionada!.id);
+
+    _cargando = true;
+    _error = null;
+    notifyListeners();
+
+    // DELETE /admin/news/{id}
+    final ok = await _noticiasService.eliminar(_noticiaSeleccionada!.id);
+
+    if (ok) {
+      _noticias.removeWhere((n) => n.id == _noticiaSeleccionada!.id);
+    } else {
+      _error = 'No se pudo eliminar la noticia.';
+    }
+
     _noticiaSeleccionada = null;
     _modoCreacion = false;
     titular = '';
@@ -171,6 +235,7 @@ class NoticiasProvider extends ChangeNotifier {
     fechaPublicacion = null;
     estadoEditor = EstadoNoticia.borrador;
     _editorKey++;
+    _cargando = false;
     notifyListeners();
   }
 }

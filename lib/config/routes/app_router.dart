@@ -1,10 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:audioguia_web/screens/login_screen.dart';
 import 'package:audioguia_web/screens/dashboard_screen.dart';
 import 'package:audioguia_web/screens/noticias_screen.dart';
 import 'package:audioguia_web/screens/config_screen.dart';
 import 'package:audioguia_web/screens/agrega_monumento_screen.dart';
 import 'package:audioguia_web/screens/rendimiento_screen.dart';
+import 'package:audioguia_web/providers/noticias_provider.dart';
+import 'package:audioguia_web/providers/config_provider.dart';
 
 /// Configuración de rutas de la aplicación.
 /// Ruta inicial: /login → LoginScreen
@@ -25,11 +29,18 @@ final appRouter = GoRouter(
       builder: (context, state) => const DashboardScreen(),
     ),
 
-    // Editor de noticias
+    // Editor de noticias — carga las noticias del backend al entrar
     GoRoute(
       path: '/noticias',
       name: 'noticias',
-      builder: (context, state) => const NoticiasPage(),
+      builder: (context, state) {
+        // Capturamos el provider antes de cualquier gap asíncrono
+        final noticiasProvider =
+            Provider.of<NoticiasProvider>(context, listen: false);
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => noticiasProvider.cargarNoticias());
+        return const NoticiasPage();
+      },
     ),
 
     // Gestión de monumentos
@@ -46,11 +57,18 @@ final appRouter = GoRouter(
       builder: (context, state) => const RendimientoPage(),
     ),
 
-    // Configuración de módulos
+    // Configuración — carga los controles del backend al entrar
     GoRoute(
       path: '/configuracion',
       name: 'configuracion',
-      builder: (context, state) => const ConfiguracionPage(),
+      builder: (context, state) {
+        // Capturamos el provider antes de cualquier gap asíncrono
+        final configProvider =
+            Provider.of<ConfiguracionProvider>(context, listen: false);
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => configProvider.cargarConfiguracion());
+        return const ConfiguracionPage();
+      },
     ),
   ],
 );

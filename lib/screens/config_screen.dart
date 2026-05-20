@@ -222,39 +222,7 @@ class _CardConfiguracion extends StatelessWidget {
             value: config.mapasInteractivos,
             onChanged: config.toggleMapas,
           ),
-          Divider(height: 1, color: dividerColor),
-          ConfigItem(
-            isDarkMode: isDarkMode,
-            color: Colors.grey[500]!,
-            icono: Icons.notifications_outlined,
-            titulo: 'Notificaciones Push',
-            descripcion:
-                'Envío de alertas sobre eventos locales, proximidad a monumentos importantes y actualizaciones de rutas.',
-            value: config.notificacionesPush,
-            onChanged: config.toggleNotificaciones,
-          ),
-          Divider(height: 1, color: dividerColor),
-          ConfigItem(
-            isDarkMode: isDarkMode,
-            color: const Color(0xFF00BCD4),
-            icono: Icons.headphones_outlined,
-            titulo: 'Audio Guías',
-            descripcion:
-                'Habilita la reproducción de narraciones de voz para monumentos y puntos de interés. Requiere descarga de paquetes de audio.',
-            value: config.audioGuias,
-            onChanged: config.toggleAudioGuias,
-          ),
-          Divider(height: 1, color: dividerColor),
-          ConfigItem(
-            isDarkMode: isDarkMode,
-            color: Colors.purple,
-            icono: Icons.info_outline,
-            titulo: 'Créditos',
-            descripcion:
-                'Muestra la sección de créditos en la aplicación móvil con información sobre el equipo de desarrollo, licencias y versión.',
-            value: config.creditos,
-            onChanged: config.toggleCreditos,
-          ),
+
         ],
       ),
     );

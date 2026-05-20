@@ -1,30 +1,71 @@
 import 'package:flutter/material.dart';
-
-/// Valores por defecto de cada funcionalidad.
-class _Defaults {
-  static const rutasTuristicas = true;
-  static const asistenteIA = true;
-  static const mapasInteractivos = true;
-  static const notificacionesPush = false;
-  static const audioGuias = true;
-  static const creditos = true;
-}
+import '../services/control_service.dart';
 
 /// Provider que gestiona el estado de las funcionalidades configurables
-/// de la aplicación móvil de Audioguía. Proviene de dev_ahmed.
+/// de la app móvil. Se conecta al backend a través de [ControlService].
+///
+/// ✅ Controles CON endpoint en el backend:
+///   - Rutas Turísticas   → "routes"
+///   - Asistente IA       → "IA_Chatbox"
+///   - Mapas Interactivos → "monuments"
+///
+/// ⚠️ Controles SIN endpoint en el backend (solo locales por ahora):
+///   - Notificaciones Push  (no existe /control/notifications)
+///   - Audio Guías          (no existe /control/audioGuides)
+///   - Créditos             (no existe /control/credits)
 class ConfiguracionProvider extends ChangeNotifier {
-  bool rutasTuristicas = _Defaults.rutasTuristicas;
-  bool asistenteIA = _Defaults.asistenteIA;
-  bool mapasInteractivos = _Defaults.mapasInteractivos;
-  bool notificacionesPush = _Defaults.notificacionesPush;
-  bool audioGuias = _Defaults.audioGuias;
-  bool creditos = _Defaults.creditos;
+  final ControlService _controlService = ControlService();
+
+  // Controles con endpoint en el backend
+  bool rutasTuristicas = true;
+  bool asistenteIA = true;
+  bool mapasInteractivos = true;
 
   bool _hayPendientes = false;
   bool _cargando = false;
+  bool _cargandoInicial = false;
+
+  String? _error;
 
   bool get hayPendientes => _hayPendientes;
   bool get cargando => _cargando;
+  bool get cargandoInicial => _cargandoInicial;
+  String? get error => _error;
+
+  // ─── Carga inicial del backend ─────────────────────────────────────────────
+
+  Future<void> cargarConfiguracion() async {
+    _cargandoInicial = true;
+    _error = null;
+    notifyListeners();
+
+    // GET /public/control → lista de todos los controles
+    final lista = await _controlService.obtenerTodos();
+
+    if (lista != null) {
+      for (final control in lista) {
+        switch (control.name) {
+          case ControlService.nombreRutas:
+            rutasTuristicas = control.active;
+            break;
+          case ControlService.nombreIA:
+            asistenteIA = control.active;
+            break;
+          case ControlService.nombreMonumentos:
+            mapasInteractivos = control.active;
+            break;
+        }
+      }
+      _hayPendientes = false;
+    } else {
+      _error = 'No se pudo cargar la configuración del servidor.';
+    }
+
+    _cargandoInicial = false;
+    notifyListeners();
+  }
+
+  // ─── Toggles ───────────────────────────────────────────────────────────────
 
   void _toggle(bool value, void Function(bool) setter) {
     setter(value);
@@ -35,31 +76,48 @@ class ConfiguracionProvider extends ChangeNotifier {
   void toggleRutas(bool v) => _toggle(v, (val) => rutasTuristicas = val);
   void toggleAsistenteIA(bool v) => _toggle(v, (val) => asistenteIA = val);
   void toggleMapas(bool v) => _toggle(v, (val) => mapasInteractivos = val);
-  void toggleNotificaciones(bool v) =>
-      _toggle(v, (val) => notificacionesPush = val);
-  void toggleAudioGuias(bool v) => _toggle(v, (val) => audioGuias = val);
-  void toggleCreditos(bool v) => _toggle(v, (val) => creditos = val);
 
-  /// Simula guardado asíncrono de la configuración.
+  // ─── Guardar en el backend ─────────────────────────────────────────────────
+
   Future<bool> guardarConfiguracion() async {
     _cargando = true;
+    _error = null;
     notifyListeners();
-    await Future.delayed(const Duration(milliseconds: 800));
+
+    // Guardamos solo los controles que tienen endpoint
+    final resultados = await Future.wait([
+      _controlService.actualizarEstado(
+        ControlService.nombreRutas,
+        rutasTuristicas,
+      ),
+      _controlService.actualizarEstado(
+        ControlService.nombreIA,
+        asistenteIA,
+      ),
+      _controlService.actualizarEstado(
+        ControlService.nombreMonumentos,
+        mapasInteractivos,
+      ),
+    ]);
+
+    // Si alguno devolvió null, hubo un error en esa petición
+    final exito = resultados.every((r) => r != null);
+
+    if (exito) {
+      _hayPendientes = false;
+    } else {
+      _error = 'Error al guardar alguna configuración en el servidor.';
+    }
+
     _cargando = false;
-    _hayPendientes = false;
     notifyListeners();
-    return true;
+    return exito;
   }
 
-  /// Descarta los cambios pendientes y restaura valores por defecto.
+  // ─── Descartar cambios ─────────────────────────────────────────────────────
+
   void descartarCambios() {
-    rutasTuristicas = _Defaults.rutasTuristicas;
-    asistenteIA = _Defaults.asistenteIA;
-    mapasInteractivos = _Defaults.mapasInteractivos;
-    notificacionesPush = _Defaults.notificacionesPush;
-    audioGuias = _Defaults.audioGuias;
-    creditos = _Defaults.creditos;
-    _hayPendientes = false;
-    notifyListeners();
+    // Recargamos desde el backend para restaurar el estado real
+    cargarConfiguracion();
   }
 }
