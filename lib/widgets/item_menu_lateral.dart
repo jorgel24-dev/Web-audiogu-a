@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Ítem individual del menú lateral de navegación.
-/// Reemplaza tanto a [BarraLateral] (feature/dashboard) como a la
-/// antigua clase privada _ItemMenuLateral de menu_lateral.dart.
 class ItemMenuLateral extends StatelessWidget {
   final IconData icon;
   final String label;

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../services/auth_service.dart';
 import '../widgets/boton_primario.dart';
 import '../widgets/input_campo.dart';
 
-/// Pantalla de inicio de sesión del panel de administración.
-/// Usa widgets compartidos [BotonPrimario] e [InputCampo]
-/// y navega al dashboard tras autenticación.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -14,15 +12,45 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
+  final TextEditingController _usuarioController = TextEditingController();
+  final TextEditingController _contrasenaController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  bool _cargando = false;
+  String? _mensajeError;
 
   @override
   void dispose() {
-    // Liberamos los controllers para evitar fugas de memoria
-    _emailController.dispose();
-    _passController.dispose();
+    _usuarioController.dispose();
+    _contrasenaController.dispose();
     super.dispose();
+  }
+
+  Future<void> _iniciarSesion() async {
+    setState(() {
+      _cargando = true;
+      _mensajeError = null;
+    });
+
+    final resultado = await _authService.iniciarSesion(
+      _usuarioController.text.trim(),
+      _contrasenaController.text,
+    );
+
+    if (!mounted) return;
+
+    switch (resultado) {
+      case ResultadoLogin.exito:
+        context.go('/dashboard');
+      case ResultadoLogin.credencialesInvalidas:
+        setState(() => _mensajeError = 'Usuario o contraseña incorrectos.');
+      case ResultadoLogin.errorServidor:
+        setState(() => _mensajeError = 'Error en el servidor. Inténtalo de nuevo.');
+      case ResultadoLogin.errorConexion:
+        setState(() => _mensajeError = 'No se pudo conectar con el servidor.');
+    }
+
+    setState(() => _cargando = false);
   }
 
   @override
@@ -47,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Logo
               Container(
                 width: 56,
                 height: 56,
@@ -77,25 +104,48 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 32),
               InputCampo(
-                texto: 'Correo electrónico',
-                controller: _emailController,
-                icono: Icons.email_outlined,
+                texto: 'Usuario',
+                controller: _usuarioController,
+                icono: Icons.person_outline,
               ),
               const SizedBox(height: 14),
               InputCampo(
                 texto: 'Contraseña',
-                controller: _passController,
+                controller: _contrasenaController,
                 icono: Icons.lock_outline,
                 password: true,
               ),
+              if (_mensajeError != null) ...[
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red[200]!),
+                  ),
+                  child: Text(
+                    _mensajeError!,
+                    style: TextStyle(color: Colors.red[700], fontSize: 13),
+                  ),
+                ),
+              ],
               const SizedBox(height: 28),
-              BotonPrimario(
-                texto: 'Iniciar sesión',
-                onPressed: () {
-                  // TODO: integrar autenticación real
-                  context.go('/dashboard');
-                },
-              ),
+              _cargando
+                  ? const SizedBox(
+                      height: 50,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF2D6A4F),
+                          strokeWidth: 2.5,
+                        ),
+                      ),
+                    )
+                  : BotonPrimario(
+                      texto: 'Iniciar sesión',
+                      onPressed: _iniciarSesion,
+                    ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () {},

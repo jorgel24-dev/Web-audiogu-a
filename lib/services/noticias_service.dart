@@ -39,11 +39,25 @@ class NoticiasService {
   }
 
 
-  Future<Noticia?> crear(Noticia noticia) async {
+  Future<Noticia?> crear(
+    String titulo,
+    String subtitulo,
+    String contenido,
+    int estado,
+    DateTime? fechaPublicacion,
+    String? imagenUrl,
+  ) async {
     final response = await post(
       Uri.parse('$_url/admin/news'),
       headers: _headersAdmin,
-      body: noticia.toRawJson(),
+      body: jsonEncode({
+        "titulo": titulo,
+        "subtitulo": subtitulo,
+        "contenido": contenido,
+        "estado": estado,
+        if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
+        if (imagenUrl != null) "imagen_url": imagenUrl,
+      }),
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       return Noticia.fromRawJson(response.body);
@@ -51,12 +65,26 @@ class NoticiasService {
     return null;
   }
 
-
-  Future<Noticia?> actualizar(String id, Noticia noticia) async {
+  Future<Noticia?> actualizar(
+    String id,
+    String titulo,
+    String subtitulo,
+    String contenido,
+    int estado,
+    DateTime? fechaPublicacion,
+    String? imagenUrl,
+  ) async {
     final response = await put(
       Uri.parse('$_url/admin/news/$id'),
       headers: _headersAdmin,
-      body: noticia.toRawJson(),
+      body: jsonEncode({
+        "titulo": titulo,
+        "subtitulo": subtitulo,
+        "contenido": contenido,
+        "estado": estado,
+        if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
+        if (imagenUrl != null) "imagen_url": imagenUrl,
+      }),
     );
     if (response.statusCode == 200) {
       return Noticia.fromRawJson(response.body);

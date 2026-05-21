@@ -6,8 +6,8 @@ class Noticia {
     String subtitulo;
     String contenido;
     int estado;
-    dynamic fechaPublicacion;
-    dynamic imagenUrl;
+    DateTime? fechaPublicacion;
+    String? imagenUrl;
     DateTime createdAt;
     DateTime lastModified;
 
@@ -17,8 +17,8 @@ class Noticia {
         required this.subtitulo,
         required this.contenido,
         required this.estado,
-        required this.fechaPublicacion,
-        required this.imagenUrl,
+        this.fechaPublicacion,
+        this.imagenUrl,
         required this.createdAt,
         required this.lastModified,
     });
@@ -33,7 +33,9 @@ class Noticia {
         subtitulo: json["subtitulo"] ?? '',
         contenido: json["contenido"] ?? '',
         estado: json["estado"] ?? 0,
-        fechaPublicacion: json["fecha_publicacion"],
+        fechaPublicacion: json["fecha_publicacion"] != null
+            ? DateTime.parse(json["fecha_publicacion"])
+            : null,
         imagenUrl: json["imagen_url"],
         createdAt: json["created_at"] != null ? DateTime.parse(json["created_at"]) : DateTime.now(),
         lastModified: json["last_modified"] != null ? DateTime.parse(json["last_modified"]) : DateTime.now(),
@@ -45,7 +47,7 @@ class Noticia {
         "subtitulo": subtitulo,
         "contenido": contenido,
         "estado": estado,
-        "fecha_publicacion": fechaPublicacion,
+        "fecha_publicacion": fechaPublicacion?.toIso8601String(),
         "imagen_url": imagenUrl,
         "created_at": createdAt.toIso8601String(),
         "last_modified": lastModified.toIso8601String(),

@@ -22,7 +22,7 @@ class ControlModel {
     factory ControlModel.fromJson(Map<String, dynamic> json) => ControlModel(
         id: json["id"] ?? 0,
         name: json["name"] ?? '',
-        isActive: json["isActive"] ?? false,
+        isActive: json["isActive"] ?? json["is_active"] ?? false,
         createdAt: json["created_at"] != null ? DateTime.parse(json["created_at"]) : DateTime.now(),
         lastModified: json["last_modified"] != null ? DateTime.parse(json["last_modified"]) : DateTime.now(),
     );

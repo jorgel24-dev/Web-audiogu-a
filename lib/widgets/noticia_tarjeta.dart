@@ -75,10 +75,10 @@ class NoticiaTarjeta extends StatelessWidget {
     final ahora = DateTime.now();
     final diferencia = ahora.difference(fecha);
 
-    if (diferencia.inMinutes < 60) {
-      return 'Hoy, ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')} AM';
-    } else if (diferencia.inDays == 0) {
-      return 'Hoy';
+    if (diferencia.inDays == 0) {
+      final hora = fecha.hour.toString().padLeft(2, '0');
+      final minuto = fecha.minute.toString().padLeft(2, '0');
+      return 'Hoy, $hora:$minuto';
     } else if (diferencia.inDays == 1) {
       return 'Ayer';
     } else if (diferencia.inDays < 7) {

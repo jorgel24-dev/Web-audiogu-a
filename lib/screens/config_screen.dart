@@ -5,8 +5,21 @@ import '../providers/config_provider.dart';
 import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 
-class ConfiguracionPage extends StatelessWidget {
+class ConfiguracionPage extends StatefulWidget {
   const ConfiguracionPage({super.key});
+
+  @override
+  State<ConfiguracionPage> createState() => _ConfiguracionPageState();
+}
+
+class _ConfiguracionPageState extends State<ConfiguracionPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ConfiguracionProvider>().cargarConfiguracion();
+    });
+  }
 
   @override
   Widget build(BuildContext context) => const _ConfiguracionView();
@@ -19,6 +32,18 @@ class _ConfiguracionView extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<TemaProvider>().isDarkMode;
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
+    final config = context.watch<ConfiguracionProvider>();
+
+    if (config.cargandoInicial) {
+      return Scaffold(
+        backgroundColor: isDarkMode
+            ? const Color(0xFF121212)
+            : const Color(0xFFF8F9FA),
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFF2D6A4F)),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: isDarkMode
@@ -38,16 +63,15 @@ class _ConfiguracionView extends StatelessWidget {
           VerticalDivider(width: 1, color: dividerColor),
           Expanded(
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _HeaderConfig(isDarkMode: isDarkMode),
-                    const SizedBox(height: 24),
-                    _CardConfiguracion(isDarkMode: isDarkMode),
-                  ],
-                ),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _HeaderConfig(isDarkMode: isDarkMode),
+                  const SizedBox(height: 24),
+                  _CardConfiguracion(isDarkMode: isDarkMode),
+                  const SizedBox(height: 32),
+                ],
               ),
             ),
           ),

@@ -35,7 +35,7 @@ class AgregaMonumentoPage extends StatelessWidget {
                     child: _FormularioMonumento(isDarkMode: isDarkMode),
                   ),
                 ),
-                _buildFooter(context, isDarkMode), // ← pasar isDarkMode
+                _buildFooter(context, isDarkMode),
               ],
             ),
           ),
@@ -99,7 +99,6 @@ class _FormularioMonumento extends StatelessWidget {
   final bool isDarkMode;
   const _FormularioMonumento({required this.isDarkMode});
 
-  // Colores derivados del modo
   Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
   Color get _fieldBorder => isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
   Color get _uploadBoxBg => isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;

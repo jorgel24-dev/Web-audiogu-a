@@ -146,24 +146,17 @@ class NoticiasProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
 
-    final noticiaParaEnviar = Noticia(
-      id: _noticiaSeleccionada?.id ?? '',
-      titulo: titulo,
-      subtitulo: subtitulo,
-      contenido: contenido,
-      fechaPublicacion: fechaPublicacion,
-      estado: estadoEditor,
-      imagenUrl: _noticiaSeleccionada?.imagenUrl,
-      createdAt: _noticiaSeleccionada?.createdAt ?? DateTime.now(),
-      lastModified: DateTime.now(),
-    );
-
     bool exito = false;
 
     if (_noticiaSeleccionada != null) {
       final actualizada = await _noticiasService.actualizar(
         _noticiaSeleccionada!.id,
-        noticiaParaEnviar,
+        titulo,
+        subtitulo,
+        contenido,
+        estadoEditor,
+        fechaPublicacion,
+        _noticiaSeleccionada?.imagenUrl,
       );
       if (actualizada != null) {
         final index = _noticias.indexWhere((n) => n.id == actualizada.id);
@@ -172,7 +165,14 @@ class NoticiasProvider extends ChangeNotifier {
         exito = true;
       }
     } else {
-      final creada = await _noticiasService.crear(noticiaParaEnviar);
+      final creada = await _noticiasService.crear(
+        titulo,
+        subtitulo,
+        contenido,
+        estadoEditor,
+        fechaPublicacion,
+        null,
+      );
       if (creada != null) {
         _noticias.insert(0, creada);
         _noticiaSeleccionada = creada;
@@ -198,8 +198,8 @@ class NoticiasProvider extends ChangeNotifier {
 
   // ─── Eliminar noticia ──────────────────────────────────────────────────────
 
-  Future<void> eliminarNoticia() async {
-    if (_noticiaSeleccionada == null) return;
+  Future<bool> eliminarNoticia() async {
+    if (_noticiaSeleccionada == null) return false;
 
     _cargando = true;
     _error = null;
@@ -209,19 +209,22 @@ class NoticiasProvider extends ChangeNotifier {
 
     if (ok) {
       _noticias.removeWhere((n) => n.id == _noticiaSeleccionada!.id);
+      _noticiaSeleccionada = null;
+      _modoCreacion = false;
+      titulo = '';
+      subtitulo = '';
+      contenido = '';
+      fechaPublicacion = null;
+      estadoEditor = 0;
+      _editorKey++;
+      _cargando = false;
+      notifyListeners();
+      return true;
     } else {
       _error = 'No se pudo eliminar la noticia.';
+      _cargando = false;
+      notifyListeners();
+      return false;
     }
-
-    _noticiaSeleccionada = null;
-    _modoCreacion = false;
-    titulo = '';
-    subtitulo = '';
-    contenido = '';
-    fechaPublicacion = null;
-    estadoEditor = 0;
-    _editorKey++;
-    _cargando = false;
-    notifyListeners();
   }
 }

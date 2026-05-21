@@ -11,8 +11,21 @@ import '../widgets/editor_toolbar.dart';
 import '../widgets/chip_filtro.dart';
 import '../widgets/label_campo.dart';
 
-class NoticiasPage extends StatelessWidget {
+class NoticiasPage extends StatefulWidget {
   const NoticiasPage({super.key});
+
+  @override
+  State<NoticiasPage> createState() => _NoticiasPageState();
+}
+
+class _NoticiasPageState extends State<NoticiasPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NoticiasProvider>().cargarNoticias();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +39,11 @@ class _NoticiasView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<TemaProvider>().isDarkMode;
+    final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
+
     final bgColor = isDarkMode
         ? const Color(0xFF121212)
         : const Color(0xFFF8F9FA);
-    final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -80,6 +94,20 @@ class _PanelLista extends StatelessWidget {
       color: cardColor,
       child: Column(
         children: [
+          if (noticiasProvider.cargandoLista)
+            const LinearProgressIndicator(
+              minHeight: 2,
+              backgroundColor: Colors.transparent,
+              color: Color(0xFF2D6A4F),
+            )
+          else if (noticiasProvider.error != null)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                noticiasProvider.error!,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
             child: TextField(
@@ -533,9 +561,22 @@ class _PanelEditorState extends State<_PanelEditor> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton.icon(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
-              noticiasProvider.eliminarNoticia();
+              final ok = await noticiasProvider.eliminarNoticia();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      ok
+                          ? 'Noticia eliminada correctamente'
+                          : 'Error al eliminar la noticia',
+                    ),
+                    backgroundColor: ok ? Colors.green : Colors.red[700],
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
             },
             icon: const Icon(Icons.delete_outline, size: 16),
             label: const Text('Eliminar'),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Campo de texto reutilizable con icono prefijo y soporte opcional
-/// para ocultar/mostrar contraseña. Originalmente de feature/login.
 class InputCampo extends StatefulWidget {
   final String texto;
   final IconData icono;

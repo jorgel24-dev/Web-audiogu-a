@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Botón primario reutilizable con estilo consistente en toda la app.
-/// Ocupa todo el ancho disponible. Originalmente de feature/login.
 class BotonPrimario extends StatelessWidget {
   final String texto;
   final VoidCallback onPressed;

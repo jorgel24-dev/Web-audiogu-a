@@ -14,7 +14,6 @@ class _ItemMenu {
   });
 }
 
-/// Ítems del menú lateral de navegación principal.
 const _itemsMenu = [
   _ItemMenu(icon: Icons.grid_view,       label: 'Panel Principal', ruta: '/dashboard'),
   _ItemMenu(icon: Icons.account_balance, label: 'Monumentos',      ruta: '/monumentos/agregar'),
@@ -23,8 +22,6 @@ const _itemsMenu = [
   _ItemMenu(icon: Icons.settings,        label: 'Configuración',   ruta: '/configuracion'),
 ];
 
-/// Menú de navegación lateral compartido por todas las pantallas del panel.
-/// Usa [ItemMenuLateral] (widget público extraído) para cada ítem.
 class MenuLateral extends StatelessWidget {
   final String rutaActual;
   final bool isDarkMode;
