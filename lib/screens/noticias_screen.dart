@@ -53,7 +53,7 @@ class _NoticiasView extends StatelessWidget {
                 child: _PanelEditor(
                   key: ValueKey(noticiasProvider.editorKey),
                   isDarkMode: isDarkMode,
-                  initialCuerpo: noticiasProvider.cuerpo,
+                  initialContenido: noticiasProvider.contenido,
                 ),
               ),
             ],
@@ -188,12 +188,12 @@ class _PanelLista extends StatelessWidget {
 
 class _PanelEditor extends StatefulWidget {
   final bool isDarkMode;
-  final String initialCuerpo;
+  final String initialContenido;
 
   const _PanelEditor({
     super.key,
     required this.isDarkMode,
-    this.initialCuerpo = '',
+    this.initialContenido = '',
   });
 
   @override
@@ -205,19 +205,17 @@ class _PanelEditorState extends State<_PanelEditor> {
   final _subtituloController = TextEditingController();
   late final quill.QuillController _quillController;
 
-  /// Crea un QuillController desde texto plano o JSON delta.
-  quill.QuillController _buildQuillController(String cuerpo) {
-    if (cuerpo.isEmpty) return quill.QuillController.basic();
+  quill.QuillController _buildQuillController(String contenido) {
+    if (contenido.isEmpty) return quill.QuillController.basic();
     try {
-      final delta = jsonDecode(cuerpo) as List;
+      final delta = jsonDecode(contenido) as List;
       return quill.QuillController(
         document: quill.Document.fromJson(delta),
         selection: const TextSelection.collapsed(offset: 0),
       );
     } catch (_) {
-      // Si no es JSON, lo tratamos como texto plano
       final doc = quill.Document();
-      doc.insert(0, cuerpo);
+      doc.insert(0, contenido);
       return quill.QuillController(
         document: doc,
         selection: const TextSelection.collapsed(offset: 0),
@@ -228,13 +226,12 @@ class _PanelEditorState extends State<_PanelEditor> {
   @override
   void initState() {
     super.initState();
-    _quillController = _buildQuillController(widget.initialCuerpo);
-    // Sincronizar cambios del editor con el provider
+    _quillController = _buildQuillController(widget.initialContenido);
     _quillController.addListener(() {
       final delta = jsonEncode(
         _quillController.document.toDelta().toJson(),
       );
-      context.read<NoticiasProvider>().setCuerpo(delta);
+      context.read<NoticiasProvider>().setContenido(delta);
     });
   }
 
@@ -252,16 +249,13 @@ class _PanelEditorState extends State<_PanelEditor> {
     final noticiasProvider = Provider.of<NoticiasProvider>(context);
     final noticia = noticiasProvider.noticiaSeleccionada;
     if (noticia != null) {
-      if (_titularController.text != noticiasProvider.titular) {
-        _titularController.text = noticiasProvider.titular;
+      if (_titularController.text != noticiasProvider.titulo) {
+        _titularController.text = noticiasProvider.titulo;
       }
       if (_subtituloController.text != noticiasProvider.subtitulo) {
         _subtituloController.text = noticiasProvider.subtitulo;
       }
-      if (_subtituloController.text != noticiasProvider.subtitulo) {
-        _subtituloController.text = noticiasProvider.subtitulo;
-      }
-    } else if (noticiasProvider.titular.isEmpty &&
+    } else if (noticiasProvider.titulo.isEmpty &&
         _titularController.text.isNotEmpty) {
       _titularController.clear();
       _subtituloController.clear();
@@ -299,7 +293,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 TextFormField(
                                   controller: _titularController,
                                   onChanged: (value) =>
-                                      noticiasProvider.setTitular(value),
+                                      noticiasProvider.setTitulo(value),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -336,63 +330,6 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 const SizedBox(height: 16),
                                 Row(
                                   children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          LabelCampo(label: 'Categoría'),
-                                          const SizedBox(height: 6),
-                                          DropdownButtonFormField<String>(
-                                            initialValue:
-                                                noticiasProvider
-                                                    .categoria
-                                                    .isEmpty
-                                                ? null
-                                                : noticiasProvider.categoria,
-                                            decoration: _inputDecoration(
-                                              hint: 'Seleccionar...',
-                                            ),
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 'Cultura y Fiestas',
-                                                child: Text(
-                                                  'Cultura y Fiestas',
-                                                ),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'Turismo',
-                                                child: Text('Turismo'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'Eventos',
-                                                child: Text('Eventos'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'Gastronomía',
-                                                child: Text('Gastronomía'),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 'Deportes',
-                                                child: Text('Deportes'),
-                                              ),
-                                            ],
-                                            onChanged: (value) =>
-                                                noticiasProvider.setCategoria(
-                                                  value ?? '',
-                                                ),
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Selecciona una categoría';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -448,6 +385,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                         ],
                                       ),
                                     ),
+                                    const Spacer(),
                                   ],
                                 ),
                               ],
@@ -518,9 +456,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 color: Colors.orange,
                                 activo:
                                     noticiasProvider.estadoEditor ==
-                                    EstadoNoticia.borrador,
+                                    0,
                                 onTap: () => noticiasProvider.cambiarEstado(
-                                  EstadoNoticia.borrador,
+                                  0,
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -529,9 +467,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 color: Colors.green,
                                 activo:
                                     noticiasProvider.estadoEditor ==
-                                    EstadoNoticia.publicado,
+                                    1,
                                 onTap: () => noticiasProvider.cambiarEstado(
-                                  EstadoNoticia.publicado,
+                                  1,
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -587,7 +525,7 @@ class _PanelEditorState extends State<_PanelEditor> {
           ],
         ),
         content: Text(
-          '¿Estás seguro de que quieres eliminar "${noticiasProvider.titular}"?\n\nEsta acción no se puede deshacer.',
+          '¿Estás seguro de que quieres eliminar "${noticiasProvider.titulo}"?\n\nEsta acción no se puede deshacer.',
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
@@ -733,8 +671,8 @@ class _BotonGuardar extends StatelessWidget {
                   SnackBar(
                     content: Text(
                       guardado
-                          ? '✓ Noticia guardada correctamente'
-                          : '✗ Revisa los campos obligatorios',
+                          ? 'Noticia guardada correctamente'
+                          : 'Revisa los campos obligatorios',
                     ),
                     backgroundColor: guardado ? Colors.green : Colors.red[700],
                     duration: const Duration(seconds: 2),

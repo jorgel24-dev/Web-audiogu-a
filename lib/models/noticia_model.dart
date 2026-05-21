@@ -1,88 +1,53 @@
 import 'dart:convert';
 
-enum EstadoNoticia { borrador, publicado, archivado }
-
 class Noticia {
-  final String id;
-  String titular;
-  String subtitulo;
-  String categoria;
-  String cuerpo;
-  DateTime? fechaPublicacion;
-  EstadoNoticia estado;
+    String id;
+    String titulo;
+    String subtitulo;
+    String contenido;
+    int estado;
+    dynamic fechaPublicacion;
+    dynamic imagenUrl;
+    DateTime createdAt;
+    DateTime lastModified;
 
-  Noticia({
-    required this.id,
-    this.titular = '',
-    this.subtitulo = '',
-    this.categoria = '',
-    this.cuerpo = '',
-    this.fechaPublicacion,
-    this.estado = EstadoNoticia.borrador,
-  });
+    Noticia({
+        required this.id,
+        required this.titulo,
+        required this.subtitulo,
+        required this.contenido,
+        required this.estado,
+        required this.fechaPublicacion,
+        required this.imagenUrl,
+        required this.createdAt,
+        required this.lastModified,
+    });
 
-  // ─── Serialización ──────────────────────────────────────────────────────────
+    factory Noticia.fromRawJson(String str) => Noticia.fromJson(json.decode(str));
 
-  factory Noticia.fromRawJson(String str) => Noticia.fromJson(json.decode(str));
+    String toRawJson() => json.encode(toJson());
 
-  String toRawJson() => json.encode(toJson());
+    factory Noticia.fromJson(Map<String, dynamic> json) => Noticia(
+        id: json["id"].toString(),
+        titulo: json["titulo"] ?? '',
+        subtitulo: json["subtitulo"] ?? '',
+        contenido: json["contenido"] ?? '',
+        estado: json["estado"] ?? 0,
+        fechaPublicacion: json["fecha_publicacion"],
+        imagenUrl: json["imagen_url"],
+        createdAt: json["created_at"] != null ? DateTime.parse(json["created_at"]) : DateTime.now(),
+        lastModified: json["last_modified"] != null ? DateTime.parse(json["last_modified"]) : DateTime.now(),
+    );
 
-  factory Noticia.fromJson(Map<String, dynamic> json) => Noticia(
-    id: (json['id'] ?? json['_id'] ?? '').toString(),
-    titular: json['titular'] ?? json['title'] ?? '',
-    subtitulo: json['subtitulo'] ?? json['subtitle'] ?? '',
-    categoria: json['categoria'] ?? json['category'] ?? '',
-    cuerpo: json['cuerpo'] ?? json['content'] ?? '',
-    fechaPublicacion: json['fechaPublicacion'] != null
-        ? DateTime.tryParse(json['fechaPublicacion'].toString())
-        : null,
-    estado: EstadoNoticiaParser.fromString(
-      json['estado'] ?? json['status'] ?? 'borrador',
-    ),
-  );
-
-  Map<String, dynamic> toJson() => {
-    'titular': titular,
-    'subtitulo': subtitulo,
-    'categoria': categoria,
-    'cuerpo': cuerpo,
-    if (fechaPublicacion != null)
-      'fechaPublicacion': fechaPublicacion!.toIso8601String(),
-    'estado': estado.toApiString(),
-  };
-
-  // ─── Ejemplos locales (solo para el estado inicial vacío) ───────────────────
-
-  static List<Noticia> get ejemplos => [];
-}
-
-// ─── Extensiones del enum ────────────────────────────────────────────────────
-
-extension EstadoNoticiaX on EstadoNoticia {
-  String toApiString() {
-    switch (this) {
-      case EstadoNoticia.publicado:
-        return 'publicado';
-      case EstadoNoticia.archivado:
-        return 'archivado';
-      case EstadoNoticia.borrador:
-        return 'borrador';
-    }
-  }
-}
-
-extension EstadoNoticiaParser on EstadoNoticia {
-  static EstadoNoticia fromString(dynamic valor) {
-    switch (valor.toString().toLowerCase()) {
-      case 'publicado':
-      case 'published':
-      case 'active':
-        return EstadoNoticia.publicado;
-      case 'archivado':
-      case 'archived':
-        return EstadoNoticia.archivado;
-      default:
-        return EstadoNoticia.borrador;
-    }
-  }
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "titulo": titulo,
+        "subtitulo": subtitulo,
+        "contenido": contenido,
+        "estado": estado,
+        "fecha_publicacion": fechaPublicacion,
+        "imagen_url": imagenUrl,
+        "created_at": createdAt.toIso8601String(),
+        "last_modified": lastModified.toIso8601String(),
+    };
 }

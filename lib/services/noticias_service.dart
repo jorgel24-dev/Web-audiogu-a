@@ -2,24 +2,15 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import '../models/noticia_model.dart';
 
-/// Servicio de noticias que se conecta directamente con el backend.
-///
-/// Endpoints:
-///   GET    /public/news         → lista de noticias
-///   GET    /public/news/{id}    → noticia por ID
-///   POST   /admin/news          → crear noticia
-///   PUT    /admin/news/{id}     → actualizar noticia
-///   DELETE /admin/news/{id}     → eliminar noticia (204 No Content)
 class NoticiasService {
   final String _url = 'http://backend-tfg-escuchatuhistoria.onrender.com/api/v1';
 
-  // Cabeceras de administrador (Basic Auth: admin / admin123)
+
   final Map<String, String> _headersAdmin = {
     'Content-Type': 'application/json',
     'Authorization': 'Basic ${base64Encode(utf8.encode('admin:admin123'))}',
   };
 
-  // ─── Obtener todas las noticias ────────────────────────────────────────────
 
   Future<List<Noticia>?> obtenerTodas() async {
     final response = await get(
@@ -35,7 +26,6 @@ class NoticiasService {
     return null;
   }
 
-  // ─── Obtener noticia por ID ────────────────────────────────────────────────
 
   Future<Noticia?> obtenerPorId(String id) async {
     final response = await get(
@@ -48,7 +38,6 @@ class NoticiasService {
     return null;
   }
 
-  // ─── Crear noticia ─────────────────────────────────────────────────────────
 
   Future<Noticia?> crear(Noticia noticia) async {
     final response = await post(
@@ -62,7 +51,6 @@ class NoticiasService {
     return null;
   }
 
-  // ─── Actualizar noticia ────────────────────────────────────────────────────
 
   Future<Noticia?> actualizar(String id, Noticia noticia) async {
     final response = await put(
@@ -76,14 +64,13 @@ class NoticiasService {
     return null;
   }
 
-  // ─── Eliminar noticia ──────────────────────────────────────────────────────
 
   Future<bool> eliminar(String id) async {
     final response = await delete(
       Uri.parse('$_url/admin/news/$id'),
       headers: _headersAdmin,
     );
-    // 204 No Content = eliminado correctamente
+
     return response.statusCode == 204 || response.statusCode == 200;
   }
 }

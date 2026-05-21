@@ -48,7 +48,7 @@ class NoticiaTarjeta extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                noticia.titular,
+                noticia.titulo,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -90,16 +90,16 @@ class NoticiaTarjeta extends StatelessWidget {
 }
 
 class _EtiquetaEstado extends StatelessWidget {
-  final EstadoNoticia estado;
+  final int estado;
 
   const _EtiquetaEstado({required this.estado});
 
   @override
   Widget build(BuildContext context) {
     final (Color color, String texto) = switch (estado) {
-      EstadoNoticia.borrador  => (Colors.orange, 'BORRADOR'),
-      EstadoNoticia.publicado => (Colors.green,  'PUBLICADO'),
-      EstadoNoticia.archivado => (Colors.grey,   'ARCHIVADO'),
+      0  => (Colors.orange, 'BORRADOR'),
+      1 => (Colors.green,  'PUBLICADO'),
+      _ => (Colors.grey,   'ARCHIVADO'),
     };
 
     return Container(

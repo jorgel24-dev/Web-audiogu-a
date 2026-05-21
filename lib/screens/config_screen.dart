@@ -5,8 +5,6 @@ import '../providers/config_provider.dart';
 import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 
-/// Pantalla de configuración de módulos de la app móvil.
-/// Integrada desde dev_ahmed.
 class ConfiguracionPage extends StatelessWidget {
   const ConfiguracionPage({super.key});
 
@@ -87,8 +85,8 @@ class _BotonesAppBar extends StatelessWidget {
                       SnackBar(
                         content: Text(
                           ok
-                              ? '✓ Configuración guardada'
-                              : '✗ Error al guardar',
+                              ? 'Configuración guardada'
+                              : 'Error al guardar',
                         ),
                         backgroundColor: ok ? Colors.green : Colors.red,
                         duration: const Duration(seconds: 2),
@@ -207,7 +205,7 @@ class _CardConfiguracion extends StatelessWidget {
             titulo: 'Asistente IA',
             descripcion:
                 'Activa el chatbot inteligente basado en IA generativa. Responde preguntas sobre historia local, horarios de monumentos y ofrece recomendaciones personalizadas.',
-            advertencia: '⚠ Consume tokens de API adicionales.',
+            advertencia: 'Consume tokens de API adicionales.',
             value: config.asistenteIA,
             onChanged: config.toggleAsistenteIA,
           ),
@@ -222,14 +220,23 @@ class _CardConfiguracion extends StatelessWidget {
             value: config.mapasInteractivos,
             onChanged: config.toggleMapas,
           ),
-
+          Divider(height: 1, color: dividerColor),
+          ConfigItem(
+            isDarkMode: isDarkMode,
+            color: const Color(0xFF9C27B0),
+            icono: Icons.article_outlined,
+            titulo: 'Noticias',
+            descripcion:
+                'Habilita la sección de noticias y eventos. Muestra las últimas novedades y avisos importantes.',
+            value: config.noticias,
+            onChanged: config.toggleNoticias,
+          ),
         ],
       ),
     );
   }
 }
 
-/// Fila de configuración con icono, título, descripción y switch.
 class ConfigItem extends StatelessWidget {
   final bool isDarkMode;
   final Color color;

@@ -1,25 +1,13 @@
 import 'package:flutter/material.dart';
 import '../services/control_service.dart';
 
-/// Provider que gestiona el estado de las funcionalidades configurables
-/// de la app móvil. Se conecta al backend a través de [ControlService].
-///
-/// ✅ Controles CON endpoint en el backend:
-///   - Rutas Turísticas   → "routes"
-///   - Asistente IA       → "IA_Chatbox"
-///   - Mapas Interactivos → "monuments"
-///
-/// ⚠️ Controles SIN endpoint en el backend (solo locales por ahora):
-///   - Notificaciones Push  (no existe /control/notifications)
-///   - Audio Guías          (no existe /control/audioGuides)
-///   - Créditos             (no existe /control/credits)
 class ConfiguracionProvider extends ChangeNotifier {
   final ControlService _controlService = ControlService();
 
-  // Controles con endpoint en el backend
   bool rutasTuristicas = true;
   bool asistenteIA = true;
   bool mapasInteractivos = true;
+  bool noticias = true;
 
   bool _hayPendientes = false;
   bool _cargando = false;
@@ -32,27 +20,29 @@ class ConfiguracionProvider extends ChangeNotifier {
   bool get cargandoInicial => _cargandoInicial;
   String? get error => _error;
 
-  // ─── Carga inicial del backend ─────────────────────────────────────────────
+
 
   Future<void> cargarConfiguracion() async {
     _cargandoInicial = true;
     _error = null;
     notifyListeners();
 
-    // GET /public/control → lista de todos los controles
     final lista = await _controlService.obtenerTodos();
 
     if (lista != null) {
       for (final control in lista) {
         switch (control.name) {
           case ControlService.nombreRutas:
-            rutasTuristicas = control.active;
+            rutasTuristicas = control.isActive;
             break;
           case ControlService.nombreIA:
-            asistenteIA = control.active;
+            asistenteIA = control.isActive;
             break;
           case ControlService.nombreMonumentos:
-            mapasInteractivos = control.active;
+            mapasInteractivos = control.isActive;
+            break;
+          case ControlService.nombreNoticias:
+            noticias = control.isActive;
             break;
         }
       }
@@ -65,7 +55,7 @@ class ConfiguracionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ─── Toggles ───────────────────────────────────────────────────────────────
+
 
   void _toggle(bool value, void Function(bool) setter) {
     setter(value);
@@ -76,15 +66,13 @@ class ConfiguracionProvider extends ChangeNotifier {
   void toggleRutas(bool v) => _toggle(v, (val) => rutasTuristicas = val);
   void toggleAsistenteIA(bool v) => _toggle(v, (val) => asistenteIA = val);
   void toggleMapas(bool v) => _toggle(v, (val) => mapasInteractivos = val);
-
-  // ─── Guardar en el backend ─────────────────────────────────────────────────
+  void toggleNoticias(bool v) => _toggle(v, (val) => noticias = val);
 
   Future<bool> guardarConfiguracion() async {
     _cargando = true;
     _error = null;
     notifyListeners();
 
-    // Guardamos solo los controles que tienen endpoint
     final resultados = await Future.wait([
       _controlService.actualizarEstado(
         ControlService.nombreRutas,
@@ -98,9 +86,12 @@ class ConfiguracionProvider extends ChangeNotifier {
         ControlService.nombreMonumentos,
         mapasInteractivos,
       ),
+      _controlService.actualizarEstado(
+        ControlService.nombreNoticias,
+        noticias,
+      ),
     ]);
 
-    // Si alguno devolvió null, hubo un error en esa petición
     final exito = resultados.every((r) => r != null);
 
     if (exito) {
@@ -114,10 +105,7 @@ class ConfiguracionProvider extends ChangeNotifier {
     return exito;
   }
 
-  // ─── Descartar cambios ─────────────────────────────────────────────────────
-
   void descartarCambios() {
-    // Recargamos desde el backend para restaurar el estado real
     cargarConfiguracion();
   }
 }
