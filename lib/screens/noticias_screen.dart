@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:provider/provider.dart';
-import '../models/noticia_model.dart';
 import '../providers/noticias_provider.dart';
 import '../providers/tema_provider.dart';
 import '../widgets/app_bar_principal.dart';
