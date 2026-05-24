@@ -15,10 +15,7 @@ class _ItemMenu {
 }
 
 const _itemsMenu = [
-  _ItemMenu(icon: Icons.grid_view,       label: 'Panel Principal', ruta: '/dashboard'),
-  _ItemMenu(icon: Icons.account_balance, label: 'Monumentos',      ruta: '/monumentos/agregar'),
   _ItemMenu(icon: Icons.article,         label: 'Noticias',        ruta: '/noticias'),
-  _ItemMenu(icon: Icons.analytics,       label: 'Rendimiento',     ruta: '/rendimiento'),
   _ItemMenu(icon: Icons.settings,        label: 'Configuración',   ruta: '/configuracion'),
 ];
 

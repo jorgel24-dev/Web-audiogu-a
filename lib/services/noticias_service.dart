@@ -6,12 +6,6 @@ class NoticiasService {
   final String _url = 'http://backend-tfg-escuchatuhistoria.onrender.com/api/v1';
 
 
-  final Map<String, String> _headersAdmin = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Basic ${base64Encode(utf8.encode('admin:admin123'))}',
-  };
-
-
   Future<List<Noticia>?> obtenerTodas() async {
     final response = await get(
       Uri.parse('$_url/public/news'),
@@ -46,10 +40,14 @@ class NoticiasService {
     int estado,
     DateTime? fechaPublicacion,
     String? imagenUrl,
+    String authHeader,
   ) async {
     final response = await post(
       Uri.parse('$_url/admin/news'),
-      headers: _headersAdmin,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader,
+      },
       body: jsonEncode({
         "titulo": titulo,
         "subtitulo": subtitulo,
@@ -73,10 +71,14 @@ class NoticiasService {
     int estado,
     DateTime? fechaPublicacion,
     String? imagenUrl,
+    String authHeader,
   ) async {
     final response = await put(
       Uri.parse('$_url/admin/news/$id'),
-      headers: _headersAdmin,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader,
+      },
       body: jsonEncode({
         "titulo": titulo,
         "subtitulo": subtitulo,
@@ -93,10 +95,13 @@ class NoticiasService {
   }
 
 
-  Future<bool> eliminar(String id) async {
+  Future<bool> eliminar(String id, String authHeader) async {
     final response = await delete(
       Uri.parse('$_url/admin/news/$id'),
-      headers: _headersAdmin,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader,
+      },
     );
 
     return response.statusCode == 204 || response.statusCode == 200;

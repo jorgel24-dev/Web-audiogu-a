@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../services/control_service.dart';
 
@@ -73,22 +74,28 @@ class ConfiguracionProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
 
+    final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
+
     final resultados = await Future.wait([
       _controlService.actualizarEstado(
         ControlService.nombreRutas,
         rutasTuristicas,
+        authHeader,
       ),
       _controlService.actualizarEstado(
         ControlService.nombreIA,
         asistenteIA,
+        authHeader,
       ),
       _controlService.actualizarEstado(
         ControlService.nombreMonumentos,
         mapasInteractivos,
+        authHeader,
       ),
       _controlService.actualizarEstado(
         ControlService.nombreNoticias,
         noticias,
+        authHeader,
       ),
     ]);
 

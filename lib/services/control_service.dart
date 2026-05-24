@@ -6,12 +6,6 @@ class ControlService {
   final String _url = 'http://backend-tfg-escuchatuhistoria.onrender.com/api/v1';
 
 
-  final Map<String, String> _headersAdmin = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Basic ${base64Encode(utf8.encode('admin:admin123'))}',
-  };
-
-
   static const String nombreMonumentos = 'monuments';
   static const String nombreRutas = 'routes';
   static const String nombreIA = 'IA_Chatbox';
@@ -49,10 +43,13 @@ class ControlService {
   }
 
 
-  Future<ControlModel?> actualizarEstado(String nombre, bool activo) async {
+  Future<ControlModel?> actualizarEstado(String nombre, bool activo, String authHeader) async {
     final response = await put(
       Uri.parse('$_url/admin/control/$nombre'),
-      headers: _headersAdmin,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader,
+      },
       body: jsonEncode({'active': activo}),
     );
     if (response.statusCode == 200) {

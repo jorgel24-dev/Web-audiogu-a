@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/noticia_model.dart';
 import '../services/noticias_service.dart';
@@ -147,6 +148,7 @@ class NoticiasProvider extends ChangeNotifier {
     notifyListeners();
 
     bool exito = false;
+    final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
 
     if (_noticiaSeleccionada != null) {
       final actualizada = await _noticiasService.actualizar(
@@ -157,6 +159,7 @@ class NoticiasProvider extends ChangeNotifier {
         estadoEditor,
         fechaPublicacion,
         _noticiaSeleccionada?.imagenUrl,
+        authHeader,
       );
       if (actualizada != null) {
         final index = _noticias.indexWhere((n) => n.id == actualizada.id);
@@ -172,6 +175,7 @@ class NoticiasProvider extends ChangeNotifier {
         estadoEditor,
         fechaPublicacion,
         null,
+        authHeader,
       );
       if (creada != null) {
         _noticias.insert(0, creada);
@@ -205,7 +209,8 @@ class NoticiasProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
 
-    final ok = await _noticiasService.eliminar(_noticiaSeleccionada!.id);
+    final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
+    final ok = await _noticiasService.eliminar(_noticiaSeleccionada!.id, authHeader);
 
     if (ok) {
       _noticias.removeWhere((n) => n.id == _noticiaSeleccionada!.id);
