@@ -1,3 +1,5 @@
+import 'package:audioguia_web/providers/monumentos_provider.dart';
+import 'package:audioguia_web/providers/rendimiento_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +15,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => NoticiasProvider()),
         ChangeNotifierProvider(create: (_) => TemaProvider()),
         ChangeNotifierProvider(create: (_) => ConfiguracionProvider()),
+        ChangeNotifierProvider(create: (_) => RendimientoProvider()),
+        ChangeNotifierProvider(create: (_) => MonumentosProvider()),
       ],
       child: const MainApp(),
     ),
