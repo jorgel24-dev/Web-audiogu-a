@@ -71,22 +71,25 @@ class ApiService {
 
   Future<bool> crearMonumento({
     required Monumento monumento,
-    required Uint8List? imagenBytes, // No se usan en este endpoint según el backend
+    required Uint8List? imagenBytes, 
     required String? imagenNombre,
-    required Uint8List? audioBytes,  // No se usan en este endpoint según el backend
+    required Uint8List? audioBytes,  
     required String? audioNombre,
   }) async {
     try {
       final uri = Uri.parse('$_baseUrl/admin/monuments');
 
-      // Construimos el JSON con la estructura exacta que exige el modelo Java (Monument.java)
+      // Generamos la fecha actual en el formato ISO estándar que entiende Spring Boot
+      final String fechaActual = DateTime.now().toIso8601String().substring(0, 19); // Cortamos a 'YYYY-MM-DDTHH:MM:SS'
+
       final Map<String, dynamic> bodyJson = {
         'name': monumento.nombre,
         'description': [], // El backend espera un List<Description> según el modelo
         'lat': double.tryParse(monumento.latitud.toString()) ?? 0.0,
         'lon': double.tryParse(monumento.longitud.toString()) ?? 0.0,
         'accessibility': monumento.accesible,
-        'isActive': monumento.activo, // Mapea a @JsonProperty("isActive") -> private Boolean activate;
+        'isActive': monumento.activo, 
+        'maps_url': 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
         'tag': {
           'id': int.tryParse(monumento.categoria) ?? 1 // Pasa el objeto Tag con su ID correspondiente
         },
@@ -94,15 +97,16 @@ class ApiService {
         'audio': [],   // List<Audio> en blanco por ahora
         'localidad_id': 1, // Añade el id de localidad si tu tabla lo requiere obligatoriamente
         'NLikes': 0,
-        'n_likes': 0
+        'n_likes': 0,
+        'created_at': fechaActual, 
+        'last_modified': fechaActual
       };
 
-      print("Enviando JSON puro al backend...");
+      print("Enviando JSON completo y corregido al backend...");
       
-      // Hacemos un POST normal de JSON, respetando el @RequestBody del backend
       final response = await http.post(
         uri,
-        headers: _headers, // Usa tus headers que ya incluyen Content-Type: application/json y Authorization
+        headers: _headers,
         body: jsonEncode(bodyJson),
       );
 
