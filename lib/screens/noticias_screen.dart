@@ -415,6 +415,10 @@ class _PanelEditorState extends State<_PanelEditor> {
                                     const Spacer(),
                                   ],
                                 ),
+                                const SizedBox(height: 16),
+                                LabelCampo(label: 'Imagen de Portada'),
+                                const SizedBox(height: 6),
+                                _SelectorImagen(isDarkMode: isDarkMode),
                               ],
                             ),
                           ),
@@ -740,3 +744,75 @@ class _BotonGuardar extends StatelessWidget {
     );
   }
 }
+
+class _SelectorImagen extends StatelessWidget {
+  final bool isDarkMode;
+
+  const _SelectorImagen({required this.isDarkMode});
+
+  @override
+  Widget build(BuildContext context) {
+    final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final hasImage = noticiasProvider.imagenUrl != null || noticiasProvider.imagenBytes != null;
+    final borderColor = isDarkMode ? Colors.white24 : Colors.grey[300]!;
+    final fillColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: fillColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (hasImage) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: noticiasProvider.imagenBytes != null
+                  ? Image.memory(
+                      noticiasProvider.imagenBytes!,
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.network(
+                      noticiasProvider.imagenUrl!,
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Container(
+                            height: 150,
+                            color: Colors.grey[300],
+                            child: const Center(child: Icon(Icons.broken_image)),
+                          ),
+                    ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          OutlinedButton.icon(
+            onPressed: () => noticiasProvider.seleccionarImagen(),
+            icon: const Icon(Icons.upload_file, size: 18),
+            label: Text(hasImage ? 'Cambiar Imagen' : 'Subir Imagen'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF2D6A4F),
+              side: const BorderSide(color: Color(0xFF2D6A4F)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          if (noticiasProvider.imagenNombre != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Archivo seleccionado: ${noticiasProvider.imagenNombre}',
+              style: TextStyle(fontSize: 12, color: Colors.green[700]),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+

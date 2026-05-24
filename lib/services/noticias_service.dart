@@ -3,33 +3,41 @@ import 'package:http/http.dart';
 import '../models/noticia_model.dart';
 
 class NoticiasService {
-  final String _url = 'http://backend-tfg-escuchatuhistoria.onrender.com/api/v1';
+  final String _url = 'https://backend-tfg.fly.dev/api/v1';
 
 
   Future<List<Noticia>?> obtenerTodas() async {
-    final response = await get(
-      Uri.parse('$_url/public/news'),
-      headers: {'Content-Type': 'application/json'},
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> lista = json.decode(response.body);
-      return lista
-          .map((item) => Noticia.fromJson(item as Map<String, dynamic>))
-          .toList();
+    try {
+      final response = await get(
+        Uri.parse('$_url/public/news'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> lista = json.decode(response.body);
+        return lista
+            .map((item) => Noticia.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
 
   Future<Noticia?> obtenerPorId(String id) async {
-    final response = await get(
-      Uri.parse('$_url/public/news/$id'),
-      headers: {'Content-Type': 'application/json'},
-    );
-    if (response.statusCode == 200) {
-      return Noticia.fromRawJson(response.body);
+    try {
+      final response = await get(
+        Uri.parse('$_url/public/news/$id'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        return Noticia.fromRawJson(response.body);
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
 
@@ -42,25 +50,29 @@ class NoticiasService {
     String? imagenUrl,
     String authHeader,
   ) async {
-    final response = await post(
-      Uri.parse('$_url/admin/news'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
-      body: jsonEncode({
-        "titulo": titulo,
-        "subtitulo": subtitulo,
-        "contenido": contenido,
-        "estado": estado,
-        if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
-        if (imagenUrl != null) "imagen_url": imagenUrl,
-      }),
-    );
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return Noticia.fromRawJson(response.body);
+    try {
+      final response = await post(
+        Uri.parse('$_url/admin/news'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader,
+        },
+        body: jsonEncode({
+          "titulo": titulo,
+          "subtitulo": subtitulo,
+          "contenido": contenido,
+          "estado": estado,
+          if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
+          if (imagenUrl != null) "imagen_url": imagenUrl,
+        }),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return Noticia.fromRawJson(response.body);
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
   Future<Noticia?> actualizar(
@@ -73,37 +85,45 @@ class NoticiasService {
     String? imagenUrl,
     String authHeader,
   ) async {
-    final response = await put(
-      Uri.parse('$_url/admin/news/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
-      body: jsonEncode({
-        "titulo": titulo,
-        "subtitulo": subtitulo,
-        "contenido": contenido,
-        "estado": estado,
-        if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
-        if (imagenUrl != null) "imagen_url": imagenUrl,
-      }),
-    );
-    if (response.statusCode == 200) {
-      return Noticia.fromRawJson(response.body);
+    try {
+      final response = await put(
+        Uri.parse('$_url/admin/news/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader,
+        },
+        body: jsonEncode({
+          "titulo": titulo,
+          "subtitulo": subtitulo,
+          "contenido": contenido,
+          "estado": estado,
+          if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
+          if (imagenUrl != null) "imagen_url": imagenUrl,
+        }),
+      );
+      if (response.statusCode == 200) {
+        return Noticia.fromRawJson(response.body);
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
 
   Future<bool> eliminar(String id, String authHeader) async {
-    final response = await delete(
-      Uri.parse('$_url/admin/news/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
-    );
+    try {
+      final response = await delete(
+        Uri.parse('$_url/admin/news/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader,
+        },
+      );
 
-    return response.statusCode == 204 || response.statusCode == 200;
+      return response.statusCode == 204 || response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
 }

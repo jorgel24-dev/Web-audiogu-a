@@ -108,9 +108,7 @@ class _BotonesAppBar extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          ok
-                              ? 'Configuración guardada'
-                              : 'Error al guardar',
+                          ok ? 'Configuración guardada' : 'Error al guardar',
                         ),
                         backgroundColor: ok ? Colors.green : Colors.red,
                         duration: const Duration(seconds: 2),
@@ -211,39 +209,68 @@ class _CardConfiguracion extends StatelessWidget {
             ),
           ),
           Divider(height: 1, color: dividerColor),
-          ConfigItem(
+          
+          ConfigExpansionItem(
             isDarkMode: isDarkMode,
             color: const Color(0xFF4CAF50),
             icono: Icons.hiking,
-            titulo: 'Rutas Turísticas',
+            titulo: 'Rutas',
             descripcion:
                 'Habilita la sección de rutas recomendadas. Permite a los usuarios visualizar, seguir y descargar itinerarios turísticos predefinidos.',
             value: config.rutasTuristicas,
             onChanged: config.toggleRutas,
+            children: config.rutas.map((r) => SwitchListTile(
+              title: Text(
+                r.name,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                  fontSize: 13,
+                ),
+              ),
+              value: r.isActive,
+              onChanged: (v) => config.toggleRuta(r.id, v),
+              activeThumbColor: const Color(0xFF4CAF50),
+              contentPadding: const EdgeInsets.only(left: 70, right: 24),
+            )).toList(),
           ),
+          
           Divider(height: 1, color: dividerColor),
           ConfigItem(
             isDarkMode: isDarkMode,
             color: Colors.red[400]!,
             icono: Icons.smart_toy_outlined,
-            titulo: 'Asistente IA',
+            titulo: 'Chat IA',
             descripcion:
                 'Activa el chatbot inteligente basado en IA generativa. Responde preguntas sobre historia local, horarios de monumentos y ofrece recomendaciones personalizadas.',
-            advertencia: 'Consume tokens de API adicionales.',
             value: config.asistenteIA,
             onChanged: config.toggleAsistenteIA,
           ),
+          
           Divider(height: 1, color: dividerColor),
-          ConfigItem(
+          ConfigExpansionItem(
             isDarkMode: isDarkMode,
             color: const Color(0xFF2196F3),
             icono: Icons.map_outlined,
-            titulo: 'Mapas Interactivos',
+            titulo: 'Monumentos',
             descripcion:
                 'Muestra el mapa detallado con puntos de interés (POIs), geolocalización del usuario y filtros por categorías.',
             value: config.mapasInteractivos,
             onChanged: config.toggleMapas,
+            children: config.monumentos.map((m) => SwitchListTile(
+              title: Text(
+                m.name,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                  fontSize: 13,
+                ),
+              ),
+              value: m.isActive,
+              onChanged: (v) => config.toggleMonumento(m.id, v),
+              activeThumbColor: const Color(0xFF2196F3),
+              contentPadding: const EdgeInsets.only(left: 70, right: 24),
+            )).toList(),
           ),
+          
           Divider(height: 1, color: dividerColor),
           ConfigItem(
             isDarkMode: isDarkMode,
@@ -267,7 +294,6 @@ class ConfigItem extends StatelessWidget {
   final IconData icono;
   final String titulo;
   final String descripcion;
-  final String? advertencia;
   final bool value;
   final ValueChanged<bool> onChanged;
 
@@ -278,7 +304,6 @@ class ConfigItem extends StatelessWidget {
     required this.icono,
     required this.titulo,
     required this.descripcion,
-    this.advertencia,
     required this.value,
     required this.onChanged,
   });
@@ -316,13 +341,6 @@ class ConfigItem extends StatelessWidget {
                   descripcion,
                   style: TextStyle(fontSize: 12, color: descColor),
                 ),
-                if (advertencia != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    advertencia!,
-                    style: const TextStyle(fontSize: 11, color: Colors.orange),
-                  ),
-                ],
               ],
             ),
           ),
@@ -331,6 +349,128 @@ class ConfigItem extends StatelessWidget {
             value: value,
             onChanged: onChanged,
             activeThumbColor: const Color(0xFF2D6A4F),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ConfigExpansionItem extends StatelessWidget {
+  final bool isDarkMode;
+  final Color color;
+  final IconData icono;
+  final String titulo;
+  final String descripcion;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final List<Widget> children;
+
+  const ConfigExpansionItem({
+    super.key,
+    required this.isDarkMode,
+    required this.color,
+    required this.icono,
+    required this.titulo,
+    required this.descripcion,
+    required this.value,
+    required this.onChanged,
+    this.children = const [],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = isDarkMode ? Colors.white : Colors.black87;
+    final descColor = isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
+
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: color.withValues(alpha: 0.15),
+              child: Icon(icono, size: 20, color: color),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    titulo,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: titleColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    descripcion,
+                    style: TextStyle(fontSize: 12, color: descColor),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.02),
+              border: Border(
+                top: BorderSide(color: isDarkMode ? Colors.white10 : Colors.black12, width: 1),
+              ),
+            ),
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: Text(
+                    'Activar $titulo',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: titleColor,
+                      fontSize: 13,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Habilita o deshabilita este módulo por completo en la app',
+                    style: TextStyle(fontSize: 11, color: descColor),
+                  ),
+                  value: value,
+                  onChanged: onChanged,
+                  activeThumbColor: color,
+                  contentPadding: const EdgeInsets.only(left: 70, right: 24),
+                ),
+                  Divider(height: 1, indent: 70, color: isDarkMode ? Colors.white10 : Colors.black12),
+                  if (children.isNotEmpty)
+                    ...children
+                  else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      child: Row(
+                        children: [
+                          Icon(Icons.warning_amber_rounded, color: Colors.orange[400], size: 22),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'No se han podido cargar los elementos desde el servidor. Comprueba la conexión o la configuración.',
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.white70 : Colors.black54,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+            ),
           ),
         ],
       ),

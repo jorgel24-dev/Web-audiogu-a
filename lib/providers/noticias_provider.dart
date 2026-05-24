@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
 import '../models/noticia_model.dart';
 import '../services/noticias_service.dart';
+import '../services/supabase_service.dart';
 
 class NoticiasProvider extends ChangeNotifier {
   final NoticiasService _noticiasService = NoticiasService();
@@ -29,6 +32,9 @@ class NoticiasProvider extends ChangeNotifier {
   String contenido = '';
   DateTime? fechaPublicacion;
   int estadoEditor = 0;
+  String? imagenUrl;
+  Uint8List? imagenBytes;
+  String? imagenNombre;
 
   bool get cargando => _cargando;
   bool get cargandoLista => _cargandoLista;
@@ -120,6 +126,9 @@ class NoticiasProvider extends ChangeNotifier {
     contenido = noticia.contenido;
     fechaPublicacion = noticia.fechaPublicacion;
     estadoEditor = noticia.estado;
+    imagenUrl = noticia.imagenUrl;
+    imagenBytes = null;
+    imagenNombre = null;
     _editorKey++;
     notifyListeners();
   }
@@ -132,9 +141,24 @@ class NoticiasProvider extends ChangeNotifier {
     contenido = '';
     fechaPublicacion = null;
     estadoEditor = 0;
+    imagenUrl = null;
+    imagenBytes = null;
+    imagenNombre = null;
     _editorKey++;
     formKey = GlobalKey<FormState>();
     notifyListeners();
+  }
+
+  // ─── Selección de imagen y subida ──────────────────────────────────────────
+
+  Future<void> seleccionarImagen() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      imagenBytes = await image.readAsBytes();
+      imagenNombre = image.name;
+      notifyListeners();
+    }
   }
 
   // ─── Guardar (crear o actualizar) ──────────────────────────────────────────
@@ -150,6 +174,23 @@ class NoticiasProvider extends ChangeNotifier {
     bool exito = false;
     final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
 
+    // Subir imagen a Supabase si se seleccionó una nueva
+    if (imagenBytes != null && imagenNombre != null) {
+      final supabaseService = SupabaseService();
+      final url = await supabaseService.subirImagen(imagenBytes!, imagenNombre!);
+      if (url != null) {
+        imagenUrl = url;
+        // Limpiamos los bytes pendientes porque ya los subimos
+        imagenBytes = null;
+        imagenNombre = null;
+      } else {
+        _error = 'Error al subir la imagen a Supabase.';
+        _cargando = false;
+        notifyListeners();
+        return false;
+      }
+    }
+
     if (_noticiaSeleccionada != null) {
       final actualizada = await _noticiasService.actualizar(
         _noticiaSeleccionada!.id,
@@ -158,7 +199,7 @@ class NoticiasProvider extends ChangeNotifier {
         contenido,
         estadoEditor,
         fechaPublicacion,
-        _noticiaSeleccionada?.imagenUrl,
+        imagenUrl ?? _noticiaSeleccionada?.imagenUrl,
         authHeader,
       );
       if (actualizada != null) {
@@ -174,7 +215,7 @@ class NoticiasProvider extends ChangeNotifier {
         contenido,
         estadoEditor,
         fechaPublicacion,
-        null,
+        imagenUrl,
         authHeader,
       );
       if (creada != null) {
@@ -221,6 +262,9 @@ class NoticiasProvider extends ChangeNotifier {
       contenido = '';
       fechaPublicacion = null;
       estadoEditor = 0;
+      imagenUrl = null;
+      imagenBytes = null;
+      imagenNombre = null;
       _editorKey++;
       _cargando = false;
       notifyListeners();
