@@ -3,7 +3,8 @@ class Monumento {
   final String nombre;
   final String descripcion;
   final String categoria;
-  final String estado;
+  final bool accesible;   
+  final bool activo;      
   final double latitud;
   final double longitud;
   final String? imagenUrl;
@@ -14,38 +15,24 @@ class Monumento {
     required this.nombre,
     required this.descripcion,
     required this.categoria,
-    required this.estado,
+    required this.accesible,
+    required this.activo,
     required this.latitud,
     required this.longitud,
     this.imagenUrl,
     this.audioUrl,
   });
 
-  Map<String, dynamic> toJson() {
+  // Este método genera la estructura exacta que espera tu Spring Boot
+  Map<String, String> toBackendJson() {
     return {
-      'id': id,
-      'nombre': nombre,
-      'descripcion': descripcion,
-      'categoria': categoria,
-      'estado': estado,
-      'latitud': latitud,
-      'longitud': longitud,
-      'imagenUrl': imagenUrl,
-      'audioUrl': audioUrl,
+      'name': nombre,
+      'description': descripcion,
+      'latitude': latitud.toString(),
+      'longitude': longitud.toString(),
+      'accessibility': accesible.toString(),
+      'isActive': activo.toString(),
+      'tagId': categoria, 
     };
-  }
-
-  factory Monumento.fromJson(Map<String, dynamic> json) {
-    return Monumento(
-      id: json['id']?.toString(),
-      nombre: json['nombre'] ?? '',
-      descripcion: json['descripcion'] ?? '',
-      categoria: json['categoria'] ?? '',
-      estado: json['estado'] ?? 'Publicado',
-      latitud: (json['latitud'] as num).toDouble(),
-      longitud: (json['longitud'] as num).toDouble(),
-      imagenUrl: json['imagenUrl'],
-      audioUrl: json['audioUrl'],
-    );
   }
 }

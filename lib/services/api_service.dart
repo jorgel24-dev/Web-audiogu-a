@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:audioguia_web/models/monumento_model.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String _baseUrl = 'https://corsproxy.io/?https://backend-tfg.fly.dev/api/v1';
+  final String _baseUrl = 'https://backend-tfg.fly.dev/api/v1';
 
   // Helper para headers
   Map<String, String> get _headers => {
@@ -64,6 +66,56 @@ class ApiService {
       return json.decode(response.body);
     } else {
       throw Exception('Error ${response.statusCode}: ${response.body}');
+    }
+  }
+
+  Future<bool> crearMonumento({
+    required Monumento monumento,
+    required Uint8List? imagenBytes, // No se usan en este endpoint según el backend
+    required String? imagenNombre,
+    required Uint8List? audioBytes,  // No se usan en este endpoint según el backend
+    required String? audioNombre,
+  }) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/admin/monuments');
+
+      // Construimos el JSON con la estructura exacta que exige el modelo Java (Monument.java)
+      final Map<String, dynamic> bodyJson = {
+        'name': monumento.nombre,
+        'description': [], // El backend espera un List<Description> según el modelo
+        'lat': double.tryParse(monumento.latitud.toString()) ?? 0.0,
+        'lon': double.tryParse(monumento.longitud.toString()) ?? 0.0,
+        'accessibility': monumento.accesible,
+        'isActive': monumento.activo, // Mapea a @JsonProperty("isActive") -> private Boolean activate;
+        'tag': {
+          'id': int.tryParse(monumento.categoria) ?? 1 // Pasa el objeto Tag con su ID correspondiente
+        },
+        'picture': [], // List<Picture> en blanco por ahora
+        'audio': [],   // List<Audio> en blanco por ahora
+        'localidad_id': 1, // Añade el id de localidad si tu tabla lo requiere obligatoriamente
+        'NLikes': 0,
+        'n_likes': 0
+      };
+
+      print("Enviando JSON puro al backend...");
+      
+      // Hacemos un POST normal de JSON, respetando el @RequestBody del backend
+      final response = await http.post(
+        uri,
+        headers: _headers, // Usa tus headers que ya incluyen Content-Type: application/json y Authorization
+        body: jsonEncode(bodyJson),
+      );
+
+      print("Respuesta servidor crear: ${response.statusCode} - ${response.body}");
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('Error al crear monumento: ${response.body}');
+      }
+    } catch (e) {
+      print("Excepción en crearMonumento: $e");
+      rethrow;
     }
   }
 }

@@ -28,9 +28,16 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Publicado';
 
+  // Mapa para transformar los nombres legibles a los ID de tags que espera Spring Boot
+  final Map<String, String> _categoriasMap = {
+    'Monumentos Históricos': '1',
+    'Iglesias': '2',
+    'Fuentes': '3',
+    'Parques': '4',
+  };
+
   @override
   void dispose() {
-    // Evitamos fugas de memoria limpiando los controladores
     _nombreController.dispose();
     _descripcionController.dispose();
     _latController.dispose();
@@ -39,26 +46,29 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   }
 
   Future<void> _ejecutarGuardado() async {
-    // Validación segura sin lanzar excepciones controlando el nulo
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
 
     final double lat = double.tryParse(_latController.text) ?? 37.7214;
     final double lon = double.tryParse(_lonController.text) ?? -4.0321;
 
+    // Obtenemos el ID correspondiente de la categoría para Spring Boot
+    final String tagIdId = _categoriasMap[_categoriaSeleccionada] ?? '1';
+
     // Estructuramos el modelo con los datos recolectados
     final nuevoMonumento = Monumento(
       nombre: _nombreController.text,
       descripcion: _descripcionController.text,
-      categoria: _categoriaSeleccionada,
-      estado: _estadoSeleccionado,
+      categoria: tagIdId, // Enviamos el ID al Backend
+      accesible: false,   // Por defecto false, puedes cambiarlo según tu lógica
+      activo: _estadoSeleccionado == 'Publicado', // true si está publicado
       latitud: lat,
       longitud: lon,
     );
 
-    // Despachamos la petición HTTP mediante el Provider de monumentos
-    final monumentosProv = context.read<MonumentosProvider>();
-    final exito = await monumentosProv.guardarMonumento(nuevoMonumento);
+    // Despachamos la petición HTTP mediante el Provider correcto configurado en main.dart
+    final nuevoMonumentoProv = context.read<NuevoMonumentoProvider>();
+    final exito = await nuevoMonumentoProv.guardarMonumento(nuevoMonumento);
 
     if (mounted) {
       if (exito) {
@@ -83,7 +93,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<TemaProvider>().isDarkMode;
-    final monumentosProv = context.watch<MonumentosProvider>();
+    final nuevoMonumentoProv = context.watch<NuevoMonumentoProvider>();
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
@@ -100,7 +110,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
           VerticalDivider(width: 1, color: dividerColor),
           Expanded(
             child: Form(
-              key: _formKey, // Asignación de la llave global al Formulario contenedor
+              key: _formKey,
               child: Column(
                 children: [
                   Expanded(
@@ -123,7 +133,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                       ),
                     ),
                   ),
-                  _buildFooter(context, isDarkMode, monumentosProv.isSaving),
+                  _buildFooter(context, isDarkMode, nuevoMonumentoProv.isSaving),
                 ],
               ),
             ),
@@ -149,7 +159,10 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: isSaving ? null : () => context.go('/dashboard'),
+              onPressed: isSaving ? null : () {
+                context.read<NuevoMonumentoProvider>().limpiarArchivos();
+                context.go('/dashboard');
+              },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: BorderSide(color: cancelBorderColor),
@@ -209,13 +222,14 @@ class _FormularioMonumento extends StatelessWidget {
   Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
   Color get _fieldBorder => isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
   Color get _uploadBoxBg => isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
-  Color get _mapBg => isDarkMode ? const Color(0xFF263040) : const Color(0xFFE9ECEF);
-  Color get _mapIconColor => isDarkMode ? Colors.grey[500]! : const Color(0xFF6C757D);
   Color get _hintColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
   Color get _subtextColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
 
   @override
   Widget build(BuildContext context) {
+    // Escuchamos el provider para reaccionar al cambio de nombre de los archivos cargados
+    final nuevoMonumentoProv = context.watch<NuevoMonumentoProvider>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -223,8 +237,10 @@ class _FormularioMonumento extends StatelessWidget {
         const SizedBox(height: 8),
         _buildUploadBox(
           icon: Icons.image_outlined,
-          label: 'Subir un archivo o arrastrar y soltar',
+          label: nuevoMonumentoProv.imagenNombre ?? 'Subir un archivo o arrastrar y soltar',
           sublabel: 'PNG, JPG, GIF hasta 10MB',
+          onTap: () => nuevoMonumentoProv.seleccionarImagen(),
+          hasFile: nuevoMonumentoProv.imagenNombre != null,
         ),
         const SizedBox(height: 20),
 
@@ -282,8 +298,10 @@ class _FormularioMonumento extends StatelessWidget {
         const SizedBox(height: 8),
         _buildUploadBox(
           icon: Icons.mic_none_outlined,
-          label: 'Subir audios o notas de voz',
+          label: nuevoMonumentoProv.audioNombre ?? 'Subir audios o notas de voz',
           sublabel: 'MP3, WAV hasta 20MB',
+          onTap: () => nuevoMonumentoProv.seleccionarAudio(),
+          hasFile: nuevoMonumentoProv.audioNombre != null,
         ),
         const SizedBox(height: 24),
 
@@ -297,19 +315,6 @@ class _FormularioMonumento extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Container(
-          height: 150,
-          width: double.infinity,
-          decoration: BoxDecoration(color: _mapBg, borderRadius: BorderRadius.circular(8)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.map_outlined, color: _mapIconColor, size: 30),
-              const SizedBox(height: 8),
-              Text('Vista previa del mapa', style: TextStyle(color: _mapIconColor)),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -348,7 +353,7 @@ class _FormularioMonumento extends StatelessWidget {
     required ValueChanged<String?> onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       dropdownColor: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
       items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
@@ -363,26 +368,47 @@ class _FormularioMonumento extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadBox({required IconData icon, required String label, required String sublabel}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 30),
-      decoration: BoxDecoration(color: _uploadBoxBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: _fieldBorder)),
-      child: Column(
-        children: [
-          Icon(icon, color: _hintColor, size: 40),
-          const SizedBox(height: 12),
-          RichText(
-            text: TextSpan(
-              children: [
-                const TextSpan(text: 'Subir un archivo ', style: TextStyle(color: Color(0xFF008F68), fontWeight: FontWeight.bold)),
-                TextSpan(text: label.replaceFirst('Subir un archivo', ''), style: TextStyle(color: _hintColor)),
-              ],
+  Widget _buildUploadBox({
+    required IconData icon, 
+    required String label, 
+    required String sublabel,
+    required VoidCallback onTap,
+    required bool hasFile,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+        decoration: BoxDecoration(
+          color: _uploadBoxBg, 
+          borderRadius: BorderRadius.circular(12), 
+          border: Border.all(color: hasFile ? const Color(0xFF008F68) : _fieldBorder, width: hasFile ? 2 : 1),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: hasFile ? const Color(0xFF008F68) : _hintColor, size: 40),
+            const SizedBox(height: 12),
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: hasFile ? 'Archivo seleccionado: ' : 'Subir un archivo ', 
+                    style: TextStyle(color: const Color(0xFF008F68), fontWeight: FontWeight.bold)
+                  ),
+                  TextSpan(
+                    text: hasFile ? label : label.replaceFirst('Subir un archivo', ''), 
+                    style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87, fontWeight: hasFile ? FontWeight.w500 : FontWeight.normal)
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(sublabel, style: TextStyle(color: _subtextColor, fontSize: 12)),
-        ],
+            const SizedBox(height: 4),
+            Text(sublabel, style: TextStyle(color: _subtextColor, fontSize: 12)),
+          ],
+        ),
       ),
     );
   }

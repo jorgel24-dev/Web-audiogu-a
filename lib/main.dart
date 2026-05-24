@@ -16,7 +16,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => TemaProvider()),
         ChangeNotifierProvider(create: (_) => ConfiguracionProvider()),
         ChangeNotifierProvider(create: (_) => RendimientoProvider()),
-        ChangeNotifierProvider(create: (_) => MonumentosProvider()),
+        ChangeNotifierProvider(create: (_) => NuevoMonumentoProvider()),
       ],
       child: const MainApp(),
     ),
