@@ -3,8 +3,8 @@ import 'package:http/http.dart';
 import '../models/control_model.dart';
 
 class ControlService {
-  final String _url = 'https://backend-tfg.fly.dev/api/v1';
-
+  final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/control';
+  final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/control';
 
   static const String nombreMonumentos = 'monuments';
   static const String nombreRutas = 'routes';
@@ -15,11 +15,11 @@ class ControlService {
   Future<List<ControlModel>?> obtenerTodos() async {
     try {
       final response = await get(
-        Uri.parse('$_url/public/control'),
+        Uri.parse(_urlPublic),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
-        final List<dynamic> lista = json.decode(response.body);
+        final List<dynamic> lista = json.decode(utf8.decode(response.bodyBytes));
         return lista
             .map((item) => ControlModel.fromJson(item as Map<String, dynamic>))
             .toList();
@@ -34,11 +34,11 @@ class ControlService {
   Future<bool?> obtenerEstado(String nombre) async {
     try {
       final response = await get(
-        Uri.parse('$_url/public/control/$nombre/status'),
+        Uri.parse('$_urlPublic/$nombre/status'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = json.decode(utf8.decode(response.bodyBytes));
         if (body is bool) return body;
         if (body is Map<String, dynamic>) {
           return body['active'] ?? body['activo'] ?? body['isActive'];
@@ -54,7 +54,7 @@ class ControlService {
   Future<ControlModel?> actualizarEstado(String nombre, bool activo, String authHeader) async {
     try {
       final response = await put(
-        Uri.parse('$_url/admin/control/$nombre'),
+        Uri.parse('$_urlAdmin/$nombre'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': authHeader,
@@ -62,7 +62,8 @@ class ControlService {
         body: jsonEncode({'active': activo}),
       );
       if (response.statusCode == 200) {
-        return ControlModel.fromRawJson(response.body);
+        return ControlModel.fromJson(
+            json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>);
       }
       return null;
     } catch (e) {

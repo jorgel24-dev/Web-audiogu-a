@@ -66,8 +66,6 @@ class NoticiasProvider extends ChangeNotifier {
     return resultado;
   }
 
-  // ─── Carga inicial del backend ─────────────────────────────────────────────
-
   Future<void> cargarNoticias() async {
     _cargandoLista = true;
     _error = null;
@@ -86,8 +84,6 @@ class NoticiasProvider extends ChangeNotifier {
     _cargandoLista = false;
     notifyListeners();
   }
-
-  // ─── Setters de campos del editor ─────────────────────────────────────────
 
   void setTitulo(String value) {
     titulo = value;
@@ -115,8 +111,6 @@ class NoticiasProvider extends ChangeNotifier {
     _textoBusqueda = texto;
     notifyListeners();
   }
-
-  // ─── Selección y creación ──────────────────────────────────────────────────
 
   void seleccionarNoticia(Noticia noticia) {
     _noticiaSeleccionada = noticia;
@@ -149,8 +143,6 @@ class NoticiasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ─── Selección de imagen y subida ──────────────────────────────────────────
-
   Future<void> seleccionarImagen() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -160,8 +152,6 @@ class NoticiasProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // ─── Guardar (crear o actualizar) ──────────────────────────────────────────
 
   Future<bool> guardarCambios() async {
     final esValido = formKey.currentState?.validate() ?? false;
@@ -174,13 +164,11 @@ class NoticiasProvider extends ChangeNotifier {
     bool exito = false;
     final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
 
-    // Subir imagen a Supabase si se seleccionó una nueva
     if (imagenBytes != null && imagenNombre != null) {
       final supabaseService = SupabaseService();
       final url = await supabaseService.subirImagen(imagenBytes!, imagenNombre!);
       if (url != null) {
         imagenUrl = url;
-        // Limpiamos los bytes pendientes porque ya los subimos
         imagenBytes = null;
         imagenNombre = null;
       } else {
@@ -231,8 +219,6 @@ class NoticiasProvider extends ChangeNotifier {
     return exito;
   }
 
-  // ─── Cambiar estado ────────────────────────────────────────────────────────
-
   void cambiarEstado(int nuevoEstado) {
     estadoEditor = nuevoEstado;
     if (_noticiaSeleccionada != null) {
@@ -240,8 +226,6 @@ class NoticiasProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  // ─── Eliminar noticia ──────────────────────────────────────────────────────
 
   Future<bool> eliminarNoticia() async {
     if (_noticiaSeleccionada == null) return false;

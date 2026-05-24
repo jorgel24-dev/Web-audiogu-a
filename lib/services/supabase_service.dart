@@ -4,31 +4,27 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  /// Sube un archivo a Supabase Storage y devuelve la URL pública.
   Future<String?> subirImagen(Uint8List bytes, String nombreArchivo) async {
     try {
-      final currentYear = DateTime.now().year.toString();
-      // Generamos un nombre único para evitar colisiones
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
       final extension = nombreArchivo.split('.').last;
-      final uniqueName = '${timestamp}_$nombreArchivo';
-      
-      final ruta = '$currentYear/$uniqueName';
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final uniqueName = '${timestamp}_imagen.$extension';
+      final ruta = uniqueName;
 
-      await _client.storage.from('monumentos').uploadBinary(
+      await _client.storage
+          .from('monumentos')
+          .uploadBinary(
             ruta,
             bytes,
             fileOptions: FileOptions(
               contentType: _getContentType(extension),
-              upsert: true,
+              upsert: false,
             ),
           );
 
-      // Obtenemos la URL pública
       final urlPublica = _client.storage.from('monumentos').getPublicUrl(ruta);
       return urlPublica;
     } catch (e) {
-      print('Error al subir imagen a Supabase: $e');
       return null;
     }
   }
