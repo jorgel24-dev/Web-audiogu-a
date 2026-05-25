@@ -92,9 +92,39 @@ class ConfiguracionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleRutas(bool v) => _toggle(v, (val) => rutasTuristicas = val);
+  void toggleRutas(bool v) {
+    _toggle(v, (val) => rutasTuristicas = val);
+    for (int i = 0; i < rutas.length; i++) {
+      final old = rutas[i];
+      rutas[i] = RutaModel(id: old.id, name: old.name, isActive: v);
+    }
+    notifyListeners();
+  }
+
   void toggleAsistenteIA(bool v) => _toggle(v, (val) => asistenteIA = val);
-  void toggleMapas(bool v) => _toggle(v, (val) => mapasInteractivos = val);
+
+  void toggleMapas(bool v) {
+    _toggle(v, (val) => mapasInteractivos = val);
+    for (int i = 0; i < monumentos.length; i++) {
+      final old = monumentos[i];
+      monumentos[i] = Monumento(
+        id: old.id,
+        nombre: old.nombre,
+        categoria: old.categoria,
+        accesible: old.accesible,
+        latitud: old.latitud,
+        longitud: old.longitud,
+        paraNinos: old.paraNinos,
+        idioma: old.idioma,
+        activo: v,
+        imagenUrl: old.imagenUrl,
+        audioUrl: old.audioUrl,
+        likes: old.likes,
+      );
+    }
+    notifyListeners();
+  }
+
   void toggleNoticias(bool v) => _toggle(v, (val) => noticias = val);
 
   void toggleMonumento(String id, bool v) {

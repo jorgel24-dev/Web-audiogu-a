@@ -5,7 +5,7 @@ import '../model/dashboard_model.dart';
 import '../provider/auth_provider.dart';
 
 class DashboardService {
-  static const String baseUrlHttp = 'https://fly.io/apps/backend-tfg/api/v1';
+  static const String baseUrlHttp = 'https://backend-tfg.fly.dev/api/v1';
 
   Future<DashboardStats> obtenerStats() async {
     final anioActual = DateTime.now().year.toString();

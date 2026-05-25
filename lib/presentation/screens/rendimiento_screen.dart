@@ -6,6 +6,7 @@ import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 import 'package:provider/provider.dart';
 import '../../provider/tema_provider.dart';
+import '../../provider/config_provider.dart';
 
 class RendimientoPage extends StatefulWidget {
   const RendimientoPage({super.key});
@@ -250,6 +251,13 @@ class _RendimientoContenido extends StatelessWidget {
           ...data.monumentosPopulares.asMap().entries.map((entry) {
             int index = entry.key + 1;
             var monumento = entry.value;
+            String? imagenUrl;
+            try {
+              final configProvider = context.read<ConfiguracionProvider>();
+              final mon = configProvider.monumentos.firstWhere((m) => m.id == monumento.id);
+              imagenUrl = mon.imagenUrl;
+            } catch (_) {}
+
             return _monumentRow(
               context,
               index.toString(),
@@ -257,6 +265,7 @@ class _RendimientoContenido extends StatelessWidget {
               monumento.visitas,
               monumento.porcentaje,
               monumento.id,
+              imagenUrl,
             );
           }),
         ],
@@ -270,7 +279,8 @@ class _RendimientoContenido extends StatelessWidget {
     String name,
     String stats,
     String percent,
-    String monumentoId,
+    String? monumentoId,
+    String? imagenUrl,
   ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
@@ -288,6 +298,20 @@ class _RendimientoContenido extends StatelessWidget {
               color: _thumbnailBg,
               borderRadius: BorderRadius.circular(8),
             ),
+            child: imagenUrl != null && imagenUrl.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      imagenUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.image_not_supported,
+                        color: _textSecondary,
+                        size: 20,
+                      ),
+                    ),
+                  )
+                : Icon(Icons.location_on, color: _textSecondary, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -317,16 +341,17 @@ class _RendimientoContenido extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, size: 20),
-            color: _textSecondary,
-            onPressed: () async {
-              context.pushNamed(
-                'editar_monumento',
-                pathParameters: {'id': monumentoId},
-              );
-            },
-          ),
+          if (monumentoId != null)
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, size: 20),
+              color: _textSecondary,
+              onPressed: () async {
+                context.pushNamed(
+                  'editar_monumento',
+                  pathParameters: {'id': monumentoId},
+                );
+              },
+            ),
         ],
       ),
     );
