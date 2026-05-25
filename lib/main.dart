@@ -1,5 +1,7 @@
 import 'package:audioguia_web/provider/monumentos_provider.dart';
 import 'package:audioguia_web/provider/rendimiento_provider.dart';
+import 'package:audioguia_web/provider/auth_provider.dart';
+import 'package:audioguia_web/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +25,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => NoticiaProvider()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => TemaProvider()),
         ChangeNotifierProvider(create: (_) => ConfiguracionProvider()),
         ChangeNotifierProvider(create: (_) => RendimientoProvider()),
