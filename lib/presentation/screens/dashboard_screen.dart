@@ -160,9 +160,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     TarjetaModulo(
                                       icono: Icons.castle_rounded,
                                       colorTema: const Color(0xFF00796B),
-                                      titulo: 'Monumentos',
+                                      titulo: 'Añadir un monumento',
                                       descripcion:
-                                          'Edita puntos de interés, horarios y audioguías.',
+                                          'Añade nuevas ubicaciones históricas a tu catálogo de la app.',
                                       textoEstado: '$totalMonumentos Activos',
                                       textoAccion: 'Gestionar',
                                       widgetsInferiores: _buildAvatarStack(),
@@ -192,10 +192,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     TarjetaModulo(
                                       icono: Icons.analytics_rounded,
                                       colorTema: Colors.blueAccent,
-                                      titulo: 'Analítica',
+                                      titulo: 'Monumentos',
                                       descripcion:
-                                          'Comportamiento de usuarios y rutas visitadas.',
-                                      textoAccion: 'Ver Reportes',
+                                          'Administra y edita los monumentos actuales de la app.',
+                                      textoAccion: 'Administrar',
                                       widgetsInferiores: const [
                                         Icon(
                                           Icons.insights,
