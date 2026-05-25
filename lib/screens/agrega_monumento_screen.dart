@@ -20,13 +20,15 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   
   // Controladores de texto persistentes en el Estado
   final _nombreController = TextEditingController();
-  final _descripcionController = TextEditingController();
+  final _likesController = TextEditingController(); // CORREGIDO: Cambiado descripción por likes
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
 
   // Estados de los Selectores desplegables
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Publicado';
+  String _paraNinosSeleccionado = 'No'; // AÑADIDO: Estado para el filtro infantil
+  String _idiomaSeleccionado = 'Español'; // AÑADIDO: Estado para el idioma
 
   // Mapa para transformar los nombres legibles a los ID de tags que espera Spring Boot
   final Map<String, String> _categoriasMap = {
@@ -39,7 +41,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   @override
   void dispose() {
     _nombreController.dispose();
-    _descripcionController.dispose();
+    _likesController.dispose(); // CORREGIDO: Liberar controlador de likes
     _latController.dispose();
     _lonController.dispose();
     super.dispose();
@@ -51,19 +53,27 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
 
     final double lat = double.tryParse(_latController.text) ?? 37.7214;
     final double lon = double.tryParse(_lonController.text) ?? -4.0321;
+    final int likes = int.tryParse(_likesController.text) ?? 0; // Parseo de los likes
 
     // Obtenemos el ID correspondiente de la categoría para Spring Boot
     final String tagIdId = _categoriasMap[_categoriaSeleccionada] ?? '1';
 
+    // Mapeo de idioma legible al código que entiende tu backend
+    final String codigoIdioma = _idiomaSeleccionado == 'Español' ? 'es' : 'en';
+
     // Estructuramos el modelo con los datos recolectados
     final nuevoMonumento = Monumento(
       nombre: _nombreController.text,
-      descripcion: _descripcionController.text,
-      categoria: tagIdId, // Enviamos el ID al Backend
-      accesible: false,   // Por defecto false, puedes cambiarlo según tu lógica
-      activo: _estadoSeleccionado == 'Publicado', // true si está publicado
+      descripcion: '', // Enviamos vacío ya que se quitó el campo de texto largo de la UI
+      categoria: tagIdId, 
+      accesible: false,   
+      activo: _estadoSeleccionado == 'Publicado', 
       latitud: lat,
       longitud: lon,
+      likes: likes, // Pasamos los likes que recuperamos (mapeado con tu api_service)
+      // NOTA: Si tu modelo de Dart ya soporta "kids" e "idioma" a nivel raíz, puedes descomentar estas líneas:
+      // paraNinos: _paraNinosSeleccionado == 'Sí',
+      // idioma: codigoIdioma,
     );
 
     // Despachamos la petición HTTP mediante el Provider correcto configurado en main.dart
@@ -119,16 +129,24 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                       child: _FormularioMonumento(
                         isDarkMode: isDarkMode,
                         nombreController: _nombreController,
-                        descripcionController: _descripcionController,
+                        likesController: _likesController, // Cambiado
                         latController: _latController,
                         lonController: _lonController,
                         categoria: _categoriaSeleccionada,
                         estado: _estadoSeleccionado,
+                        paraNinos: _paraNinosSeleccionado, // Añadido
+                        idioma: _idiomaSeleccionado, // Añadido
                         onCategoriaChanged: (val) {
                           if (val != null) setState(() => _categoriaSeleccionada = val);
                         },
                         onEstadoChanged: (val) {
                           if (val != null) setState(() => _estadoSeleccionado = val);
+                        },
+                        onParaNinosChanged: (val) { // Añadido
+                          if (val != null) setState(() => _paraNinosSeleccionado = val);
+                        },
+                        onIdiomaChanged: (val) { // Añadido
+                          if (val != null) setState(() => _idiomaSeleccionado = val);
                         },
                       ),
                     ),
@@ -199,24 +217,32 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
 class _FormularioMonumento extends StatelessWidget {
   final bool isDarkMode;
   final TextEditingController nombreController;
-  final TextEditingController descripcionController;
+  final TextEditingController likesController; // Cambiado
   final TextEditingController latController;
   final TextEditingController lonController;
   final String categoria;
   final String estado;
+  final String paraNinos; // Añadido
+  final String idioma; // Añadido
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
+  final ValueChanged<String?> onParaNinosChanged; // Añadido
+  final ValueChanged<String?> onIdiomaChanged; // Añadido
 
   const _FormularioMonumento({
     required this.isDarkMode,
     required this.nombreController,
-    required this.descripcionController,
+    required this.likesController, // Cambiado
     required this.latController,
     required this.lonController,
     required this.categoria,
     required this.estado,
+    required this.paraNinos, // Añadido
+    required this.idioma, // Añadido
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
+    required this.onParaNinosChanged, // Añadido
+    required this.onIdiomaChanged, // Añadido
   });
 
   Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
@@ -227,7 +253,6 @@ class _FormularioMonumento extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Escuchamos el provider para reaccionar al cambio de nombre de los archivos cargados
     final nuevoMonumentoProv = context.watch<NuevoMonumentoProvider>();
 
     return Column(
@@ -284,14 +309,50 @@ class _FormularioMonumento extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        const LabelCampo(label: 'Descripción'),
+        // MODIFICADO: Reemplazado el bloque de descripción por el número de Likes
+        const LabelCampo(label: 'Número de Me Gustas'),
         const SizedBox(height: 8),
         _buildTextField(
-          textoGuia: 'Descripción detallada del monumento...',
-          maxLines: 4,
-          controller: descripcionController,
+          textoGuia: 'Ej: 145',
+          controller: likesController,
+          keyboardType: TextInputType.number, // Configura el teclado numérico
         ),
-        Text('Breve historia y detalles arquitectónicos.', style: TextStyle(color: _subtextColor, fontSize: 12)),
+        const SizedBox(height: 20),
+
+        // AÑADIDO: Nueva fila con los campos para Niños e Idioma
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LabelCampo(label: '¿Para Niños?'),
+                  const SizedBox(height: 8),
+                  _buildDropdown(
+                    value: paraNinos,
+                    items: ['No', 'Sí'],
+                    onChanged: onParaNinosChanged,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LabelCampo(label: 'Idioma'),
+                  const SizedBox(height: 8),
+                  _buildDropdown(
+                    value: idioma,
+                    items: ['Español', 'Inglés'],
+                    onChanged: onIdiomaChanged,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 24),
 
         const LabelCampo(label: 'Archivos de Audio'),
@@ -309,9 +370,9 @@ class _FormularioMonumento extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: _buildTextField(textoGuia: '37.7214', prefix: 'Lat', controller: latController)),
+            Expanded(child: _buildTextField(textoGuia: '37.7214', prefix: 'Lat', controller: latController, keyboardType: TextInputType.number)),
             const SizedBox(width: 16),
-            Expanded(child: _buildTextField(textoGuia: '-4.0321', prefix: 'Lon', controller: lonController)),
+            Expanded(child: _buildTextField(textoGuia: '-4.0321', prefix: 'Lon', controller: lonController, keyboardType: TextInputType.number)),
           ],
         ),
         const SizedBox(height: 12),
@@ -324,10 +385,12 @@ class _FormularioMonumento extends StatelessWidget {
     required TextEditingController controller,
     int maxLines = 1,
     String? prefix,
+    TextInputType keyboardType = TextInputType.text, // AÑADIDO: Soporte para tipo de teclado
   }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      keyboardType: keyboardType, // Asigna el tipo de teclado configurado
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
       validator: (value) => value == null || value.isEmpty ? 'Este campo es obligatorio' : null,
       decoration: InputDecoration(
@@ -396,7 +459,7 @@ class _FormularioMonumento extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: hasFile ? 'Archivo seleccionado: ' : 'Subir un archivo ', 
-                    style: TextStyle(color: const Color(0xFF008F68), fontWeight: FontWeight.bold)
+                    style: const TextStyle(color: Color(0xFF008F68), fontWeight: FontWeight.bold)
                   ),
                   TextSpan(
                     text: hasFile ? label : label.replaceFirst('Subir un archivo', ''), 
