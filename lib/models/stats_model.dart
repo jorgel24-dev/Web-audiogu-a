@@ -12,7 +12,6 @@ class StatsModel {
   });
 
   factory StatsModel.fromJson(Map<String, dynamic> json) {
-    // Parsea la lista de monumentos populares de forma segura
     var monumentosList = json['monumentosPopulares'] as List? ?? [];
     List<MonumentStat> popular = monumentosList.map((m) => MonumentStat.fromJson(m)).toList();
 
@@ -29,16 +28,12 @@ class MonumentStat {
   final String id;
   final String nombre;
   final String visitas;
-  final String valoracion;
-  final double progreso;
   final String porcentaje;
 
   MonumentStat({
     required this.id,
     required this.nombre,
     required this.visitas,
-    required this.valoracion,
-    required this.progreso,
     required this.porcentaje,
   });
 
@@ -46,9 +41,7 @@ class MonumentStat {
     return MonumentStat(
       id: json['id'] ?? '00',
       nombre: json['name'] ?? 'Desconocido',
-      visitas: (json['NLikes'] ?? 0).toString(), // Mapeo de NLikes a visitas
-      valoracion: 'N/A', 
-      progreso: 0.5, // Podrías calcularlo basado en un máximo de likes
+      visitas: (json['NLikes'] ?? 0).toString(),
       porcentaje: '${json['NLikes'] ?? 0} likes',
     );
   }

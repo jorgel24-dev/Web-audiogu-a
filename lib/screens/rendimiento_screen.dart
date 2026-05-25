@@ -220,7 +220,6 @@ class _RendimientoContenido extends StatelessWidget {
               index.toString(), 
               monumento.nombre, 
               monumento.visitas, 
-              monumento.progreso, 
               monumento.porcentaje,
               monumento.id
             );
@@ -230,7 +229,7 @@ class _RendimientoContenido extends StatelessWidget {
     );
   }
 
-  Widget _monumentRow(BuildContext context, String rank, String name, String stats, double progress, String percent, String monumentoId) {
+  Widget _monumentRow(BuildContext context, String rank, String name, String stats, String percent, String monumentoId) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(

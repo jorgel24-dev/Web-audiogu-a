@@ -31,7 +31,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
   final _nombreController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
-  final _likesController = TextEditingController(); // NUEVO
+  final _likesController = TextEditingController();
 
   // Mapa de transformación de categorías
   final Map<String, String> _categoriasMap = {
@@ -52,7 +52,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     _nombreController.dispose();
     _latController.dispose();
     _lonController.dispose();
-    _likesController.dispose(); // NUEVO
+    _likesController.dispose(); 
     super.dispose();
   }
 
@@ -64,7 +64,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
         _nombreController.text = data.nombre;
         _latController.text = data.latitud.toString();
         _lonController.text = data.longitud.toString();
-        _likesController.text = data.likes.toString(); // NUEVO
+        _likesController.text = data.likes.toString(); 
         _categoriaSeleccionada = _obtenerNombreCategoria(data.categoria);
         _estadoSeleccionado = data.activo ? 'Publicado' : 'Borrador';
         _isLoading = false;
@@ -93,7 +93,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
 
     final double lat = double.tryParse(_latController.text) ?? 37.7214;
     final double lon = double.tryParse(_lonController.text) ?? -4.0321;
-    final int likes = int.tryParse(_likesController.text) ?? 0; // NUEVO
+    final int likes = int.tryParse(_likesController.text) ?? 0; 
     final String tagId = _categoriasMap[_categoriaSeleccionada] ?? '1';
 
     // Construimos el modelo con las propiedades requeridas
@@ -111,7 +111,6 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     );
 
     try {
-      // CORREGIDO: Llamada al servicio activada correctamente
       await _apiService.editarMonumento(monumentoActualizado);
       
       if (mounted) {
@@ -207,7 +206,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               nombreController: _nombreController,
                               latController: _latController,
                               lonController: _lonController,
-                              likesController: _likesController, // NUEVO
+                              likesController: _likesController, 
                               categoria: _categoriaSeleccionada,
                               estado: _estadoSeleccionado,
                               onCategoriaChanged: (val) {
@@ -293,7 +292,7 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController nombreController;
   final TextEditingController latController;
   final TextEditingController lonController;
-  final TextEditingController likesController; // NUEVO
+  final TextEditingController likesController; 
   final String categoria;
   final String estado;
   final ValueChanged<String?> onCategoriaChanged;
@@ -371,7 +370,6 @@ class _FormularioMonumento extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        // NUEVO: Campo para editar la cantidad de Likes del monumento
         const LabelCampo(label: 'Número de Likes'),
         const SizedBox(height: 8),
         _buildTextField(
@@ -424,7 +422,7 @@ class _FormularioMonumento extends StatelessWidget {
     required ValueChanged<String?> onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       dropdownColor: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
       items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),

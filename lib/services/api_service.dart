@@ -17,9 +17,6 @@ class ApiService {
   Future<List<dynamic>> obtenerEstadisticasIA() async {
     final response = await http.get(Uri.parse('$_baseUrl/admin/stats/all-ia'), headers: _headers);
 
-    // Imprime esto en la consola
-    print("Respuesta IA: ${response.body}"); 
-
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -31,9 +28,6 @@ class ApiService {
   Future<List<dynamic>> obtenerRutasActivas() async {
     final response = await http.get(Uri.parse('$_baseUrl/public/route?isActive=true'), headers: _headers);
 
-    // Imprime esto en la consola
-    print("Respuesta rutas: ${response.body}"); 
-
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -41,12 +35,10 @@ class ApiService {
     }
   }
 
-  // Obtener Descargas (el resumen general)
+  // Obtener Descargas 
   Future<List<dynamic>> obtenerDescargas() async {
-    final response = await http.get(Uri.parse('$_baseUrl/admin/stats/summary?period=2026'), headers: _headers);
-    
-    // Imprime esto en la consola
-    print("Respuesta Descargas: ${response.body}"); 
+    final String anio = DateTime.now().year.toString();
+    final response = await http.get(Uri.parse('$_baseUrl/admin/stats/summary?period=$anio'), headers: _headers);
     
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -58,8 +50,6 @@ class ApiService {
   // Obtener Monumentos
   Future<List<dynamic>> obtenerMonumentos() async {
     final response = await http.get(Uri.parse('$_baseUrl/public/monuments?orderBy=desc'), headers: _headers);
-
-    print("Respuesta monumentos: ${response.body}"); 
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -88,10 +78,8 @@ class ApiService {
         'isActive': monumento.activo, 
         'maps_url': 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
         'tag': {
-          'id': int.tryParse(monumento.categoria) ?? 1 // Pasa el objeto Tag con su ID correspondiente
+          'id': int.tryParse(monumento.categoria) ?? 1 
         },
-        //"picture" : [],
-        //"audio" : [],
         "picture": imagenUrl != null ? [
             {
               "url" : imagenUrl,
@@ -104,7 +92,7 @@ class ApiService {
             "language": monumento.idioma,
           }
         ] : [],
-        'localidad_id': 1, // Añade el id de localidad si tu tabla lo requiere obligatoriamente
+        'localidad_id': 1,
         'NLikes': monumento.likes,
         'created_at': fechaActual, 
         'last_modified': fechaActual
@@ -134,10 +122,7 @@ class ApiService {
   // Editar (PUT)
   Future<bool> editarMonumento(Monumento monumento) async {
     final uri = Uri.parse('$_baseUrl/admin/monuments/${monumento.id}');
-
     final String fechaActual = DateTime.now().toIso8601String().substring(0, 19);
-    
-    // Mapeamos el modelo con los datos exactos que procesa el formulario
     final bodyMapeado = {
       "name": monumento.nombre,
       "coordenates": {
@@ -191,14 +176,14 @@ class ApiService {
     return response.statusCode == 200 || response.statusCode == 204;
   }
 
+  // Buscar monumento por ID
   Future<Monumento> obtenerMonumentoPorId(String id) async {
     final response = await http.get(
-      Uri.parse('$_baseUrl/public/monuments/$id'), // Asegúrate de que este endpoint exista
+      Uri.parse('$_baseUrl/public/monuments/$id'), 
       headers: _headers,
     );
 
     if (response.statusCode == 200) {
-      // Usas el factory desdeJson de tu modelo Monumento
       return Monumento.fromJson(json.decode(response.body));
     } else {
       throw Exception('No se pudo cargar el monumento');

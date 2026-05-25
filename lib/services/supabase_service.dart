@@ -26,6 +26,7 @@ class SupabaseService {
       final urlPublica = _client.storage.from('monumentos').getPublicUrl(ruta);
       return urlPublica;
     } catch (e) {
+      print("Error al subir imagen a Supabase: $e");
       return null;
     }
   }
@@ -39,7 +40,7 @@ class SupabaseService {
       final ruta = uniqueName;
 
       await _client.storage
-          .from('monumentos') // Usamos el mismo bucket u otro si prefieres
+          .from('monumentos') 
           .uploadBinary(
             ruta,
             bytes,
@@ -86,7 +87,7 @@ class SupabaseService {
       case 'aac':
         return 'audio/aac';
       default:
-        return 'audio/mpeg'; // Por defecto ponemos mpeg si no se reconoce
+        return 'audio/mpeg'; 
     }
   }
 }

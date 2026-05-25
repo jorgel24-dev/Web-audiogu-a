@@ -9,8 +9,8 @@ class Monumento {
   final String? imagenUrl;
   final String? audioUrl;
   final int likes;
-  final bool paraNinos; // AÑADIDO
-  final String idioma;  // AÑADIDO
+  final bool paraNinos;
+  final String idioma;
 
   Monumento({
     this.id,
@@ -20,8 +20,8 @@ class Monumento {
     required this.activo,
     required this.latitud,
     required this.longitud,
-    required this.paraNinos, // AÑADIDO
-    required this.idioma,    // AÑADIDO
+    required this.paraNinos,
+    required this.idioma,
     this.imagenUrl,
     this.audioUrl,
     this.likes = 0,
@@ -40,9 +40,9 @@ class Monumento {
                   ? json['picture'][0]['url'] : null,
       audioUrl: json['audio'] != null && (json['audio'] as List).isNotEmpty 
                   ? json['audio'][0]['url'] : null,
-      likes: json['NLikes'] ?? 0, // CORREGIDO: Ahora sí lee los likes del backend
-      paraNinos: json['kids'] ?? false, // AÑADIDO: Mapeo de la API a Dart
-      idioma: json['language'] ?? 'es',  // AÑADIDO: Mapeo de la API a Dart
+      likes: json['NLikes'] ?? 0, 
+      paraNinos: json['kids'] ?? false, 
+      idioma: json['language'] ?? 'es',  
     );
   }
 }

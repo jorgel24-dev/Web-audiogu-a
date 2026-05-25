@@ -70,7 +70,7 @@ class NuevoMonumentoProvider extends ChangeNotifier {
       String? urlImagenSubida;
       String? urlAudioSubido;
 
-      // 1. Subir la imagen a Supabase si el usuario seleccionó una
+      // Subimos la imagen a Supabase si el usuario seleccionó una
       if (_imagenBytes != null && _imagenNombre != null) {
         urlImagenSubida = await _supabaseService.subirImagen(_imagenBytes!, _imagenNombre!);
         if (urlImagenSubida == null) {
@@ -78,7 +78,7 @@ class NuevoMonumentoProvider extends ChangeNotifier {
         }
       }
 
-      // 2. NUEVO: Subir el audio a Supabase si el usuario seleccionó uno
+      // Subimos el audio a Supabase si el usuario seleccionó uno
       if (_audioBytes != null && _audioNombre != null) {
         urlAudioSubido = await _supabaseService.subirAudio(_audioBytes!, _audioNombre!);
         if (urlAudioSubido == null) {

@@ -20,15 +20,15 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   
   // Controladores de texto persistentes en el Estado
   final _nombreController = TextEditingController();
-  final _likesController = TextEditingController(); // CORREGIDO: Cambiado descripción por likes
+  final _likesController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
 
   // Estados de los Selectores desplegables
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Publicado';
-  String _paraNinosSeleccionado = 'No'; // AÑADIDO: Estado para el filtro infantil
-  String _idiomaSeleccionado = 'Español'; // AÑADIDO: Estado para el idioma
+  String _paraNinosSeleccionado = 'No'; 
+  String _idiomaSeleccionado = 'Español'; 
 
   // Mapa para transformar los nombres legibles a los ID de tags que espera Spring Boot
   final Map<String, String> _categoriasMap = {
@@ -41,7 +41,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   @override
   void dispose() {
     _nombreController.dispose();
-    _likesController.dispose(); // CORREGIDO: Liberar controlador de likes
+    _likesController.dispose(); 
     _latController.dispose();
     _lonController.dispose();
     super.dispose();
@@ -53,12 +53,8 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
 
     final double lat = double.tryParse(_latController.text) ?? 37.7214;
     final double lon = double.tryParse(_lonController.text) ?? -4.0321;
-    final int likes = int.tryParse(_likesController.text) ?? 0; // Parseo de los likes
-
-    // Obtenemos el ID correspondiente de la categoría para Spring Boot
+    final int likes = int.tryParse(_likesController.text) ?? 0; 
     final String tagIdId = _categoriasMap[_categoriaSeleccionada] ?? '1';
-
-    // Mapeo de idioma legible al código que entiende tu backend
     final String codigoIdioma = _idiomaSeleccionado == 'Español' ? 'es' : 'en';
 
     // Estructuramos el modelo con los datos recolectados
@@ -127,23 +123,23 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                       child: _FormularioMonumento(
                         isDarkMode: isDarkMode,
                         nombreController: _nombreController,
-                        likesController: _likesController, // Cambiado
+                        likesController: _likesController, 
                         latController: _latController,
                         lonController: _lonController,
                         categoria: _categoriaSeleccionada,
                         estado: _estadoSeleccionado,
-                        paraNinos: _paraNinosSeleccionado, // Añadido
-                        idioma: _idiomaSeleccionado, // Añadido
+                        paraNinos: _paraNinosSeleccionado, 
+                        idioma: _idiomaSeleccionado, 
                         onCategoriaChanged: (val) {
                           if (val != null) setState(() => _categoriaSeleccionada = val);
                         },
                         onEstadoChanged: (val) {
                           if (val != null) setState(() => _estadoSeleccionado = val);
                         },
-                        onParaNinosChanged: (val) { // Añadido
+                        onParaNinosChanged: (val) { 
                           if (val != null) setState(() => _paraNinosSeleccionado = val);
                         },
-                        onIdiomaChanged: (val) { // Añadido
+                        onIdiomaChanged: (val) { 
                           if (val != null) setState(() => _idiomaSeleccionado = val);
                         },
                       ),
@@ -215,32 +211,32 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
 class _FormularioMonumento extends StatelessWidget {
   final bool isDarkMode;
   final TextEditingController nombreController;
-  final TextEditingController likesController; // Cambiado
+  final TextEditingController likesController; 
   final TextEditingController latController;
   final TextEditingController lonController;
   final String categoria;
   final String estado;
-  final String paraNinos; // Añadido
-  final String idioma; // Añadido
+  final String paraNinos; 
+  final String idioma; 
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
-  final ValueChanged<String?> onParaNinosChanged; // Añadido
-  final ValueChanged<String?> onIdiomaChanged; // Añadido
+  final ValueChanged<String?> onParaNinosChanged;
+  final ValueChanged<String?> onIdiomaChanged; 
 
   const _FormularioMonumento({
     required this.isDarkMode,
     required this.nombreController,
-    required this.likesController, // Cambiado
+    required this.likesController,
     required this.latController,
     required this.lonController,
     required this.categoria,
     required this.estado,
-    required this.paraNinos, // Añadido
-    required this.idioma, // Añadido
+    required this.paraNinos,
+    required this.idioma, 
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
-    required this.onParaNinosChanged, // Añadido
-    required this.onIdiomaChanged, // Añadido
+    required this.onParaNinosChanged, 
+    required this.onIdiomaChanged, 
   });
 
   Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
@@ -306,8 +302,6 @@ class _FormularioMonumento extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-
-        // MODIFICADO: Reemplazado el bloque de descripción por el número de Likes
         const LabelCampo(label: 'Número de Me Gustas'),
         const SizedBox(height: 8),
         _buildTextField(
@@ -316,8 +310,6 @@ class _FormularioMonumento extends StatelessWidget {
           keyboardType: TextInputType.number, // Configura el teclado numérico
         ),
         const SizedBox(height: 20),
-
-        // AÑADIDO: Nueva fila con los campos para Niños e Idioma
         Row(
           children: [
             Expanded(
@@ -383,7 +375,7 @@ class _FormularioMonumento extends StatelessWidget {
     required TextEditingController controller,
     int maxLines = 1,
     String? prefix,
-    TextInputType keyboardType = TextInputType.text, // AÑADIDO: Soporte para tipo de teclado
+    TextInputType keyboardType = TextInputType.text, // Soporte para tipo de teclado
   }) {
     return TextFormField(
       controller: controller,
