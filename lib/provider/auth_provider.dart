@@ -16,9 +16,9 @@ class AuthProvider extends ChangeNotifier {
   }
 
   static Map<String, String> get headersAdmin => {
-        'Content-Type': 'application/json',
-        'Authorization': basicAuth,
-      };
+    'Content-Type': 'application/json',
+    'Authorization': basicAuth,
+  };
 
   Future<bool> login(String nombre, String password) async {
     cargando = true;

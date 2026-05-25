@@ -41,10 +41,10 @@ final appRouter = GoRouter(
       builder: (context, state) => const RendimientoPage(),
     ),
     GoRoute(
-      path: '/monumentos/editar',
+      path: '/monumentos/editar/:id',
       name: 'editar_monumento',
       builder: (context, state) {
-        final monumento = state.extra as String; 
+        final monumento = state.pathParameters['id'] ?? '';
         return EditaMonumentoScreen(monumentoId: monumento);
       },
     ),

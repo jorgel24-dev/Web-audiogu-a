@@ -29,7 +29,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final dashboard = context.watch<DashboardProvider>();
     final isDarkMode = temaProvider.isDarkMode;
 
-    final bgColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
+    final bgColor = isDarkMode
+        ? const Color(0xFF121212)
+        : const Color(0xFFF8F9FA);
     final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final subTextColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
@@ -68,10 +70,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildHeader(context, textColor, subTextColor, cardColor),
+                            _buildHeader(
+                              context,
+                              textColor,
+                              subTextColor,
+                              cardColor,
+                            ),
                             const SizedBox(height: 30),
 
-                            // Tarjetas de estadísticas
                             Row(
                               children: [
                                 Expanded(
@@ -144,7 +150,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 return GridView.count(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  crossAxisCount: constraints.maxWidth < 600 ? 1 : 2,
+                                  crossAxisCount: constraints.maxWidth < 600
+                                      ? 1
+                                      : 2,
                                   crossAxisSpacing: 20,
                                   mainAxisSpacing: 20,
                                   childAspectRatio: ratio,
@@ -153,48 +161,68 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       icono: Icons.castle_rounded,
                                       colorTema: const Color(0xFF00796B),
                                       titulo: 'Monumentos',
-                                      descripcion: 'Edita puntos de interés, horarios y audioguías.',
+                                      descripcion:
+                                          'Edita puntos de interés, horarios y audioguías.',
                                       textoEstado: '$totalMonumentos Activos',
                                       textoAccion: 'Gestionar',
                                       widgetsInferiores: _buildAvatarStack(),
-                                      alPulsarAccion: () => context.go('/monumentos/agregar'),
+                                      alPulsarAccion: () =>
+                                          context.go('/monumentos/agregar'),
                                       isDarkMode: isDarkMode,
                                     ),
                                     TarjetaModulo(
                                       icono: Icons.newspaper_rounded,
                                       colorTema: Colors.redAccent,
                                       titulo: 'Noticias',
-                                      descripcion: 'Publica novedades y festivales de la ciudad.',
+                                      descripcion:
+                                          'Publica novedades y festivales de la ciudad.',
                                       textoEstado: '$totalNoticias Publicadas',
                                       textoAccion: 'Redactar',
                                       widgetsInferiores: const [
-                                        Icon(Icons.access_time, size: 14, color: Colors.grey),
+                                        Icon(
+                                          Icons.access_time,
+                                          size: 14,
+                                          color: Colors.grey,
+                                        ),
                                       ],
-                                      alPulsarAccion: () => context.go('/noticias'),
+                                      alPulsarAccion: () =>
+                                          context.go('/noticias'),
                                       isDarkMode: isDarkMode,
                                     ),
                                     TarjetaModulo(
                                       icono: Icons.analytics_rounded,
                                       colorTema: Colors.blueAccent,
                                       titulo: 'Analítica',
-                                      descripcion: 'Comportamiento de usuarios y rutas visitadas.',
+                                      descripcion:
+                                          'Comportamiento de usuarios y rutas visitadas.',
                                       textoAccion: 'Ver Reportes',
                                       widgetsInferiores: const [
-                                        Icon(Icons.insights, size: 16, color: Colors.blueAccent),
+                                        Icon(
+                                          Icons.insights,
+                                          size: 16,
+                                          color: Colors.blueAccent,
+                                        ),
                                       ],
-                                      alPulsarAccion: () => context.go('/rendimiento'),
+                                      alPulsarAccion: () =>
+                                          context.go('/rendimiento'),
                                       isDarkMode: isDarkMode,
                                     ),
                                     TarjetaModulo(
                                       icono: Icons.tune_rounded,
                                       colorTema: Colors.purpleAccent,
                                       titulo: 'Configuración',
-                                      descripcion: 'Control de API Keys y ajustes globales de la App.',
+                                      descripcion:
+                                          'Control de API Keys y ajustes globales de la App.',
                                       textoAccion: 'Ajustar',
                                       widgetsInferiores: const [
-                                        Icon(Icons.security, size: 16, color: Colors.grey),
+                                        Icon(
+                                          Icons.security,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
                                       ],
-                                      alPulsarAccion: () => context.go('/configuracion'),
+                                      alPulsarAccion: () =>
+                                          context.go('/configuracion'),
                                       isDarkMode: isDarkMode,
                                     ),
                                   ],

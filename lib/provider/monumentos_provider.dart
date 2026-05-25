@@ -5,14 +5,13 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import '../model/monumento_model.dart';
 
-class NuevoMonumentoProvider extends ChangeNotifier {
+class GestionMonumentoProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   final SupabaseService _supabaseService = SupabaseService();
 
   bool _isSaving = false;
   bool get isSaving => _isSaving;
 
-  // Datos de los archivos en memoria para Flutter Web
   Uint8List? _imagenBytes;
   String? _imagenNombre;
   Uint8List? _audioBytes;
@@ -23,11 +22,10 @@ class NuevoMonumentoProvider extends ChangeNotifier {
   Uint8List? get audioBytes => _audioBytes;
   String? get audioNombre => _audioNombre;
 
-  // Método para seleccionar la imagen
   Future<void> seleccionarImagen() async {
     final result = await FilePicker.pickFiles(
       type: FileType.image,
-      withData: true, // Crucial en Web para obtener los bytes
+      withData: true,
     );
 
     if (result != null && result.files.single.bytes != null) {
@@ -37,12 +35,11 @@ class NuevoMonumentoProvider extends ChangeNotifier {
     }
   }
 
-  // Método para seleccionar el audio
   Future<void> seleccionarAudio() async {
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['mp3', 'wav', 'm4a'],
-      withData: true, // Crucial en Web para obtener los bytes
+      withData: true,
     );
 
     if (result != null && result.files.single.bytes != null) {
@@ -52,7 +49,6 @@ class NuevoMonumentoProvider extends ChangeNotifier {
     }
   }
 
-  // Limpiar selección
   void limpiarArchivos() {
     _imagenBytes = null;
     _imagenNombre = null;
@@ -61,7 +57,6 @@ class NuevoMonumentoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Método para guardar todo el monumento a través de la API
   Future<bool> guardarMonumento(Monumento monumento) async {
     _isSaving = true;
     notifyListeners();
@@ -70,17 +65,21 @@ class NuevoMonumentoProvider extends ChangeNotifier {
       String? urlImagenSubida;
       String? urlAudioSubido;
 
-      // Subimos la imagen a Supabase si el usuario seleccionó una
       if (_imagenBytes != null && _imagenNombre != null) {
-        urlImagenSubida = await _supabaseService.subirImagen(_imagenBytes!, _imagenNombre!);
+        urlImagenSubida = await _supabaseService.subirImagen(
+          _imagenBytes!,
+          _imagenNombre!,
+        );
         if (urlImagenSubida == null) {
           throw Exception("Error al subir la imagen a Supabase");
         }
       }
 
-      // Subimos el audio a Supabase si el usuario seleccionó uno
       if (_audioBytes != null && _audioNombre != null) {
-        urlAudioSubido = await _supabaseService.subirAudio(_audioBytes!, _audioNombre!);
+        urlAudioSubido = await _supabaseService.subirAudio(
+          _audioBytes!,
+          _audioNombre!,
+        );
         if (urlAudioSubido == null) {
           throw Exception("Error al subir el archivo de audio a Supabase");
         }
@@ -89,10 +88,45 @@ class NuevoMonumentoProvider extends ChangeNotifier {
       final exito = await _apiService.crearMonumento(
         monumento: monumento,
         imagenUrl: urlImagenSubida,
-        audioUrl: urlAudioSubido
+        audioUrl: urlAudioSubido,
       );
-      
+
       if (exito) limpiarArchivos();
+      return exito;
+    } catch (e) {
+      _isSaving = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<Monumento> cargarMonumento(String id) async {
+    return await _apiService.obtenerMonumentoPorId(id);
+  }
+
+  Future<bool> editarMonumento(Monumento monumento) async {
+    _isSaving = true;
+    notifyListeners();
+
+    try {
+      final exito = await _apiService.editarMonumento(monumento);
+      return exito;
+    } catch (e) {
+      _isSaving = false;
+      notifyListeners();
+      return false;
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> eliminarMonumento(String id) async {
+    _isSaving = true;
+    notifyListeners();
+
+    try {
+      final exito = await _apiService.eliminarMonumento(id);
       return exito;
     } catch (e) {
       _isSaving = false;

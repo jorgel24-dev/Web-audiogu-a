@@ -15,9 +15,7 @@ class MonumentoService {
           utf8.decode(response.bodyBytes),
         );
         return lista
-            .map(
-              (item) => Monumento.fromJson(item as Map<String, dynamic>),
-            )
+            .map((item) => Monumento.fromJson(item as Map<String, dynamic>))
             .toList();
       }
       return null;

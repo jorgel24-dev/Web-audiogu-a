@@ -21,13 +21,15 @@ class _RendimientoPageState extends State<RendimientoPage> {
     final provider = context.read<RendimientoProvider>();
     Future.microtask(() => provider.fetchRendimiento());
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<TemaProvider>().isDarkMode;
     final rendimientoProv = context.watch<RendimientoProvider>();
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
-    final bgColor = isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA);
+    final bgColor = isDarkMode
+        ? const Color(0xFF121212)
+        : const Color(0xFFF8F9FA);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -44,36 +46,45 @@ class _RendimientoPageState extends State<RendimientoPage> {
           Expanded(
             child: rendimientoProv.isLoading
                 ? const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF008F68)),
-                )
+                    child: CircularProgressIndicator(color: Color(0xFF008F68)),
+                  )
                 : rendimientoProv.error != null
-                    ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                              rendimientoProv.error!,
-                              style: const TextStyle(color: Colors.red, fontSize: 16),
-                            ),
-                            const SizedBox(height: 12),
-                            ElevatedButton(
-                              onPressed: () => context.read<RendimientoProvider>().fetchRendimiento(),
-                              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF008F68)),
-                              child: const Text('Reintentar', style: TextStyle(color: Colors.white)),
-                            )
-                        ],
-                      ),
-                    )
-                    : rendimientoProv.data == null
-                        ? const Center(child: Text('No hay datos disponibles.'))
-                        : SingleChildScrollView(
-                            padding: const EdgeInsets.all(24),
-                            child: _RendimientoContenido(
-                              isDarkMode: isDarkMode,
-                              data: rendimientoProv.data!,
-                            ),
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          rendimientoProv.error!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
                           ),
-
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () => context
+                              .read<RendimientoProvider>()
+                              .fetchRendimiento(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF008F68),
+                          ),
+                          child: const Text(
+                            'Reintentar',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : rendimientoProv.data == null
+                ? const Center(child: Text('No hay datos disponibles.'))
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: _RendimientoContenido(
+                      isDarkMode: isDarkMode,
+                      data: rendimientoProv.data!,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -84,18 +95,18 @@ class _RendimientoPageState extends State<RendimientoPage> {
 class _RendimientoContenido extends StatelessWidget {
   final bool isDarkMode;
   final StatsModel data;
-  
-  const _RendimientoContenido({
-    required this.isDarkMode,
-    required this.data,
-  });
+
+  const _RendimientoContenido({required this.isDarkMode, required this.data});
 
   Color get _cardBg => isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
-  Color get _cardBorder => isDarkMode ? Colors.white12 : const Color(0xFFF1F3F5);
+  Color get _cardBorder =>
+      isDarkMode ? Colors.white12 : const Color(0xFFF1F3F5);
   Color get _textPrimary => isDarkMode ? Colors.white : Colors.black87;
-  Color get _textSecondary => isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
+  Color get _textSecondary =>
+      isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
   Color get _textMuted => isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
-  Color get _thumbnailBg => isDarkMode ? const Color(0xFF263040) : Colors.grey[200]!;
+  Color get _thumbnailBg =>
+      isDarkMode ? const Color(0xFF263040) : Colors.grey[200]!;
 
   @override
   Widget build(BuildContext context) {
@@ -108,9 +119,7 @@ class _RendimientoContenido extends StatelessWidget {
         const SizedBox(height: 24),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(flex: 3, child: _buildPopularMonuments(context)),
-          ],
+          children: [Expanded(flex: 3, child: _buildPopularMonuments(context))],
         ),
       ],
     );
@@ -140,16 +149,36 @@ class _RendimientoContenido extends StatelessWidget {
   Widget _buildEstadisticas() {
     return Row(
       children: [
-        _cardEstadistica('Total Usuarios', data.totalUsuarios.toString(), Icons.people_outline, Colors.blue),
+        _cardEstadistica(
+          'Total Usuarios',
+          data.totalUsuarios.toString(),
+          Icons.people_outline,
+          Colors.blue,
+        ),
         const SizedBox(width: 16),
-        _cardEstadistica('Rutas Activas', data.rutasActivas.toString(), Icons.directions_walk, Colors.green),
+        _cardEstadistica(
+          'Rutas Activas',
+          data.rutasActivas.toString(),
+          Icons.directions_walk,
+          Colors.green,
+        ),
         const SizedBox(width: 16),
-        _cardEstadistica('Consultas a la IA', data.peticionesIA.toString(), Icons.smart_toy_outlined, Colors.red),
+        _cardEstadistica(
+          'Consultas a la IA',
+          data.peticionesIA.toString(),
+          Icons.smart_toy_outlined,
+          Colors.red,
+        ),
       ],
     );
   }
 
-  Widget _cardEstadistica(String title, String value, IconData icon, Color color) {
+  Widget _cardEstadistica(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -164,7 +193,10 @@ class _RendimientoContenido extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: TextStyle(color: _textSecondary, fontSize: 13)),
+                Text(
+                  title,
+                  style: TextStyle(color: _textSecondary, fontSize: 13),
+                ),
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
@@ -183,7 +215,7 @@ class _RendimientoContenido extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: _textPrimary,
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -206,35 +238,48 @@ class _RendimientoContenido extends StatelessWidget {
             children: [
               Text(
                 'Monumentos más Populares',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _textPrimary),
-              )
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: _textPrimary,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 24),
-          // Enumeramos usando .asMap().entries
           ...data.monumentosPopulares.asMap().entries.map((entry) {
             int index = entry.key + 1;
             var monumento = entry.value;
             return _monumentRow(
               context,
-              index.toString(), 
-              monumento.nombre, 
-              monumento.visitas, 
+              index.toString(),
+              monumento.nombre,
+              monumento.visitas,
               monumento.porcentaje,
-              monumento.id
+              monumento.id,
             );
-          })
+          }),
         ],
       ),
     );
   }
 
-  Widget _monumentRow(BuildContext context, String rank, String name, String stats, String percent, String monumentoId) {
+  Widget _monumentRow(
+    BuildContext context,
+    String rank,
+    String name,
+    String stats,
+    String percent,
+    String monumentoId,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
         children: [
-          Text(rank, style: TextStyle(color: _textMuted, fontWeight: FontWeight.bold)),
+          Text(
+            rank,
+            style: TextStyle(color: _textMuted, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(width: 16),
           Container(
             width: 40,
@@ -245,7 +290,6 @@ class _RendimientoContenido extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          // Nombre y likes
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +301,10 @@ class _RendimientoContenido extends StatelessWidget {
                     color: _textPrimary,
                   ),
                 ),
-                Text(stats, style: TextStyle(color: _textSecondary, fontSize: 11)),
+                Text(
+                  stats,
+                  style: TextStyle(color: _textSecondary, fontSize: 11),
+                ),
               ],
             ),
           ),
@@ -270,13 +317,14 @@ class _RendimientoContenido extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          // Botón Editar
           IconButton(
             icon: const Icon(Icons.edit_outlined, size: 20),
             color: _textSecondary,
             onPressed: () async {
-              // Lógica para editar el monumento
-              context.pushNamed('editar_monumento', extra: monumentoId);
+              context.pushNamed(
+                'editar_monumento',
+                pathParameters: {'id': monumentoId},
+              );
             },
           ),
         ],

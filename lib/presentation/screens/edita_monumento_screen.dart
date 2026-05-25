@@ -5,7 +5,6 @@ import 'package:audioguia_web/presentation/widgets/app_bar_principal.dart';
 import 'package:audioguia_web/presentation/widgets/label_campo.dart';
 import 'package:audioguia_web/presentation/widgets/menu_lateral.dart';
 import 'package:flutter/material.dart';
-import 'package:audioguia_web/service/api_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -19,21 +18,18 @@ class EditaMonumentoScreen extends StatefulWidget {
 }
 
 class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
-  final ApiService _apiService = ApiService();
   final _formKey = GlobalKey<FormState>();
-  
-  Monumento? _monumento; 
+
+  Monumento? _monumento;
   bool _isLoading = true;
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Publicado';
 
-  // Controladores de texto vinculados a los campos del formulario
   final _nombreController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
   final _likesController = TextEditingController();
 
-  // Mapa de transformación de categorías
   final Map<String, String> _categoriasMap = {
     'Monumentos Históricos': '1',
     'Iglesias': '2',
@@ -52,19 +48,20 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     _nombreController.dispose();
     _latController.dispose();
     _lonController.dispose();
-    _likesController.dispose(); 
+    _likesController.dispose();
     super.dispose();
   }
 
   Future<void> _cargarDatos() async {
     try {
-      final data = await _apiService.obtenerMonumentoPorId(widget.monumentoId);
+      final provider = context.read<GestionMonumentoProvider>();
+      final data = await provider.cargarMonumento(widget.monumentoId);
       setState(() {
         _monumento = data;
         _nombreController.text = data.nombre;
         _latController.text = data.latitud.toString();
         _lonController.text = data.longitud.toString();
-        _likesController.text = data.likes.toString(); 
+        _likesController.text = data.likes.toString();
         _categoriaSeleccionada = _obtenerNombreCategoria(data.categoria);
         _estadoSeleccionado = data.activo ? 'Publicado' : 'Borrador';
         _isLoading = false;
@@ -72,7 +69,10 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('✗ Error al cargar monumento: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('✗ Error al cargar monumento: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
         context.go('/rendimiento');
       }
@@ -81,7 +81,10 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
 
   String _obtenerNombreCategoria(String id) {
     return _categoriasMap.entries
-        .firstWhere((element) => element.value == id, orElse: () => const MapEntry('Monumentos Históricos', '1'))
+        .firstWhere(
+          (element) => element.value == id,
+          orElse: () => const MapEntry('Monumentos Históricos', '1'),
+        )
         .key;
   }
 
@@ -93,34 +96,44 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
 
     final double lat = double.tryParse(_latController.text) ?? 37.7214;
     final double lon = double.tryParse(_lonController.text) ?? -4.0321;
-    final int likes = int.tryParse(_likesController.text) ?? 0; 
+    final int likes = int.tryParse(_likesController.text) ?? 0;
     final String tagId = _categoriasMap[_categoriaSeleccionada] ?? '1';
 
-    // Construimos el modelo con las propiedades requeridas
     final monumentoActualizado = Monumento(
       id: _monumento!.id,
       nombre: _nombreController.text,
       categoria: tagId,
-      accesible: _monumento!.accesible, 
+      accesible: _monumento!.accesible,
       activo: _estadoSeleccionado == 'Publicado',
-      paraNinos: _monumento!.paraNinos, // Mantiene el valor previo
-      idioma: _monumento!.idioma,       // Mantiene el valor previo
+      paraNinos: _monumento!.paraNinos,
+      idioma: _monumento!.idioma,
       latitud: lat,
       longitud: lon,
-      likes: likes, // Asigna el nuevo número de likes del formulario
+      likes: likes,
     );
 
     try {
-      await _apiService.editarMonumento(monumentoActualizado);
-      
+      final provider = context.read<GestionMonumentoProvider>();
+      final exito = await provider.editarMonumento(monumentoActualizado);
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✓ Monumento actualizado correctamente'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        context.go('/rendimiento');
+        if (exito) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✓ Monumento actualizado correctamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          context.go('/rendimiento');
+        } else {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✗ Error al actualizar el monumento'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -137,37 +150,63 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
 
   Future<void> _eliminar() async {
     if (_monumento == null) return;
+    final provider = context.read<GestionMonumentoProvider>();
 
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Confirmar eliminación"),
-        content: Text("¿Estás seguro de que deseas eliminar permanentemente '${_monumento?.nombre}'? Esta acción no se puede deshacer."),
+        content: Text(
+          "¿Estás seguro de que deseas eliminar permanentemente '${_monumento?.nombre}'? Esta acción no se puede deshacer.",
+        ),
         actions: [
-          TextButton(onPressed: () => context.pop(false), child: const Text("Cancelar")),
           TextButton(
-            onPressed: () => context.pop(true), 
-            child: const Text("Eliminar", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+            onPressed: () => context.pop(false),
+            child: const Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () => context.pop(true),
+            child: const Text(
+              "Eliminar",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
     );
 
     if (confirm == true) {
+      if (!mounted) return;
       setState(() => _isLoading = true);
       try {
-        await _apiService.eliminarMonumento(widget.monumentoId);
+        final exito = await provider.eliminarMonumento(widget.monumentoId);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('✓ Monumento eliminado con éxito'), backgroundColor: Colors.green),
-          );
-          context.go('/rendimiento');
+          if (exito) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('✓ Monumento eliminado con éxito'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            context.go('/rendimiento');
+          } else {
+            setState(() => _isLoading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('✗ Error al eliminar el monumento'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         }
       } catch (e) {
         setState(() => _isLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('✗ Error al eliminar: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('✗ Error al eliminar: $e'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       }
@@ -180,7 +219,9 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      backgroundColor: isDarkMode
+          ? const Color(0xFF121212)
+          : const Color(0xFFF8F9FA),
       appBar: AppBarPrincipal(
         isDarkMode: isDarkMode,
         onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
@@ -189,11 +230,13 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
       ),
       body: Row(
         children: [
-          MenuLateral(rutaActual: '/rendimiento', isDarkMode: isDarkMode),
+          MenuLateral(rutaActual: '/monumentos/editar', isDarkMode: isDarkMode),
           VerticalDivider(width: 1, color: dividerColor),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: Color(0xFF008F68)))
+                ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF008F68)),
+                  )
                 : Form(
                     key: _formKey,
                     child: Column(
@@ -206,14 +249,18 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               nombreController: _nombreController,
                               latController: _latController,
                               lonController: _lonController,
-                              likesController: _likesController, 
+                              likesController: _likesController,
                               categoria: _categoriaSeleccionada,
                               estado: _estadoSeleccionado,
                               onCategoriaChanged: (val) {
-                                if (val != null) setState(() => _categoriaSeleccionada = val);
+                                if (val != null) {
+                                  setState(() => _categoriaSeleccionada = val);
+                                }
                               },
                               onEstadoChanged: (val) {
-                                if (val != null) setState(() => _estadoSeleccionado = val);
+                                if (val != null) {
+                                  setState(() => _estadoSeleccionado = val);
+                                }
                               },
                             ),
                           ),
@@ -231,8 +278,12 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
   Widget _buildFooter(BuildContext context, bool isDarkMode) {
     final footerBg = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final footerBorder = isDarkMode ? Colors.white12 : Colors.grey[200]!;
-    final cancelTextColor = isDarkMode ? Colors.grey[300]! : const Color(0xFF495057);
-    final cancelBorderColor = isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
+    final cancelTextColor = isDarkMode
+        ? Colors.grey[300]!
+        : const Color(0xFF495057);
+    final cancelBorderColor = isDarkMode
+        ? Colors.white24
+        : const Color(0xFFDEE2E6);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -245,13 +296,15 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
           Expanded(
             child: OutlinedButton(
               onPressed: () {
-                context.read<NuevoMonumentoProvider>().limpiarArchivos();
+                context.read<GestionMonumentoProvider>().limpiarArchivos();
                 context.go('/rendimiento');
               },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: BorderSide(color: cancelBorderColor),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: Text('Cancelar', style: TextStyle(color: cancelTextColor)),
             ),
@@ -263,9 +316,17 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: const BorderSide(color: Colors.redAccent),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              child: const Text('Eliminar Monumento', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Eliminar Monumento',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -275,10 +336,18 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008F68),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 elevation: 0,
               ),
-              child: const Text('Guardar Cambios', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Guardar Cambios',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
@@ -292,7 +361,7 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController nombreController;
   final TextEditingController latController;
   final TextEditingController lonController;
-  final TextEditingController likesController; 
+  final TextEditingController likesController;
   final String categoria;
   final String estado;
   final ValueChanged<String?> onCategoriaChanged;
@@ -310,8 +379,10 @@ class _FormularioMonumento extends StatelessWidget {
     required this.onEstadoChanged,
   });
 
-  Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
-  Color get _fieldBorder => isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
+  Color get _fieldFill =>
+      isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
+  Color get _fieldBorder =>
+      isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
   Color get _hintColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
 
   @override
@@ -321,7 +392,10 @@ class _FormularioMonumento extends StatelessWidget {
       children: [
         const LabelCampo(label: 'Nombre del Monumento'),
         const SizedBox(height: 8),
-        _buildTextField(textoGuia: 'Ej: Castillo de la Peña', controller: nombreController),
+        _buildTextField(
+          textoGuia: 'Ej: Castillo de la Peña',
+          controller: nombreController,
+        ),
         const SizedBox(height: 20),
 
         Row(
@@ -334,7 +408,12 @@ class _FormularioMonumento extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildDropdown(
                     value: categoria,
-                    items: const ['Monumentos Históricos', 'Iglesias', 'Fuentes', 'Parques'],
+                    items: const [
+                      'Monumentos Históricos',
+                      'Iglesias',
+                      'Fuentes',
+                      'Parques',
+                    ],
                     onChanged: onCategoriaChanged,
                   ),
                 ],
@@ -363,9 +442,21 @@ class _FormularioMonumento extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: _buildTextField(textoGuia: '37.7214', prefix: 'Lat', controller: latController)),
+            Expanded(
+              child: _buildTextField(
+                textoGuia: '37.7214',
+                prefix: 'Lat',
+                controller: latController,
+              ),
+            ),
             const SizedBox(width: 16),
-            Expanded(child: _buildTextField(textoGuia: '-4.0321', prefix: 'Lon', controller: lonController)),
+            Expanded(
+              child: _buildTextField(
+                textoGuia: '-4.0321',
+                prefix: 'Lon',
+                controller: lonController,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 20),
@@ -373,9 +464,9 @@ class _FormularioMonumento extends StatelessWidget {
         const LabelCampo(label: 'Número de Likes'),
         const SizedBox(height: 8),
         _buildTextField(
-          textoGuia: 'Ej: 142', 
-          controller: likesController, 
-          keyboardType: TextInputType.number
+          textoGuia: 'Ej: 142',
+          controller: likesController,
+          keyboardType: TextInputType.number,
         ),
         const SizedBox(height: 12),
       ],
@@ -394,24 +485,43 @@ class _FormularioMonumento extends StatelessWidget {
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Este campo es obligatorio';
-        if (keyboardType == TextInputType.number && int.tryParse(value) == null) {
+        if (keyboardType == TextInputType.number &&
+            int.tryParse(value) == null) {
           return 'Introduce un número válido';
         }
         return null;
       },
       decoration: InputDecoration(
         prefixIcon: prefix != null
-            ? Padding(padding: const EdgeInsets.all(12), child: Text(prefix, style: TextStyle(color: _hintColor)))
+            ? Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(prefix, style: TextStyle(color: _hintColor)),
+              )
             : null,
         hintText: textoGuia,
         hintStyle: TextStyle(color: _hintColor, fontSize: 14),
         filled: true,
         fillColor: _fieldFill,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: _fieldBorder)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF008F68))),
-        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.redAccent)),
-        focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.redAccent, width: 2)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: _fieldBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF008F68)),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.redAccent),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+        ),
       ),
     );
   }
@@ -425,14 +535,22 @@ class _FormularioMonumento extends StatelessWidget {
       initialValue: value,
       dropdownColor: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
-      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+      items: items
+          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
         filled: true,
         fillColor: _fieldFill,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: _fieldBorder)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF008F68))),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: _fieldBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF008F68)),
+        ),
       ),
     );
   }

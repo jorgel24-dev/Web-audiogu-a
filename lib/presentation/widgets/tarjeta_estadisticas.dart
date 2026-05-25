@@ -28,8 +28,7 @@ class TarjetaEstadistica extends StatelessWidget {
     final borderColor = isDarkMode
         ? colorIcono.withValues(alpha: 0.35)
         : colorIcono.withValues(alpha: 0.25);
-    final valueColor =
-        isDarkMode ? Colors.white : const Color(0xFF0F172A);
+    final valueColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
     final labelColor = isDarkMode
         ? const Color(0xFF94A3B8)
         : const Color(0xFF64748B);
@@ -80,8 +79,10 @@ class TarjetaEstadistica extends StatelessWidget {
                   child: Icon(icono, color: colorIcono, size: 20),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: trendBg,
                     borderRadius: BorderRadius.circular(8),

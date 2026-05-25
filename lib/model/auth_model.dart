@@ -21,9 +21,9 @@ class AdminUser {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'email': email,
-        'nombre': nombre,
-        'token': token,
-      };
+    'id': id,
+    'email': email,
+    'nombre': nombre,
+    'token': token,
+  };
 }

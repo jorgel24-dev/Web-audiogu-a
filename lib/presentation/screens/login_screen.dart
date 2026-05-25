@@ -13,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController usuarioController = TextEditingController(); 
+  final TextEditingController usuarioController = TextEditingController();
   final TextEditingController passController = TextEditingController();
 
   @override
@@ -58,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Logo
               Container(
                 width: 56,
                 height: 56,
@@ -90,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               InputCampo(
                 texto: 'Nombre de usuario',
-                controller: usuarioController, 
+                controller: usuarioController,
                 icono: Icons.person_outline,
               ),
               const SizedBox(height: 14),
@@ -117,7 +116,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       texto: 'Iniciar sesión',
                       onPressed: () => handleLogin(context),
                     ),
-
             ],
           ),
         ),

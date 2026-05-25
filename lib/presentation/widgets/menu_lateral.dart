@@ -37,7 +37,7 @@ class MenuLateral extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>(); 
+    final auth = context.watch<AuthProvider>();
     final nombre = auth.nombreUsuario;
     final inicial = nombre.isNotEmpty ? nombre[0].toUpperCase() : 'A';
 

@@ -32,8 +32,7 @@ class TarjetaModulo extends StatelessWidget {
         : Colors.grey.shade100;
     final titleColor = isDarkMode ? Colors.white : Colors.black87;
     final descColor = isDarkMode ? const Color(0xFF8899AA) : Colors.grey[500];
-    final estadoColor =
-        isDarkMode ? const Color(0xFF6B7A8D) : Colors.grey[400];
+    final estadoColor = isDarkMode ? const Color(0xFF6B7A8D) : Colors.grey[400];
 
     return Container(
       decoration: BoxDecoration(
@@ -101,8 +100,11 @@ class TarjetaModulo extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     descripcion,
-                    style:
-                        TextStyle(color: descColor, fontSize: 13, height: 1.5),
+                    style: TextStyle(
+                      color: descColor,
+                      fontSize: 13,
+                      height: 1.5,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -114,8 +116,7 @@ class TarjetaModulo extends StatelessWidget {
                       TextButton(
                         onPressed: alPulsarAccion,
                         style: TextButton.styleFrom(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                         ),
                         child: Row(
                           children: [

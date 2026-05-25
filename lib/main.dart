@@ -30,7 +30,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TemaProvider()),
         ChangeNotifierProvider(create: (_) => ConfiguracionProvider()),
         ChangeNotifierProvider(create: (_) => RendimientoProvider()),
-        ChangeNotifierProvider(create: (_) => NuevoMonumentoProvider()),
+        ChangeNotifierProvider(create: (_) => GestionMonumentoProvider()),
       ],
       child: const MainApp(),
     ),

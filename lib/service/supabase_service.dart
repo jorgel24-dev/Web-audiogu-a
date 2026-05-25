@@ -53,12 +53,11 @@ class SupabaseService {
     try {
       final extension = nombreArchivo.split('.').last;
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      // Guardamos con un prefijo claro para identificar que es un audio
       final uniqueName = '${timestamp}_audio.$extension';
       final ruta = uniqueName;
 
       await _client.storage
-          .from('monumentos') 
+          .from('monumentos')
           .uploadBinary(
             ruta,
             bytes,
@@ -88,7 +87,7 @@ class SupabaseService {
       case 'aac':
         return 'audio/aac';
       default:
-        return 'audio/mpeg'; 
+        return 'audio/mpeg';
     }
   }
 }

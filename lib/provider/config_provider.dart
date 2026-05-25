@@ -70,7 +70,10 @@ class ConfiguracionProvider extends ChangeNotifier {
 
     if (listaMonumentos != null) {
       monumentos = listaMonumentos;
-      _originalMonumentosState = {for (var m in monumentos) if (m.id != null) m.id!: m.activo};
+      _originalMonumentosState = {
+        for (var m in monumentos)
+          if (m.id != null) m.id!: m.activo,
+      };
     }
 
     if (listaRutas != null) {
@@ -176,7 +179,10 @@ class ConfiguracionProvider extends ChangeNotifier {
 
     if (exito) {
       _hayPendientes = false;
-      _originalMonumentosState = {for (var m in monumentos) if (m.id != null) m.id!: m.activo};
+      _originalMonumentosState = {
+        for (var m in monumentos)
+          if (m.id != null) m.id!: m.activo,
+      };
       _originalRutasState = {for (var r in rutas) r.id: r.isActive};
     } else {
       _error = 'Error al guardar alguna configuración en el servidor.';
