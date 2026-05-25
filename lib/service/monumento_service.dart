@@ -55,7 +55,7 @@ class MonumentoService {
     List<String> description = const [],
   }) async {
     try {
-      final uri = Uri.parse('$_urlAdmin');
+      final uri = Uri.parse(_urlAdmin);
       final String fechaActual = DateTime.now().toIso8601String().substring(
         0,
         19,
