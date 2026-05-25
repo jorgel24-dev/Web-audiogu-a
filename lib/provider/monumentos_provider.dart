@@ -1,4 +1,4 @@
-import 'package:audioguia_web/service/api_service.dart';
+import 'package:audioguia_web/service/monumento_service.dart';
 import 'package:audioguia_web/service/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
@@ -6,7 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import '../model/monumento_model.dart';
 
 class GestionMonumentoProvider extends ChangeNotifier {
-  final ApiService _apiService = ApiService();
+  final MonumentoService _monumentoService = MonumentoService();
   final SupabaseService _supabaseService = SupabaseService();
 
   bool _isSaving = false;
@@ -85,7 +85,7 @@ class GestionMonumentoProvider extends ChangeNotifier {
         }
       }
 
-      final exito = await _apiService.crearMonumento(
+      final exito = await _monumentoService.crearMonumento(
         monumento: monumento,
         imagenUrl: urlImagenSubida,
         audioUrl: urlAudioSubido,
@@ -101,7 +101,7 @@ class GestionMonumentoProvider extends ChangeNotifier {
   }
 
   Future<Monumento> cargarMonumento(String id) async {
-    return await _apiService.obtenerMonumentoPorId(id);
+    return await _monumentoService.obtenerMonumentoPorId(id);
   }
 
   Future<bool> editarMonumento(Monumento monumento) async {
@@ -109,7 +109,7 @@ class GestionMonumentoProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final exito = await _apiService.editarMonumento(monumento);
+      final exito = await _monumentoService.editarMonumento(monumento);
       return exito;
     } catch (e) {
       _isSaving = false;
@@ -126,7 +126,7 @@ class GestionMonumentoProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final exito = await _apiService.eliminarMonumento(id);
+      final exito = await _monumentoService.eliminarMonumento(id);
       return exito;
     } catch (e) {
       _isSaving = false;

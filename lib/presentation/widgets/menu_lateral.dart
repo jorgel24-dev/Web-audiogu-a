@@ -17,12 +17,12 @@ class _ItemMenu {
 }
 
 const _itemsMenu = [
+  _ItemMenu(icon: Icons.dashboard, label: 'Inicio', ruta: '/dashboard'),
   _ItemMenu(
-    icon: Icons.dashboard,
-    label: 'Panel Principal',
-    ruta: '/dashboard',
+    icon: Icons.analytics_outlined,
+    label: 'Estadísticas',
+    ruta: '/rendimiento',
   ),
-  _ItemMenu(icon: Icons.location_on, label: 'Monumentos', ruta: '/rendimiento'),
   _ItemMenu(icon: Icons.article, label: 'Noticias', ruta: '/noticias'),
   _ItemMenu(
     icon: Icons.settings,

@@ -1,9 +1,9 @@
 import 'package:audioguia_web/model/stats_model.dart';
-import 'package:audioguia_web/service/api_service.dart';
+import 'package:audioguia_web/service/rendimiento_service.dart';
 import 'package:flutter/material.dart';
 
 class RendimientoProvider with ChangeNotifier {
-  final ApiService _apiService = ApiService();
+  final RendimientoService _apiService = RendimientoService();
 
   StatsModel? _data;
   bool _isLoading = false;
