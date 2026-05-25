@@ -252,7 +252,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               likesController: _likesController,
                               categoria: _categoriaSeleccionada,
                               estado: _estadoSeleccionado,
-                              imagenUrl: _monumento?.imagenUrl,
+                              imagenesUrls: _monumento?.imagenesUrls ?? [],
                               onCategoriaChanged: (val) {
                                 if (val != null) {
                                   setState(() => _categoriaSeleccionada = val);
@@ -376,12 +376,12 @@ class _FormularioMonumento extends StatelessWidget {
     required this.likesController,
     required this.categoria,
     required this.estado,
-    this.imagenUrl,
+    this.imagenesUrls = const [],
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
   });
 
-  final String? imagenUrl;
+  final List<String> imagenesUrls;
 
   Color get _fieldFill =>
       isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
@@ -394,24 +394,40 @@ class _FormularioMonumento extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (imagenUrl != null) ...[
-          const LabelCampo(label: 'Imagen Actual'),
+        if (imagenesUrls.isNotEmpty) ...[
+          const LabelCampo(label: 'Imágenes Actuales'),
           const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              imagenUrl!,
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                height: 200,
-                width: double.infinity,
-                color: _fieldFill,
-                child: Center(
-                  child: Icon(Icons.broken_image, size: 50, color: _hintColor),
-                ),
-              ),
+          SizedBox(
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: imagenesUrls.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      imagenesUrls[index],
+                      height: 120,
+                      width: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 120,
+                        width: 120,
+                        color: _fieldFill,
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 30,
+                            color: _hintColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 20),

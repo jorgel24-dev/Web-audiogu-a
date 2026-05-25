@@ -7,6 +7,7 @@ class Monumento {
   final double latitud;
   final double longitud;
   final String? imagenUrl;
+  final List<String> imagenesUrls;
   final String? audioUrl;
   final int likes;
   final bool paraNinos;
@@ -23,6 +24,7 @@ class Monumento {
     required this.paraNinos,
     required this.idioma,
     this.imagenUrl,
+    this.imagenesUrls = const [],
     this.audioUrl,
     this.likes = 0,
   });
@@ -38,6 +40,19 @@ class Monumento {
         ? listaAudios[0] as Map<String, dynamic>
         : null;
 
+    final pictureList = json['picture'] as List?;
+    final List<String> allImages = [];
+    String? firstImage;
+
+    if (pictureList != null && pictureList.isNotEmpty) {
+      firstImage = pictureList[0]['url'];
+      for (var pic in pictureList) {
+        if (pic['url'] != null) {
+          allImages.add(pic['url'].toString());
+        }
+      }
+    }
+
     return Monumento(
       id: json['id']?.toString(),
       nombre: json['name'] ?? '',
@@ -46,9 +61,8 @@ class Monumento {
       activo: json['isActive'] ?? true,
       latitud: lat,
       longitud: lon,
-      imagenUrl: json['picture'] != null && (json['picture'] as List).isNotEmpty
-          ? json['picture'][0]['url']
-          : null,
+      imagenUrl: firstImage,
+      imagenesUrls: allImages,
       audioUrl: primerAudio != null ? primerAudio['url'] : null,
       likes: json['NLikes'] ?? 0,
       paraNinos: primerAudio != null ? (primerAudio['kids'] ?? false) : false,
