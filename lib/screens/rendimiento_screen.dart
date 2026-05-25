@@ -1,6 +1,7 @@
 import 'package:audioguia_web/models/stats_model.dart';
 import 'package:audioguia_web/providers/rendimiento_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
 import 'package:provider/provider.dart';
@@ -108,7 +109,7 @@ class _RendimientoContenido extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(flex: 3, child: _buildPopularMonuments()),
+            Expanded(flex: 3, child: _buildPopularMonuments(context)),
           ],
         ),
       ],
@@ -189,7 +190,7 @@ class _RendimientoContenido extends StatelessWidget {
     );
   }
 
-  Widget _buildPopularMonuments() {
+  Widget _buildPopularMonuments(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -215,11 +216,13 @@ class _RendimientoContenido extends StatelessWidget {
             int index = entry.key + 1;
             var monumento = entry.value;
             return _monumentRow(
+              context,
               index.toString(), 
               monumento.nombre, 
               monumento.visitas, 
               monumento.progreso, 
-              monumento.porcentaje
+              monumento.porcentaje,
+              monumento.id
             );
           })
         ],
@@ -227,7 +230,7 @@ class _RendimientoContenido extends StatelessWidget {
     );
   }
 
-  Widget _monumentRow(String rank, String name, String stats, double progress, String percent) {
+  Widget _monumentRow(BuildContext context, String rank, String name, String stats, double progress, String percent, String monumentoId) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -272,9 +275,9 @@ class _RendimientoContenido extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit_outlined, size: 20),
             color: _textSecondary,
-            onPressed: () {
+            onPressed: () async {
               // Lógica para editar el monumento
-              print("Editar monumento: $name");
+              context.pushNamed('editar_monumento', extra: monumentoId);
             },
           ),
         ],

@@ -1,3 +1,4 @@
+import 'package:audioguia_web/screens/edita_monumento_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:audioguia_web/screens/login_screen.dart';
 import 'package:audioguia_web/screens/dashboard_screen.dart';
@@ -51,6 +52,15 @@ final appRouter = GoRouter(
       path: '/configuracion',
       name: 'configuracion',
       builder: (context, state) => const ConfiguracionPage(),
+    ),
+    GoRoute(
+      path: '/monumentos/editar',
+      name: 'editar_monumento',
+      builder: (context, state) {
+        // Pasamos el monumento completo a través del 'extra'
+        final monumento = state.extra as String; 
+        return EditaMonumentoScreen(monumentoId: monumento);
+      },
     ),
   ],
 );

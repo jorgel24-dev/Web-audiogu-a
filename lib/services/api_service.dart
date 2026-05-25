@@ -122,4 +122,68 @@ class ApiService {
       rethrow;
     }
   }
+
+  // Editar (PUT)
+Future<bool> editarMonumento(Monumento monumento) async {
+  final uri = Uri.parse('$_baseUrl/admin/monuments/${monumento.id}');
+
+  final String fechaActual = DateTime.now().toIso8601String().substring(0, 19);
+  
+  // Mapeamos el modelo al formato JSON exacto que reconoce el Backend
+  final bodyMapeado = {
+    "name": monumento.nombre,
+    "coordenates": {
+      "lon": monumento.longitud,
+      "lat": monumento.latitud
+    },
+    "accessibility": monumento.accesible,
+    "isActive": monumento.activo,
+    "tag": {
+      "id": int.tryParse(monumento.categoria) ?? 1 // Convertimos el ID string a int
+    },
+    "maps_url": 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
+    "description": [], // Si tu backend espera listas vacías por ahora
+    "picture": [],
+    "audio": [],
+    "localidad_id": 1, // Ajusta el ID según corresponda a tu lógica
+    'NLikes': 0,
+    'n_likes': 0,
+    'last_modified': fechaActual
+  };
+
+  try {
+    final response = await http.put(
+      uri,
+      headers: _headers,
+      body: jsonEncode(bodyMapeado),
+    );
+    
+    // Retorna true si es 200 (OK) o 204 (No Content) dependiendo de tu Spring Boot
+    return response.statusCode == 200 || response.statusCode == 204;
+  } catch (e) {
+    print("Error en editarMonumento HTTP: \$e");
+    return false;
+  }
+}
+
+  // Eliminar (DELETE)
+  Future<bool> eliminarMonumento(String id) async {
+    final uri = Uri.parse('$_baseUrl/admin/monuments/$id');
+    final response = await http.delete(uri, headers: _headers);
+    return response.statusCode == 200 || response.statusCode == 204;
+  }
+
+  Future<Monumento> obtenerMonumentoPorId(String id) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/public/monuments/$id'), // Asegúrate de que este endpoint exista
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      // Usas el factory desdeJson de tu modelo Monumento
+      return Monumento.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('No se pudo cargar el monumento');
+    }
+  }
 }
