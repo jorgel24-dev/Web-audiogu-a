@@ -17,8 +17,12 @@ class _ItemMenu {
 }
 
 const _itemsMenu = [
-  _ItemMenu(icon: Icons.dashboard, label: 'Dashboard', ruta: '/dashboard'),
-  _ItemMenu(icon: Icons.bar_chart, label: 'Rendimiento', ruta: '/rendimiento'),
+  _ItemMenu(
+    icon: Icons.dashboard,
+    label: 'Panel Principal',
+    ruta: '/dashboard',
+  ),
+  _ItemMenu(icon: Icons.location_on, label: 'Monumentos', ruta: '/rendimiento'),
   _ItemMenu(icon: Icons.article, label: 'Noticias', ruta: '/noticias'),
   _ItemMenu(
     icon: Icons.settings,
@@ -95,12 +99,21 @@ class MenuLateral extends StatelessWidget {
           Divider(height: 1, color: dividerColor),
           const SizedBox(height: 8),
           ..._itemsMenu.map(
-            (item) => ItemMenuLateral(
-              icon: item.icon,
-              label: item.label,
-              seleccionado: rutaActual == item.ruta,
-              onTap: () => context.go(item.ruta),
-              isDarkMode: isDarkMode,
+            (item) => Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 4.0,
+              ),
+              child: ItemMenuLateral(
+                icon: item.icon,
+                label: item.label,
+                seleccionado:
+                    rutaActual == item.ruta ||
+                    (rutaActual.startsWith('/monumentos') &&
+                        item.ruta == '/rendimiento'),
+                onTap: () => context.go(item.ruta),
+                isDarkMode: isDarkMode,
+              ),
             ),
           ),
           const Spacer(),
