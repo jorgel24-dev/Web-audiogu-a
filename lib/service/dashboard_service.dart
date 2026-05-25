@@ -37,7 +37,12 @@ class DashboardService {
     if (respMonumentos.statusCode == 200) {
       final lista = jsonDecode(respMonumentos.body) as List;
 
-      totalMonumentos = lista.length;
+      totalMonumentos = lista.where((item) {
+        if (item is Map<String, dynamic>) {
+          return item['isActive'] == true;
+        }
+        return false;
+      }).length;
     }
 
     if (respNoticias.statusCode == 200) {
