@@ -95,17 +95,13 @@ class ApiService {
         "picture": imagenUrl != null ? [
             {
               "url" : imagenUrl,
-              "createdAt": fechaActual,
-              "lastModified": fechaActual
             } 
           ] : [],
         'audio': audioUrl != null ? [
           {
             "url": audioUrl,
             "kids": monumento.paraNinos,      
-            "language": monumento.idioma,     
-            "createdAt": fechaActual,
-            "lastModified": fechaActual
+            "language": monumento.idioma,
           }
         ] : [],
         'localidad_id': 1, // Añade el id de localidad si tu tabla lo requiere obligatoriamente
@@ -155,8 +151,19 @@ class ApiService {
       },
       "maps_url": 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
       "description": [], 
-      "picture": [], // Se mantienen vacíos al haber eliminado la carga de imágenes
-      "audio": [],   // Se mantienen vacíos al haber eliminado la carga de audios
+      "picture": monumento.imagenUrl != null ? [
+          {
+            "url" : monumento.imagenUrl
+          } 
+        ] : [],
+        
+      "audio": monumento.audioUrl != null ? [
+        {
+          "url": monumento.audioUrl,
+          "kids": monumento.paraNinos,      
+          "language": monumento.idioma      
+        }
+      ] : [],
       "localidad_id": 1, 
       "NLikes": monumento.likes,
       "last_modified": fechaActual
