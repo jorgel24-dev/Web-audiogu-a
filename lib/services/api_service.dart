@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:audioguia_web/models/monumento_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -72,7 +71,7 @@ class ApiService {
   Future<bool> crearMonumento({
     required Monumento monumento,
     String? imagenUrl,
-    required Uint8List? audioBytes,  
+    String? audioUrl,
   }) async {
     try {
       final uri = Uri.parse('$_baseUrl/admin/monuments');
@@ -82,23 +81,27 @@ class ApiService {
         'name': monumento.nombre,
         'description': [], 
         "coordenates": {
-          "lon": monumento.longitud,
-          "lat": monumento.latitud
-        },
+            "lon": monumento.longitud,
+            "lat": monumento.latitud,
+          },
         'accessibility': monumento.accesible,
         'isActive': monumento.activo, 
         'maps_url': 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
         'tag': {
           'id': int.tryParse(monumento.categoria) ?? 1 // Pasa el objeto Tag con su ID correspondiente
         },
-        "picture": imagenUrl != null ? [
+        "picture" : [],
+        //"audio" : [],
+        /*"picture": imagenUrl != null ? [
             {
-              "createdAt" : fechaActual,
-              "lastModified" : fechaActual,
               "url" : imagenUrl
             } 
-          ] : [],
-        'audio': [],   // List<Audio> en blanco por ahora
+          ] : [],*/
+        'audio': audioUrl != null ? [
+          {
+            "url": audioUrl,
+          }
+        ] : [],
         'localidad_id': 1, // Añade el id de localidad si tu tabla lo requiere obligatoriamente
         'NLikes': monumento.likes,
         'created_at': fechaActual, 

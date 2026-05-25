@@ -68,6 +68,7 @@ class NuevoMonumentoProvider extends ChangeNotifier {
 
     try {
       String? urlImagenSubida;
+      String? urlAudioSubido;
 
       // 1. Subir la imagen a Supabase si el usuario seleccionó una
       if (_imagenBytes != null && _imagenNombre != null) {
@@ -77,10 +78,18 @@ class NuevoMonumentoProvider extends ChangeNotifier {
         }
       }
 
+      // 2. NUEVO: Subir el audio a Supabase si el usuario seleccionó uno
+      if (_audioBytes != null && _audioNombre != null) {
+        urlAudioSubido = await _supabaseService.subirAudio(_audioBytes!, _audioNombre!);
+        if (urlAudioSubido == null) {
+          throw Exception("Error al subir el archivo de audio a Supabase");
+        }
+      }
+
       final exito = await _apiService.crearMonumento(
         monumento: monumento,
         imagenUrl: urlImagenSubida,
-        audioBytes: _audioBytes
+        audioUrl: urlAudioSubido
       );
       
       if (exito) limpiarArchivos();
