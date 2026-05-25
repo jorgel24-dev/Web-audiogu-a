@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
-/// Barra de herramientas del editor de noticias.
-/// Opera directamente sobre el [QuillController] del editor.
 class EditorToolbar extends StatelessWidget {
   final quill.QuillController controller;
   final bool isDarkMode;
@@ -27,7 +25,6 @@ class EditorToolbar extends StatelessWidget {
       child: quill.QuillSimpleToolbar(
         controller: controller,
         config: quill.QuillSimpleToolbarConfig(
-          // Solo mostramos los botones que necesitamos
           showBoldButton: true,
           showItalicButton: true,
           showUnderLineButton: true,
