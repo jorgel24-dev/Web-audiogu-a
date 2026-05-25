@@ -20,7 +20,7 @@ const _itemsMenu = [
   _ItemMenu(icon: Icons.dashboard, label: 'Inicio', ruta: '/dashboard'),
   _ItemMenu(
     icon: Icons.analytics_outlined,
-    label: 'Estadísticas',
+    label: 'Rendimiento',
     ruta: '/rendimiento',
   ),
   _ItemMenu(icon: Icons.article, label: 'Noticias', ruta: '/noticias'),
