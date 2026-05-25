@@ -1,4 +1,4 @@
-import 'package:audioguia_web/models/stats_model.dart';
+import 'package:audioguia_web/model/stats_model.dart';
 import 'package:audioguia_web/provider/rendimiento_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

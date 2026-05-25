@@ -1,9 +1,9 @@
-import 'package:audioguia_web/services/api_service.dart';
-import 'package:audioguia_web/services/supabase_service.dart';
+import 'package:audioguia_web/service/api_service.dart';
+import 'package:audioguia_web/service/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
-import '../models/monumento_model.dart';
+import '../model/monumento_model.dart';
 
 class NuevoMonumentoProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();

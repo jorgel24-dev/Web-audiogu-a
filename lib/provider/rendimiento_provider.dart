@@ -1,5 +1,5 @@
-import 'package:audioguia_web/models/stats_model.dart';
-import 'package:audioguia_web/services/api_service.dart';
+import 'package:audioguia_web/model/stats_model.dart';
+import 'package:audioguia_web/service/api_service.dart';
 import 'package:flutter/material.dart';
 
 class RendimientoProvider with ChangeNotifier {

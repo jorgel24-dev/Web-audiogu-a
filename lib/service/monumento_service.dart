@@ -7,7 +7,7 @@ class MonumentoService {
       'https://backend-tfg.fly.dev/api/v1/public/monuments';
   final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/monuments';
 
-  Future<List<MonumentoModel>?> obtenerTodos() async {
+  Future<List<Monumento>?> obtenerTodos() async {
     try {
       final response = await http.get(Uri.parse(_urlPublic));
       if (response.statusCode == 200) {
@@ -16,7 +16,7 @@ class MonumentoService {
         );
         return lista
             .map(
-              (item) => MonumentoModel.fromJson(item as Map<String, dynamic>),
+              (item) => Monumento.fromJson(item as Map<String, dynamic>),
             )
             .toList();
       }

@@ -264,14 +264,14 @@ class _CardConfiguracion extends StatelessWidget {
                 .map(
                   (m) => SwitchListTile(
                     title: Text(
-                      m.name,
+                      m.nombre,
                       style: TextStyle(
                         color: isDarkMode ? Colors.white : Colors.black87,
                         fontSize: 13,
                       ),
                     ),
-                    value: m.isActive,
-                    onChanged: (v) => config.toggleMonumento(m.id, v),
+                    value: m.activo,
+                    onChanged: (v) => config.toggleMonumento(m.id ?? '', v),
                     activeThumbColor: const Color(0xFF2196F3),
                     contentPadding: const EdgeInsets.only(left: 70, right: 24),
                   ),

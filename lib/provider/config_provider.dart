@@ -16,7 +16,7 @@ class ConfiguracionProvider extends ChangeNotifier {
   bool mapasInteractivos = true;
   bool noticias = true;
 
-  List<MonumentoModel> monumentos = [];
+  List<Monumento> monumentos = [];
   List<RutaModel> rutas = [];
 
   Map<String, bool> _originalMonumentosState = {};
@@ -44,7 +44,7 @@ class ConfiguracionProvider extends ChangeNotifier {
     ]);
 
     final listaControl = resultados[0];
-    final listaMonumentos = resultados[1] as List<MonumentoModel>?;
+    final listaMonumentos = resultados[1] as List<Monumento>?;
     final listaRutas = resultados[2] as List<RutaModel>?;
 
     if (listaControl != null) {
@@ -70,7 +70,7 @@ class ConfiguracionProvider extends ChangeNotifier {
 
     if (listaMonumentos != null) {
       monumentos = listaMonumentos;
-      _originalMonumentosState = {for (var m in monumentos) m.id: m.isActive};
+      _originalMonumentosState = {for (var m in monumentos) if (m.id != null) m.id!: m.activo};
     }
 
     if (listaRutas != null) {
@@ -98,10 +98,19 @@ class ConfiguracionProvider extends ChangeNotifier {
     final index = monumentos.indexWhere((m) => m.id == id);
     if (index != -1) {
       final old = monumentos[index];
-      monumentos[index] = MonumentoModel(
+      monumentos[index] = Monumento(
         id: old.id,
-        name: old.name,
-        isActive: v,
+        nombre: old.nombre,
+        categoria: old.categoria,
+        accesible: old.accesible,
+        latitud: old.latitud,
+        longitud: old.longitud,
+        paraNinos: old.paraNinos,
+        idioma: old.idioma,
+        activo: v,
+        imagenUrl: old.imagenUrl,
+        audioUrl: old.audioUrl,
+        likes: old.likes,
       );
       _hayPendientes = true;
       notifyListeners();
@@ -150,8 +159,8 @@ class ConfiguracionProvider extends ChangeNotifier {
     ]);
 
     for (var m in monumentos) {
-      if (_originalMonumentosState[m.id] != m.isActive) {
-        promesas.add(_monumentosService.toggleActivo(m.id, authHeader));
+      if (m.id != null && _originalMonumentosState[m.id!] != m.activo) {
+        promesas.add(_monumentosService.toggleActivo(m.id!, authHeader));
       }
     }
 
@@ -167,7 +176,7 @@ class ConfiguracionProvider extends ChangeNotifier {
 
     if (exito) {
       _hayPendientes = false;
-      _originalMonumentosState = {for (var m in monumentos) m.id: m.isActive};
+      _originalMonumentosState = {for (var m in monumentos) if (m.id != null) m.id!: m.activo};
       _originalRutasState = {for (var r in rutas) r.id: r.isActive};
     } else {
       _error = 'Error al guardar alguna configuración en el servidor.';

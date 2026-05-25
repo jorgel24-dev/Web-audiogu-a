@@ -48,4 +48,47 @@ class SupabaseService {
         return 'application/octet-stream';
     }
   }
+
+  Future<String?> subirAudio(Uint8List bytes, String nombreArchivo) async {
+    try {
+      final extension = nombreArchivo.split('.').last;
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      // Guardamos con un prefijo claro para identificar que es un audio
+      final uniqueName = '${timestamp}_audio.$extension';
+      final ruta = uniqueName;
+
+      await _client.storage
+          .from('monumentos') 
+          .uploadBinary(
+            ruta,
+            bytes,
+            fileOptions: FileOptions(
+              contentType: _getAudioContentType(extension),
+              upsert: false,
+            ),
+          );
+
+      final urlPublica = _client.storage.from('monumentos').getPublicUrl(ruta);
+      return urlPublica;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _getAudioContentType(String extension) {
+    switch (extension.toLowerCase()) {
+      case 'mp3':
+        return 'audio/mpeg';
+      case 'wav':
+        return 'audio/wav';
+      case 'm4a':
+        return 'audio/x-m4a';
+      case 'ogg':
+        return 'audio/ogg';
+      case 'aac':
+        return 'audio/aac';
+      default:
+        return 'audio/mpeg'; 
+    }
+  }
 }
