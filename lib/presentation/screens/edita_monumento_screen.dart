@@ -252,6 +252,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               likesController: _likesController,
                               categoria: _categoriaSeleccionada,
                               estado: _estadoSeleccionado,
+                              imagenUrl: _monumento?.imagenUrl,
                               onCategoriaChanged: (val) {
                                 if (val != null) {
                                   setState(() => _categoriaSeleccionada = val);
@@ -375,9 +376,12 @@ class _FormularioMonumento extends StatelessWidget {
     required this.likesController,
     required this.categoria,
     required this.estado,
+    this.imagenUrl,
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
   });
+
+  final String? imagenUrl;
 
   Color get _fieldFill =>
       isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
@@ -390,6 +394,28 @@ class _FormularioMonumento extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (imagenUrl != null) ...[
+          const LabelCampo(label: 'Imagen Actual'),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              imagenUrl!,
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 200,
+                width: double.infinity,
+                color: _fieldFill,
+                child: Center(
+                  child: Icon(Icons.broken_image, size: 50, color: _hintColor),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
         const LabelCampo(label: 'Nombre del Monumento'),
         const SizedBox(height: 8),
         _buildTextField(
