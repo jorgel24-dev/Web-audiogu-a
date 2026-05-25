@@ -119,7 +119,7 @@ class MonumentoService {
     Monumento monumento, {
     int localidadId = 1,
   }) async {
-    final uri = Uri.parse('$_urlAdmin/${monumento.id}');
+    final uri = Uri.parse('$_urlAdmin/${monumento.id}'); 
     final bodyMapeado = {
       "name": monumento.nombre,
       "coordenates": {"lon": monumento.longitud, "lat": monumento.latitud},
@@ -131,6 +131,7 @@ class MonumentoService {
       "description": (monumento.descripcionContenido.isNotEmpty || monumento.descripcionNombre.isNotEmpty)
           ? [
               {
+                if (monumento.descripcionId != null) "id": monumento.descripcionId, 
                 "complete": monumento.sinopsis,
                 "contenido": monumento.descripcionContenido,
                 "kids": monumento.paraNinos,

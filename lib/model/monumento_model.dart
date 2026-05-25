@@ -15,6 +15,7 @@ class Monumento {
   final bool sinopsis;
   final String descripcionContenido;
   final String descripcionNombre;
+  final int? descripcionId;
 
   Monumento({
     this.id,
@@ -33,6 +34,7 @@ class Monumento {
     this.imagenesUrls = const [],
     this.audioUrl,
     this.likes = 0,
+    this.descripcionId,
   });
 
   factory Monumento.fromJson(Map<String, dynamic> json) {
@@ -64,6 +66,7 @@ class Monumento {
         (listaDescripciones != null && listaDescripciones.isNotEmpty)
         ? listaDescripciones[0] as Map<String, dynamic>
         : null;
+    final int? descId = primeraDescripcion != null ? primeraDescripcion['id'] as int? : null;
 
     return Monumento(
       id: json['id']?.toString(),
@@ -82,6 +85,7 @@ class Monumento {
       sinopsis: primeraDescripcion != null ? (primeraDescripcion['complete'] ?? false) : false,
       descripcionContenido: primeraDescripcion != null ? (primeraDescripcion['contenido'] ?? '') : '',
       descripcionNombre: primeraDescripcion != null ? (primeraDescripcion['name'] ?? '') : '',
+      descripcionId: descId,
     );
   }
 }

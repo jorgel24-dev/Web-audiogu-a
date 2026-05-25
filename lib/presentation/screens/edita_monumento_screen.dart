@@ -136,6 +136,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
       descripcionNombre: _descNombreSeleccionada, 
       imagenUrl: _monumento!.imagenUrl,
       audioUrl: _monumento!.audioUrl,
+      descripcionId: _monumento!.descripcionId,
     );
 
     try {
