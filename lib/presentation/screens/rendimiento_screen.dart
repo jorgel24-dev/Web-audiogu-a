@@ -20,7 +20,13 @@ class _RendimientoPageState extends State<RendimientoPage> {
   void initState() {
     super.initState();
     final provider = context.read<RendimientoProvider>();
-    Future.microtask(() => provider.fetchRendimiento());
+    final configProv = context.read<ConfiguracionProvider>();
+    Future.microtask(() {
+      provider.fetchRendimiento();
+      if (configProv.monumentos.isEmpty) {
+        configProv.cargarConfiguracion();
+      }
+    });
   }
 
   @override
@@ -253,7 +259,7 @@ class _RendimientoContenido extends StatelessWidget {
             var monumento = entry.value;
             String? imagenUrl;
             try {
-              final configProvider = context.read<ConfiguracionProvider>();
+              final configProvider = context.watch<ConfiguracionProvider>();
               final mon = configProvider.monumentos.firstWhere(
                 (m) => m.id == monumento.id,
               );
