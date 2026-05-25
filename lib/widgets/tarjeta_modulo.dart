@@ -17,7 +17,7 @@ class TarjetaModulo extends StatelessWidget {
     required this.colorTema,
     required this.titulo,
     required this.descripcion,
-    required this.textoEstado,
+    this.textoEstado = '',
     required this.textoAccion,
     required this.widgetsInferiores,
     required this.alPulsarAccion,

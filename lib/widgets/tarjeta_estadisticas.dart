@@ -5,7 +5,6 @@ class TarjetaEstadistica extends StatelessWidget {
   final Color colorIcono;
   final String valor;
   final String titulo;
-  final String porcentaje;
   final bool esIncremento;
   final bool isDarkMode;
 
@@ -15,7 +14,6 @@ class TarjetaEstadistica extends StatelessWidget {
     required this.colorIcono,
     required this.valor,
     required this.titulo,
-    required this.porcentaje,
     required this.esIncremento,
     this.isDarkMode = false,
   });
@@ -87,14 +85,6 @@ class TarjetaEstadistica extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: trendBg,
                     borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    porcentaje,
-                    style: TextStyle(
-                      color: colorTendencia,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
                   ),
                 ),
               ],

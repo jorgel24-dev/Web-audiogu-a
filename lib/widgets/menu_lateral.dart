@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import 'item_menu_lateral.dart';
 
 class _ItemMenu {
@@ -14,7 +16,6 @@ class _ItemMenu {
   });
 }
 
-/// Ítems del menú lateral de navegación principal.
 const _itemsMenu = [
   _ItemMenu(icon: Icons.grid_view,       label: 'Panel Principal', ruta: '/dashboard'),
   _ItemMenu(icon: Icons.account_balance, label: 'Monumentos',      ruta: '/monumentos/agregar'),
@@ -23,8 +24,6 @@ const _itemsMenu = [
   _ItemMenu(icon: Icons.settings,        label: 'Configuración',   ruta: '/configuracion'),
 ];
 
-/// Menú de navegación lateral compartido por todas las pantallas del panel.
-/// Usa [ItemMenuLateral] (widget público extraído) para cada ítem.
 class MenuLateral extends StatelessWidget {
   final String rutaActual;
   final bool isDarkMode;
@@ -37,6 +36,10 @@ class MenuLateral extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>(); 
+    final nombre = auth.nombreUsuario;
+    final inicial = nombre.isNotEmpty ? nombre[0].toUpperCase() : 'A';
+
     final bgColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
     final titleColor = isDarkMode ? Colors.white : Colors.black87;
@@ -103,12 +106,12 @@ class MenuLateral extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 16,
-                  backgroundColor: Color(0xFF2D6A4F),
+                  backgroundColor: const Color(0xFF2D6A4F),
                   child: Text(
-                    'A',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                    inicial,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -117,22 +120,28 @@ class MenuLateral extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Administrador',
+                        nombre,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: titleColor,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        'admin@martosguia.com',
+                        'Administrador',
                         style: TextStyle(fontSize: 10, color: subColor),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.logout, size: 16, color: logoutColor),
+                GestureDetector(
+                  onTap: () {
+                    auth.logout();
+                    context.go('/login');
+                  },
+                  child: Icon(Icons.logout, size: 16, color: logoutColor),
+                ),
               ],
             ),
           ),
