@@ -95,8 +95,8 @@ class ApiService {
         },
         "picture": imagenUrl != null ? [
             {
-              "created_at" : fechaActual,
-              "last_modified" : fechaActual,
+              "createdAt" : fechaActual,
+              "lastModified" : fechaActual,
               "url" : imagenUrl
             } 
           ] : [],
