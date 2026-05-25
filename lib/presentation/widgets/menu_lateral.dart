@@ -17,6 +17,8 @@ class _ItemMenu {
 }
 
 const _itemsMenu = [
+  _ItemMenu(icon: Icons.dashboard, label: 'Dashboard', ruta: '/dashboard'),
+  _ItemMenu(icon: Icons.bar_chart, label: 'Rendimiento', ruta: '/rendimiento'),
   _ItemMenu(icon: Icons.article, label: 'Noticias', ruta: '/noticias'),
   _ItemMenu(
     icon: Icons.settings,
