@@ -51,14 +51,23 @@ class MonumentoService {
     String? imagenUrl,
     String? audioUrl,
     int localidadId = 1,
-    List<String> description = const [],
   }) async {
     try {
       final uri = Uri.parse(_urlAdmin);
 
       final Map<String, dynamic> bodyJson = {
         'name': monumento.nombre,
-        'description': description,
+        'description': (monumento.descripcionContenido.isNotEmpty || monumento.descripcionNombre.isNotEmpty)
+            ? [
+                {
+                  "complete": monumento.sinopsis,
+                  "contenido": monumento.descripcionContenido,
+                  "kids": monumento.paraNinos,
+                  "language": monumento.idioma,
+                  "name": monumento.descripcionNombre,
+                }
+              ]
+            : [],
         "coordenates": {"lon": monumento.longitud, "lat": monumento.latitud},
         'accessibility': monumento.accesible,
         'isActive': monumento.activo,
@@ -109,7 +118,6 @@ class MonumentoService {
   Future<bool> editarMonumento(
     Monumento monumento, {
     int localidadId = 1,
-    List<String> description = const [],
   }) async {
     final uri = Uri.parse('$_urlAdmin/${monumento.id}');
     final bodyMapeado = {
@@ -120,7 +128,17 @@ class MonumentoService {
       "tag": {"id": int.tryParse(monumento.categoria) ?? 1},
       "maps_url":
           'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
-      "description": description,
+      "description": (monumento.descripcionContenido.isNotEmpty || monumento.descripcionNombre.isNotEmpty)
+          ? [
+              {
+                "complete": monumento.sinopsis,
+                "contenido": monumento.descripcionContenido,
+                "kids": monumento.paraNinos,
+                "language": monumento.idioma,
+                "name": monumento.descripcionNombre,
+              }
+            ]
+          : [],
       "picture": monumento.imagenUrl != null
           ? [
               {"url": monumento.imagenUrl},

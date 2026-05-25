@@ -22,11 +22,16 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   final _likesController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
+  
+  // NUEVOS CONTROLERES: Campos de descripción
+  final _descNombreController = TextEditingController();
+  final _descContenidoController = TextEditingController();
 
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Activo';
   String _paraNinosSeleccionado = 'No';
   String _idiomaSeleccionado = 'Español';
+  String _sinopsisSeleccionada = 'No'; // NUEVO: Mapeará a 'complete' (bool)
 
   final Map<String, String> _categoriasMap = {
     'Monumentos Históricos': '1',
@@ -41,6 +46,8 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
     _likesController.dispose();
     _latController.dispose();
     _lonController.dispose();
+    _descNombreController.dispose(); // NUEVO
+    _descContenidoController.dispose(); // NUEVO
     super.dispose();
   }
 
@@ -64,6 +71,10 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
       latitud: lat,
       longitud: lon,
       likes: likes,
+      // ASIGNACIÓN: Inyección de los nuevos campos al modelo
+      sinopsis: _sinopsisSeleccionada == 'Sí',
+      descripcionContenido: _descContenidoController.text,
+      descripcionNombre: _descNombreController.text,
     );
 
     final exito = await context
@@ -127,10 +138,13 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                         likesController: _likesController,
                         latController: _latController,
                         lonController: _lonController,
+                        descNombreController: _descNombreController, // NUEVO
+                        descContenidoController: _descContenidoController, // NUEVO
                         categoria: _categoriaSeleccionada,
                         estado: _estadoSeleccionado,
                         paraNinos: _paraNinosSeleccionado,
                         idioma: _idiomaSeleccionado,
+                        sinopsis: _sinopsisSeleccionada, // NUEVO
                         onCategoriaChanged: (val) {
                           if (val != null) {
                             setState(() => _categoriaSeleccionada = val);
@@ -149,6 +163,11 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                         onIdiomaChanged: (val) {
                           if (val != null) {
                             setState(() => _idiomaSeleccionado = val);
+                          }
+                        },
+                        onSinopsisChanged: (val) { // NUEVO
+                          if (val != null) {
+                            setState(() => _sinopsisSeleccionada = val);
                           }
                         },
                       ),
@@ -245,14 +264,21 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController likesController;
   final TextEditingController latController;
   final TextEditingController lonController;
+  // NUEVOS CONTROLLERES EN SUBFORMULARIO
+  final TextEditingController descNombreController;
+  final TextEditingController descContenidoController;
+  
   final String categoria;
   final String estado;
   final String paraNinos;
   final String idioma;
+  final String sinopsis; // NUEVO
+
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
   final ValueChanged<String?> onParaNinosChanged;
   final ValueChanged<String?> onIdiomaChanged;
+  final ValueChanged<String?> onSinopsisChanged; // NUEVO
 
   const _FormularioMonumento({
     required this.isDarkMode,
@@ -260,14 +286,18 @@ class _FormularioMonumento extends StatelessWidget {
     required this.likesController,
     required this.latController,
     required this.lonController,
+    required this.descNombreController,
+    required this.descContenidoController,
     required this.categoria,
     required this.estado,
     required this.paraNinos,
     required this.idioma,
+    required this.sinopsis,
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
     required this.onParaNinosChanged,
     required this.onIdiomaChanged,
+    required this.onSinopsisChanged,
   });
 
   Color get _fieldFill =>
@@ -383,10 +413,55 @@ class _FormularioMonumento extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
+                ),
           ],
         ),
         const SizedBox(height: 24),
+
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LabelCampo(label: 'Nombre de la Descripción'),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    textoGuia: 'Ej: Sinopsis Española',
+                    controller: descNombreController,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LabelCampo(label: '¿Es Sinopsis?'),
+                  const SizedBox(height: 8),
+                  _buildDropdown(
+                    value: sinopsis,
+                    items: ['No', 'Sí'],
+                    onChanged: onSinopsisChanged,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        const LabelCampo(label: 'Contenido de la Descripción'),
+        const SizedBox(height: 8),
+        _buildTextField(
+          textoGuia: 'Escribe aquí la sinopsis completa o la información detallada del monumento...',
+          controller: descContenidoController,
+          maxLines: 4,
+        ),
+        const SizedBox(height: 24),
+        // ==========================================
 
         const LabelCampo(label: 'Archivos de Audio'),
         const SizedBox(height: 8),

@@ -24,11 +24,16 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
   bool _isLoading = true;
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Activo';
+  String _sinopsisSeleccionada = 'No'; // NUEVO
 
   final _nombreController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
   final _likesController = TextEditingController();
+  
+  // NUEVOS CONTROLADORES: Campos de descripción
+  final _descNombreController = TextEditingController();
+  final _descContenidoController = TextEditingController();
 
   final Map<String, String> _categoriasMap = {
     'Monumentos Históricos': '1',
@@ -49,6 +54,8 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     _latController.dispose();
     _lonController.dispose();
     _likesController.dispose();
+    _descNombreController.dispose(); // NUEVO
+    _descContenidoController.dispose(); // NUEVO
     super.dispose();
   }
 
@@ -62,6 +69,12 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
         _latController.text = data.latitud.toString();
         _lonController.text = data.longitud.toString();
         _likesController.text = data.likes.toString();
+        
+        // ASIGNACIÓN: Precargamos los datos de descripción existentes
+        _descNombreController.text = data.descripcionNombre;
+        _descContenidoController.text = data.descripcionContenido;
+        _sinopsisSeleccionada = data.sinopsis == true ? 'Sí' : 'No';
+
         _categoriaSeleccionada = _obtenerNombreCategoria(data.categoria);
         _estadoSeleccionado = data.activo ? 'Activo' : 'Desactivado';
         _isLoading = false;
@@ -110,6 +123,13 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
       latitud: lat,
       longitud: lon,
       likes: likes,
+      // ASIGNACIÓN: Inyectamos los valores actualizados de la descripción
+      sinopsis: _sinopsisSeleccionada == 'Sí',
+      descripcionContenido: _descContenidoController.text,
+      descripcionNombre: _descNombreController.text,
+      // Conservamos las URLs que ya tenía adjuntas el monumento
+      imagenUrl: _monumento!.imagenUrl,
+      audioUrl: _monumento!.audioUrl,
     );
 
     try {
@@ -250,9 +270,12 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               latController: _latController,
                               lonController: _lonController,
                               likesController: _likesController,
+                              descNombreController: _descNombreController, // NUEVO
+                              descContenidoController: _descContenidoController, // NUEVO
                               categoria: _categoriaSeleccionada,
                               estado: _estadoSeleccionado,
-                              imagenesUrls: _monumento?.imagenesUrls ?? [],
+                              sinopsis: _sinopsisSeleccionada, // NUEVO
+                              imagenesUrls: _monumento?.imagenUrl != null ? [_monumento!.imagenUrl!] : [],
                               onCategoriaChanged: (val) {
                                 if (val != null) {
                                   setState(() => _categoriaSeleccionada = val);
@@ -261,6 +284,11 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               onEstadoChanged: (val) {
                                 if (val != null) {
                                   setState(() => _estadoSeleccionado = val);
+                                }
+                              },
+                              onSinopsisChanged: (val) { // NUEVO
+                                if (val != null) {
+                                  setState(() => _sinopsisSeleccionada = val);
                                 }
                               },
                             ),
@@ -279,12 +307,8 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
   Widget _buildFooter(BuildContext context, bool isDarkMode) {
     final footerBg = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final footerBorder = isDarkMode ? Colors.white12 : Colors.grey[200]!;
-    final cancelTextColor = isDarkMode
-        ? Colors.grey[300]!
-        : const Color(0xFF495057);
-    final cancelBorderColor = isDarkMode
-        ? Colors.white24
-        : const Color(0xFFDEE2E6);
+    final cancelTextColor = isDarkMode ? Colors.grey[300]! : const Color(0xFF495057);
+    final cancelBorderColor = isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -363,10 +387,18 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController latController;
   final TextEditingController lonController;
   final TextEditingController likesController;
+  
+  // NUEVOS CONTROLADORES
+  final TextEditingController descNombreController;
+  final TextEditingController descContenidoController;
+
   final String categoria;
   final String estado;
+  final String sinopsis; // NUEVO
+
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
+  final ValueChanged<String?> onSinopsisChanged; // NUEVO
 
   const _FormularioMonumento({
     required this.isDarkMode,
@@ -374,19 +406,21 @@ class _FormularioMonumento extends StatelessWidget {
     required this.latController,
     required this.lonController,
     required this.likesController,
+    required this.descNombreController,
+    required this.descContenidoController,
     required this.categoria,
     required this.estado,
+    required this.sinopsis,
     this.imagenesUrls = const [],
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
+    required this.onSinopsisChanged,
   });
 
   final List<String> imagenesUrls;
 
-  Color get _fieldFill =>
-      isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
-  Color get _fieldBorder =>
-      isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
+  Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
+  Color get _fieldBorder => isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
   Color get _hintColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
 
   @override
@@ -411,7 +445,6 @@ class _FormularioMonumento extends StatelessWidget {
                         context: context,
                         builder: (context) => Dialog(
                           backgroundColor: Colors.transparent,
-                          insetPadding: const EdgeInsets.all(16),
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
@@ -426,11 +459,7 @@ class _FormularioMonumento extends StatelessWidget {
                                 top: 16,
                                 right: 16,
                                 child: IconButton(
-                                  icon: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
+                                  icon: const Icon(Icons.close, color: Colors.white, size: 30),
                                   onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ),
@@ -451,11 +480,7 @@ class _FormularioMonumento extends StatelessWidget {
                           width: 120,
                           color: _fieldFill,
                           child: Center(
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 30,
-                              color: _hintColor,
-                            ),
+                            child: Icon(Icons.broken_image, size: 30, color: _hintColor),
                           ),
                         ),
                       ),
@@ -515,6 +540,54 @@ class _FormularioMonumento extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
+        // ==========================================
+        // NUEVA SECCIÓN: Campos de Descripción (JPA)
+        // ==========================================
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LabelCampo(label: 'Nombre de la Descripción'),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    textoGuia: 'Ej: Sinopsis Española',
+                    controller: descNombreController,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LabelCampo(label: '¿Es Sinopsis?'),
+                  const SizedBox(height: 8),
+                  _buildDropdown(
+                    value: sinopsis,
+                    items: const ['No', 'Sí'],
+                    onChanged: onSinopsisChanged,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        const LabelCampo(label: 'Contenido de la Descripción'),
+        const SizedBox(height: 8),
+        _buildTextField(
+          textoGuia: 'Escribe aquí la sinopsis completa o la información detallada del monumento...',
+          controller: descContenidoController,
+          maxLines: 4, // Habilitado el soporte multilínea
+        ),
+        const SizedBox(height: 20),
+        // ==========================================
+
         const LabelCampo(label: 'Ubicación'),
         const SizedBox(height: 8),
         Row(
@@ -554,16 +627,17 @@ class _FormularioMonumento extends StatelessWidget {
     required String textoGuia,
     required TextEditingController controller,
     String? prefix,
+    int maxLines = 1, // Añadida la propiedad para descripciones largas
     TextInputType keyboardType = TextInputType.text,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      maxLines: maxLines,
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Este campo es obligatorio';
-        if (keyboardType == TextInputType.number &&
-            int.tryParse(value) == null) {
+        if (keyboardType == TextInputType.number && int.tryParse(value) == null) {
           return 'Introduce un número válido';
         }
         return null;
