@@ -1,6 +1,6 @@
 import 'package:audioguia_web/models/monumento_model.dart';
-import 'package:audioguia_web/providers/monumentos_provider.dart';
-import 'package:audioguia_web/providers/tema_provider.dart';
+import 'package:audioguia_web/provider/monumentos_provider.dart';
+import 'package:audioguia_web/provider/tema_provider.dart';
 import 'package:audioguia_web/widgets/app_bar_principal.dart';
 import 'package:audioguia_web/widgets/label_campo.dart';
 import 'package:audioguia_web/widgets/menu_lateral.dart';

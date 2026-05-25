@@ -1,11 +1,11 @@
 import 'package:audioguia_web/models/stats_model.dart';
-import 'package:audioguia_web/providers/rendimiento_provider.dart';
+import 'package:audioguia_web/provider/rendimiento_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/app_bar_principal.dart';
-import '../widgets/menu_lateral.dart';
+import '../../widgets/app_bar_principal.dart';
+import '../../widgets/menu_lateral.dart';
 import 'package:provider/provider.dart';
-import '../providers/tema_provider.dart';
+import '../../provider/tema_provider.dart';
 
 class RendimientoPage extends StatefulWidget {
   const RendimientoPage({super.key});

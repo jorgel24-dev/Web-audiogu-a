@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/dashboard_model.dart';
-import '../providers/auth_provider.dart';
+import '../provider/auth_provider.dart';
 
 class DashboardService {
 
