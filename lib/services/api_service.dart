@@ -68,7 +68,7 @@ class ApiService {
     }
   }
 
-  Future<bool> crearMonumento({
+  /*Future<bool> crearMonumento({
     required Monumento monumento,
     String? imagenUrl,
     String? audioUrl,
@@ -90,16 +90,22 @@ class ApiService {
         'tag': {
           'id': int.tryParse(monumento.categoria) ?? 1 // Pasa el objeto Tag con su ID correspondiente
         },
-        "picture" : [],
+        //"picture" : [],
         //"audio" : [],
-        /*"picture": imagenUrl != null ? [
+        "picture": imagenUrl != null ? [
             {
-              "url" : imagenUrl
+              "url" : imagenUrl,
+              "createdAt": fechaActual,
+              "lastModified": fechaActual
             } 
-          ] : [],*/
+          ] : [],
         'audio': audioUrl != null ? [
           {
             "url": audioUrl,
+            "kids": monumento.paraNinos,      // <-- OBLIGATORIO
+            "language": monumento.idioma,     // <-- OBLIGATORIO
+            "createdAt": fechaActual,
+            "lastModified": fechaActual
           }
         ] : [],
         'localidad_id': 1, // Añade el id de localidad si tu tabla lo requiere obligatoriamente
@@ -122,6 +128,75 @@ class ApiService {
         return true;
       } else {
         throw Exception('Error al crear monumento: ${response.body}');
+      }
+    } catch (e) {
+      print("Excepción en crearMonumento: $e");
+      rethrow;
+    }
+  }*/
+
+  Future<bool> crearMonumento({
+    required Monumento monumento,
+    String? imagenUrl,
+    String? audioUrl,
+  }) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/admin/monuments');
+
+      // Construimos el JSON respetando al 100% los tipos de datos de Spring Boot
+      final Map<String, dynamic> bodyJson = {
+        'name': monumento.nombre,
+        // Las coordenadas como MÚMEROS, no como Strings
+        'coordenates': {
+          'lat': monumento.latitud,
+          'lon': monumento.longitud
+        },
+        // Booleanos puros
+        'accessibility': monumento.accesible,
+        'isActive': monumento.activo,
+        'maps_url': 'http://googleusercontent.com/maps.google.com/?q=${monumento.latitud},${monumento.longitud}',
+        
+        // Envolvemos el ID del Tag, asegurando que sea un INT entero
+        'tag': {
+          'id': int.tryParse(monumento.categoria) ?? 1
+        },
+        
+        // La base de datos espera un array de objetos Picture
+        'picture': imagenUrl != null ? [
+          {
+            'url': imagenUrl
+          }
+        ] : [],
+        
+        // La base de datos espera un array de objetos Audio
+        'audio': audioUrl != null ? [
+          {
+            'url': audioUrl,
+            'kids': monumento.paraNinos,
+            'language': monumento.idioma
+          }
+        ] : [],
+        
+        // Arrays vacíos para evitar NullPointers en el backend
+        'description': [],
+        'localidad_id': 1,
+        'NLikes': monumento.likes
+      };
+
+      print("Enviando JSON tipado correctamente al backend...");
+      
+      final response = await http.post(
+        uri,
+        headers: _headers,
+        body: jsonEncode(bodyJson),
+      );
+
+      print("Respuesta servidor crear: ${response.statusCode} - ${response.body}");
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('Error HTTP ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print("Excepción en crearMonumento: $e");

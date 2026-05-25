@@ -27,21 +27,6 @@ class Monumento {
     this.likes = 0,
   });
 
-  // Este método genera la estructura exacta que espera tu Spring Boot
-  Map<String, dynamic> toBackendJson() {
-    return {
-      'name': nombre,
-      'latitude': latitud.toString(),
-      'longitude': longitud.toString(),
-      'accessibility': accesible.toString(),
-      'isActive': activo.toString(),
-      'tagId': categoria, 
-      'kids': paraNinos,
-      'language': idioma,
-      'NLikes': likes,
-    };
-  }
-
   factory Monumento.fromJson(Map<String, dynamic> json) {
     return Monumento(
       id: json['id']?.toString(),

@@ -1,8 +1,8 @@
+import 'package:audioguia_web/providers/monumentos_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../providers/tema_provider.dart';
-import '../providers/monumentos_provider.dart';
 import '../models/monumento_model.dart';      
 import '../widgets/app_bar_principal.dart';
 import '../widgets/menu_lateral.dart';
