@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 import '../model/monumento_model.dart';
 
 class MonumentoService {
-  final String _urlPublic =
-      'https://backend-tfg.fly.dev/api/v1/public/monuments';
+  final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/monuments';
   final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/monuments';
 
   Future<List<Monumento>?> obtenerTodos() async {
@@ -56,10 +55,6 @@ class MonumentoService {
   }) async {
     try {
       final uri = Uri.parse(_urlAdmin);
-      final String fechaActual = DateTime.now().toIso8601String().substring(
-        0,
-        19,
-      );
 
       final Map<String, dynamic> bodyJson = {
         'name': monumento.nombre,
@@ -86,8 +81,6 @@ class MonumentoService {
             : [],
         'localidad_id': localidadId,
         'NLikes': monumento.likes,
-        'created_at': fechaActual,
-        'last_modified': fechaActual,
       };
 
       debugPrint("Enviando JSON completo y corregido al backend...");
@@ -119,10 +112,6 @@ class MonumentoService {
     List<String> description = const [],
   }) async {
     final uri = Uri.parse('$_urlAdmin/${monumento.id}');
-    final String fechaActual = DateTime.now().toIso8601String().substring(
-      0,
-      19,
-    );
     final bodyMapeado = {
       "name": monumento.nombre,
       "coordenates": {"lon": monumento.longitud, "lat": monumento.latitud},
@@ -149,7 +138,6 @@ class MonumentoService {
           : [],
       "localidad_id": localidadId,
       "NLikes": monumento.likes,
-      "last_modified": fechaActual,
     };
 
     try {

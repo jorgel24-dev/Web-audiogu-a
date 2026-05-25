@@ -24,7 +24,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   final _lonController = TextEditingController();
 
   String _categoriaSeleccionada = 'Monumentos Históricos';
-  String _estadoSeleccionado = 'Publicado';
+  String _estadoSeleccionado = 'Activo';
   String _paraNinosSeleccionado = 'No';
   String _idiomaSeleccionado = 'Español';
 
@@ -58,7 +58,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
       nombre: _nombreController.text,
       categoria: tagIdId,
       accesible: false,
-      activo: _estadoSeleccionado == 'Publicado',
+      activo: _estadoSeleccionado == 'Activo',
       paraNinos: _paraNinosSeleccionado == 'Sí',
       idioma: codigoIdioma,
       latitud: lat,
@@ -336,7 +336,7 @@ class _FormularioMonumento extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildDropdown(
                     value: estado,
-                    items: ['Publicado', 'Borrador', 'Archivado'],
+                    items: ['Activo', 'Desactivado'],
                     onChanged: onEstadoChanged,
                   ),
                 ],

@@ -23,7 +23,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
   Monumento? _monumento;
   bool _isLoading = true;
   String _categoriaSeleccionada = 'Monumentos Históricos';
-  String _estadoSeleccionado = 'Publicado';
+  String _estadoSeleccionado = 'Activo';
 
   final _nombreController = TextEditingController();
   final _latController = TextEditingController();
@@ -63,7 +63,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
         _lonController.text = data.longitud.toString();
         _likesController.text = data.likes.toString();
         _categoriaSeleccionada = _obtenerNombreCategoria(data.categoria);
-        _estadoSeleccionado = data.activo ? 'Publicado' : 'Borrador';
+        _estadoSeleccionado = data.activo ? 'Activo' : 'Desactivado';
         _isLoading = false;
       });
     } catch (e) {
@@ -104,7 +104,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
       nombre: _nombreController.text,
       categoria: tagId,
       accesible: _monumento!.accesible,
-      activo: _estadoSeleccionado == 'Publicado',
+      activo: _estadoSeleccionado == 'Activo',
       paraNinos: _monumento!.paraNinos,
       idioma: _monumento!.idioma,
       latitud: lat,
@@ -505,7 +505,7 @@ class _FormularioMonumento extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildDropdown(
                     value: estado,
-                    items: const ['Publicado', 'Borrador', 'Archivado'],
+                    items: ['Activo', 'Desactivado'],
                     onChanged: onEstadoChanged,
                   ),
                 ],
