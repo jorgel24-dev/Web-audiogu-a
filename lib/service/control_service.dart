@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import '../models/control_model.dart';
+import '../model/control_model.dart';
 
 class ControlService {
   final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/control';

@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:provider/provider.dart';
-import '../providers/noticias_provider.dart';
-import '../providers/tema_provider.dart';
-import '../widgets/app_bar_principal.dart';
-import '../widgets/menu_lateral.dart';
-import '../widgets/noticia_tarjeta.dart';
-import '../widgets/editor_toolbar.dart';
-import '../widgets/chip_filtro.dart';
-import '../widgets/label_campo.dart';
+import '../../provider/noticia_provider.dart';
+import '../../provider/tema_provider.dart';
+import '../../widgets/app_bar_principal.dart';
+import '../../widgets/menu_lateral.dart';
+import '../../widgets/noticia_tarjeta.dart';
+import '../../widgets/editor_toolbar.dart';
+import '../../widgets/chip_filtro.dart';
+import '../../widgets/label_campo.dart';
 
 class NoticiasPage extends StatefulWidget {
   const NoticiasPage({super.key});
@@ -23,7 +23,7 @@ class _NoticiasPageState extends State<NoticiasPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NoticiasProvider>().cargarNoticias();
+      context.read<NoticiaProvider>().cargarNoticias();
     });
   }
 
@@ -53,8 +53,8 @@ class _NoticiasView extends StatelessWidget {
         icono: Icons.article_outlined,
         titulo: 'Editor de noticias',
       ),
-      body: Consumer<NoticiasProvider>(
-        builder: (context, noticiasProvider, _) {
+      body: Consumer<NoticiaProvider>(
+        builder: (context, noticiaProvider, _) {
           return Row(
             children: [
               MenuLateral(rutaActual: '/noticias', isDarkMode: isDarkMode),
@@ -64,9 +64,9 @@ class _NoticiasView extends StatelessWidget {
               Expanded(
                 flex: 4,
                 child: _PanelEditor(
-                  key: ValueKey(noticiasProvider.editorKey),
+                  key: ValueKey(noticiaProvider.editorKey),
                   isDarkMode: isDarkMode,
-                  initialContenido: noticiasProvider.contenido,
+                  initialContenido: noticiaProvider.contenido,
                 ),
               ),
             ],
@@ -84,7 +84,7 @@ class _PanelLista extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final noticiaProvider = Provider.of<NoticiaProvider>(context);
     final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final inputBg = isDarkMode ? const Color(0xFF1A2332) : Colors.white;
     final hintColor = isDarkMode ? Colors.grey[600]! : Colors.grey[400]!;
@@ -94,24 +94,24 @@ class _PanelLista extends StatelessWidget {
       color: cardColor,
       child: Column(
         children: [
-          if (noticiasProvider.cargandoLista)
+          if (noticiaProvider.cargandoLista)
             const LinearProgressIndicator(
               minHeight: 2,
               backgroundColor: Colors.transparent,
               color: Color(0xFF2D6A4F),
             )
-          else if (noticiasProvider.error != null)
+          else if (noticiaProvider.error != null)
             Padding(
               padding: const EdgeInsets.all(12),
               child: Text(
-                noticiasProvider.error!,
+                noticiaProvider.error!,
                 style: const TextStyle(color: Colors.red, fontSize: 12),
               ),
             ),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
             child: TextField(
-              onChanged: (value) => noticiasProvider.setBusqueda(value),
+              onChanged: (value) => noticiaProvider.setBusqueda(value),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: inputBg,
@@ -146,22 +146,22 @@ class _PanelLista extends StatelessWidget {
                   ChipFiltro(
                     label: 'Todos',
                     valor: 'todos',
-                    filtroActivo: noticiasProvider.filtroActivo,
-                    onSelected: () => noticiasProvider.setFiltro('todos'),
+                    filtroActivo: noticiaProvider.filtroActivo,
+                    onSelected: () => noticiaProvider.setFiltro('todos'),
                   ),
                   const SizedBox(width: 6),
                   ChipFiltro(
                     label: 'Publicados',
                     valor: 'publicado',
-                    filtroActivo: noticiasProvider.filtroActivo,
-                    onSelected: () => noticiasProvider.setFiltro('publicado'),
+                    filtroActivo: noticiaProvider.filtroActivo,
+                    onSelected: () => noticiaProvider.setFiltro('publicado'),
                   ),
                   const SizedBox(width: 6),
                   ChipFiltro(
                     label: 'Borradores',
                     valor: 'borrador',
-                    filtroActivo: noticiasProvider.filtroActivo,
-                    onSelected: () => noticiasProvider.setFiltro('borrador'),
+                    filtroActivo: noticiaProvider.filtroActivo,
+                    onSelected: () => noticiaProvider.setFiltro('borrador'),
                   ),
                 ],
               ),
@@ -173,7 +173,7 @@ class _PanelLista extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => noticiasProvider.nuevaNoticia(),
+                onPressed: () => noticiaProvider.nuevaNoticia(),
                 icon: const Icon(Icons.add_circle_outline, size: 16),
                 label: const Text(
                   'Crear nueva noticia',
@@ -194,15 +194,15 @@ class _PanelLista extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: noticiasProvider.noticiasFiltradas.length,
+              itemCount: noticiaProvider.noticiasFiltradas.length,
               separatorBuilder: (_, __) => const SizedBox(height: 6),
               itemBuilder: (context, index) {
-                final noticia = noticiasProvider.noticiasFiltradas[index];
+                final noticia = noticiaProvider.noticiasFiltradas[index];
                 return NoticiaTarjeta(
                   noticia: noticia,
                   seleccionada:
-                      noticiasProvider.noticiaSeleccionada?.id == noticia.id,
-                  onTap: () => noticiasProvider.seleccionarNoticia(noticia),
+                      noticiaProvider.noticiaSeleccionada?.id == noticia.id,
+                  onTap: () => noticiaProvider.seleccionarNoticia(noticia),
                 );
               },
             ),
@@ -258,7 +258,7 @@ class _PanelEditorState extends State<_PanelEditor> {
       final delta = jsonEncode(
         _quillController.document.toDelta().toJson(),
       );
-      context.read<NoticiasProvider>().setContenido(delta);
+      context.read<NoticiaProvider>().setContenido(delta);
     });
   }
 
@@ -273,16 +273,16 @@ class _PanelEditorState extends State<_PanelEditor> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = widget.isDarkMode;
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
-    final noticia = noticiasProvider.noticiaSeleccionada;
+    final noticiaProvider = Provider.of<NoticiaProvider>(context);
+    final noticia = noticiaProvider.noticiaSeleccionada;
     if (noticia != null) {
-      if (_titularController.text != noticiasProvider.titulo) {
-        _titularController.text = noticiasProvider.titulo;
+      if (_titularController.text != noticiaProvider.titulo) {
+        _titularController.text = noticiaProvider.titulo;
       }
-      if (_subtituloController.text != noticiasProvider.subtitulo) {
-        _subtituloController.text = noticiasProvider.subtitulo;
+      if (_subtituloController.text != noticiaProvider.subtitulo) {
+        _subtituloController.text = noticiaProvider.subtitulo;
       }
-    } else if (noticiasProvider.titulo.isEmpty &&
+    } else if (noticiaProvider.titulo.isEmpty &&
         _titularController.text.isNotEmpty) {
       _titularController.clear();
       _subtituloController.clear();
@@ -290,10 +290,10 @@ class _PanelEditorState extends State<_PanelEditor> {
 
     return Container(
       color: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
-      child: !noticiasProvider.editorActivo
+      child: !noticiaProvider.editorActivo
           ? const _EditorVacio()
           : Form(
-              key: noticiasProvider.formKey,
+              key: noticiaProvider.formKey,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -320,7 +320,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 TextFormField(
                                   controller: _titularController,
                                   onChanged: (value) =>
-                                      noticiasProvider.setTitulo(value),
+                                      noticiaProvider.setTitulo(value),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -341,7 +341,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 TextFormField(
                                   controller: _subtituloController,
                                   onChanged: (value) =>
-                                      noticiasProvider.setSubtitulo(value),
+                                      noticiaProvider.setSubtitulo(value),
                                   maxLines: 2,
                                   decoration: _inputDecoration(
                                     hint:
@@ -370,11 +370,11 @@ class _PanelEditorState extends State<_PanelEditor> {
                                             readOnly: true,
                                             controller: TextEditingController(
                                               text:
-                                                  noticiasProvider
+                                                  noticiaProvider
                                                           .fechaPublicacion !=
                                                       null
                                                   ? _formatearFecha(
-                                                      noticiasProvider
+                                                      noticiaProvider
                                                           .fechaPublicacion!,
                                                     )
                                                   : '',
@@ -393,7 +393,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                   await showDatePicker(
                                                     context: context,
                                                     initialDate:
-                                                        noticiasProvider
+                                                        noticiaProvider
                                                             .fechaPublicacion ??
                                                         DateTime.now(),
                                                     firstDate: DateTime(2020),
@@ -404,7 +404,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                                                     ),
                                                   );
                                               if (fecha != null) {
-                                                noticiasProvider
+                                                noticiaProvider
                                                     .setFechaPublicacion(fecha);
                                               }
                                             },
@@ -443,7 +443,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ],
                       ),
                     ),
-                    if (noticiasProvider.editorActivo) ...[
+                    if (noticiaProvider.editorActivo) ...[
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -463,7 +463,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                         ),
                         child: Row(
                           children: [
-                            if (noticiasProvider.noticiaSeleccionada !=
+                            if (noticiaProvider.noticiaSeleccionada !=
                                 null) ...[
                               const Icon(
                                 Icons.tune,
@@ -486,9 +486,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 label: 'Borrador',
                                 color: Colors.orange,
                                 activo:
-                                    noticiasProvider.estadoEditor ==
+                                    noticiaProvider.estadoEditor ==
                                     0,
-                                onTap: () => noticiasProvider.cambiarEstado(
+                                onTap: () => noticiaProvider.cambiarEstado(
                                   0,
                                 ),
                               ),
@@ -497,9 +497,9 @@ class _PanelEditorState extends State<_PanelEditor> {
                                 label: 'Publicado',
                                 color: Colors.green,
                                 activo:
-                                    noticiasProvider.estadoEditor ==
+                                    noticiaProvider.estadoEditor ==
                                     1,
-                                onTap: () => noticiasProvider.cambiarEstado(
+                                onTap: () => noticiaProvider.cambiarEstado(
                                   1,
                                 ),
                               ),
@@ -507,7 +507,7 @@ class _PanelEditorState extends State<_PanelEditor> {
                               OutlinedButton.icon(
                                 onPressed: () => _mostrarDialogoEliminar(
                                   context,
-                                  noticiasProvider,
+                                  noticiaProvider,
                                 ),
                                 icon: const Icon(
                                   Icons.delete_outline,
@@ -542,7 +542,7 @@ class _PanelEditorState extends State<_PanelEditor> {
 
   void _mostrarDialogoEliminar(
     BuildContext context,
-    NoticiasProvider noticiasProvider,
+    NoticiaProvider noticiaProvider,
   ) {
     showDialog(
       context: context,
@@ -556,7 +556,7 @@ class _PanelEditorState extends State<_PanelEditor> {
           ],
         ),
         content: Text(
-          '¿Estás seguro de que quieres eliminar "${noticiasProvider.titulo}"?\n\nEsta acción no se puede deshacer.',
+          '¿Estás seguro de que quieres eliminar "${noticiaProvider.titulo}"?\n\nEsta acción no se puede deshacer.',
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
@@ -567,7 +567,7 @@ class _PanelEditorState extends State<_PanelEditor> {
           ElevatedButton.icon(
             onPressed: () async {
               Navigator.of(ctx).pop();
-              final ok = await noticiasProvider.eliminarNoticia();
+              final ok = await noticiaProvider.eliminarNoticia();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -703,13 +703,13 @@ class _BotonGuardar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
+    final noticiaProvider = Provider.of<NoticiaProvider>(context);
 
     return ElevatedButton.icon(
-      onPressed: noticiasProvider.cargando
+      onPressed: noticiaProvider.cargando
           ? null
           : () async {
-              final guardado = await noticiasProvider.guardarCambios();
+              final guardado = await noticiaProvider.guardarCambios();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -724,7 +724,7 @@ class _BotonGuardar extends StatelessWidget {
                 );
               }
             },
-      icon: noticiasProvider.cargando
+      icon: noticiaProvider.cargando
           ? const SizedBox(
               width: 14,
               height: 14,
@@ -752,8 +752,8 @@ class _SelectorImagen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noticiasProvider = Provider.of<NoticiasProvider>(context);
-    final hasImage = noticiasProvider.imagenUrl != null || noticiasProvider.imagenBytes != null;
+    final noticiaProvider = Provider.of<NoticiaProvider>(context);
+    final hasImage = noticiaProvider.imagenUrl != null || noticiaProvider.imagenBytes != null;
     final borderColor = isDarkMode ? Colors.white24 : Colors.grey[300]!;
     final fillColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
 
@@ -771,15 +771,15 @@ class _SelectorImagen extends StatelessWidget {
           if (hasImage) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: noticiasProvider.imagenBytes != null
+              child: noticiaProvider.imagenBytes != null
                   ? Image.memory(
-                      noticiasProvider.imagenBytes!,
+                      noticiaProvider.imagenBytes!,
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     )
                   : Image.network(
-                      noticiasProvider.imagenUrl!,
+                      noticiaProvider.imagenUrl!,
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -794,7 +794,7 @@ class _SelectorImagen extends StatelessWidget {
             const SizedBox(height: 12),
           ],
           OutlinedButton.icon(
-            onPressed: () => noticiasProvider.seleccionarImagen(),
+            onPressed: () => noticiaProvider.seleccionarImagen(),
             icon: const Icon(Icons.upload_file, size: 18),
             label: Text(hasImage ? 'Cambiar Imagen' : 'Subir Imagen'),
             style: OutlinedButton.styleFrom(
@@ -803,10 +803,10 @@ class _SelectorImagen extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
-          if (noticiasProvider.imagenNombre != null) ...[
+          if (noticiaProvider.imagenNombre != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Archivo seleccionado: ${noticiasProvider.imagenNombre}',
+              'Archivo seleccionado: ${noticiaProvider.imagenNombre}',
               style: TextStyle(fontSize: 12, color: Colors.green[700]),
             ),
           ],

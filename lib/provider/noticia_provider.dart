@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
-import '../models/noticia_model.dart';
-import '../services/noticias_service.dart';
-import '../services/supabase_service.dart';
+import '../model/noticia_model.dart';
+import '../service/noticia_service.dart';
+import '../service/supabase_service.dart';
 
-class NoticiasProvider extends ChangeNotifier {
-  final NoticiasService _noticiasService = NoticiasService();
+class NoticiaProvider extends ChangeNotifier {
+  final NoticiaService _noticiasService = NoticiaService();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 

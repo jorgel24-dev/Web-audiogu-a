@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../services/control_service.dart';
-import '../services/monumentos_service.dart';
-import '../services/rutas_service.dart';
-import '../models/monumento_model.dart';
-import '../models/ruta_model.dart';
+import '../service/control_service.dart';
+import '../service/monumento_service.dart';
+import '../service/ruta_service.dart';
+import '../model/monumento_model.dart';
+import '../model/ruta_model.dart';
 
 class ConfiguracionProvider extends ChangeNotifier {
   final ControlService _controlService = ControlService();
-  final MonumentosService _monumentosService = MonumentosService();
-  final RutasService _rutasService = RutasService();
+  final MonumentoService _monumentosService = MonumentoService();
+  final RutaService _rutasService = RutaService();
 
   bool rutasTuristicas = true;
   bool asistenteIA = true;

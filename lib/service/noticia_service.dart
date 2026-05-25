@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import '../models/noticia_model.dart';
+import '../model/noticia_model.dart';
 
-class NoticiasService {
+class NoticiaService {
   final String _url = 'https://backend-tfg.fly.dev/api/v1';
 
 

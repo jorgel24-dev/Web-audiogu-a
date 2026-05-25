@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/monumento_model.dart';
+import '../model/monumento_model.dart';
 
-class MonumentosService {
+class MonumentoService {
   final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/monuments';
   final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/monuments';
 

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/ruta_model.dart';
+import '../model/ruta_model.dart';
 
-class RutasService {
+class RutaService {
   final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/route';
   final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/route';
 

@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:audioguia_web/screens/noticias_screen.dart';
-import 'package:audioguia_web/screens/config_screen.dart';
+import 'package:audioguia_web/presentation/screens/noticias_screen.dart';
+import 'package:audioguia_web/presentation/screens/config_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/noticias',
