@@ -40,9 +40,9 @@ class DashboardService {
     final respStats = resultados[2];
 
     // Muestra información por consola para depuración
-    print('MONUMENTOS: ${respMonumentos.statusCode}');
-    print('NOTICIAS: ${respNoticias.statusCode} → ${respNoticias.body}');
-    print('STATS: ${respStats.statusCode} → ${respStats.body}');
+    debugPrint('MONUMENTOS: ${respMonumentos.statusCode}');
+    debugPrint('NOTICIAS: ${respNoticias.statusCode} → ${respNoticias.body}');
+    debugPrint('STATS: ${respStats.statusCode} → ${respStats.body}');
 
     // Variables donde se almacenarán los datos finales
     int totalMonumentos = 0;

@@ -19,7 +19,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => context.read<DashboardProvider>().cargarStats());
+    final dashboardProvider = context.read<DashboardProvider>();
+    Future.microtask(() => dashboardProvider.cargarStats());
   }
 
   @override
@@ -134,8 +135,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             LayoutBuilder(
                               builder: (context, constraints) {
                                 double ratio = 2.1;
-                                if (constraints.maxWidth < 600) ratio = 1.2;
-                                else if (constraints.maxWidth < 800) ratio = 1.6;
+                                if (constraints.maxWidth < 600) {
+                                  ratio = 1.2;
+                                } else if (constraints.maxWidth < 800) {
+                                  ratio = 1.6;
+                                }
 
                                 return GridView.count(
                                   shrinkWrap: true,

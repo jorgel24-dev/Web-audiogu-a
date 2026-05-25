@@ -18,8 +18,8 @@ class _RendimientoPageState extends State<RendimientoPage> {
   @override
   void initState() {
     super.initState();
-    // Llamamos al fetch al iniciar la pantalla
-    Future.microtask(() => context.read<RendimientoProvider>().fetchRendimiento());
+    final provider = context.read<RendimientoProvider>();
+    Future.microtask(() => provider.fetchRendimiento());
   }
   
   @override

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:audioguia_web/model/monumento_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,7 +10,7 @@ class ApiService {
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'Authorization': 'Basic ' + base64Encode(utf8.encode('admin:admin123')),
+    'Authorization': 'Basic ${base64Encode(utf8.encode('admin:admin123'))}',
     'Access-Control-Allow-Origin': '*',
   };
 
@@ -98,7 +99,7 @@ class ApiService {
         'last_modified': fechaActual
       };
 
-      print("Enviando JSON completo y corregido al backend...");
+      debugPrint("Enviando JSON completo y corregido al backend...");
       
       final response = await http.post(
         uri,
@@ -106,7 +107,7 @@ class ApiService {
         body: jsonEncode(bodyJson),
       );
 
-      print("Respuesta servidor crear: ${response.statusCode} - ${response.body}");
+      debugPrint("Respuesta servidor crear: ${response.statusCode} - ${response.body}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return true;
@@ -114,7 +115,7 @@ class ApiService {
         throw Exception('Error al crear monumento: ${response.body}');
       }
     } catch (e) {
-      print("Excepción en crearMonumento: $e");
+      debugPrint("Excepción en crearMonumento: $e");
       rethrow;
     }
   }
@@ -164,7 +165,7 @@ class ApiService {
       // Retorna true si el backend de Spring Boot responde con un 200 OK o 204 No Content
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
-      print("Error en editarMonumento HTTP: $e");
+      debugPrint("Error en editarMonumento HTTP: $e");
       return false;
     }
   }

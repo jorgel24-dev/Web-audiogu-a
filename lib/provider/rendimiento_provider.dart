@@ -48,7 +48,7 @@ class RendimientoProvider with ChangeNotifier {
       );
 
     } catch (e) {
-      print("¡ERROR CAPTURADO!: $e"); 
+      debugPrint("¡ERROR CAPTURADO!: $e"); 
       _error = e.toString();
     } finally {
       _isLoading = false;
