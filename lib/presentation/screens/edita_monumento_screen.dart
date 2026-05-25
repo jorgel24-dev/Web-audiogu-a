@@ -25,13 +25,21 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Activo';
   String _sinopsisSeleccionada = 'No';
+  String _descNombreSeleccionada = 'Texto Infantil';
 
   final _nombreController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
   final _likesController = TextEditingController();
-  final _descNombreController = TextEditingController();
   final _descContenidoController = TextEditingController();
+
+  final List<String> _opcionesDescNombre = [
+    'Texto Infantil',
+    'Sinopsis Esp',
+    'English Audio Text',
+    'Texto Audio',
+    'English Sinopsis'
+  ];
 
   final Map<String, String> _categoriasMap = {
     'Monumentos Históricos': '1',
@@ -52,7 +60,6 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     _latController.dispose();
     _lonController.dispose();
     _likesController.dispose();
-    _descNombreController.dispose(); 
     _descContenidoController.dispose(); 
     super.dispose();
   }
@@ -67,9 +74,14 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
         _latController.text = data.latitud.toString();
         _lonController.text = data.longitud.toString();
         _likesController.text = data.likes.toString();
-        _descNombreController.text = data.descripcionNombre;
         _descContenidoController.text = data.descripcionContenido;
         _sinopsisSeleccionada = data.sinopsis == true ? 'Sí' : 'No';
+
+        if (_opcionesDescNombre.contains(data.descripcionNombre)) {
+          _descNombreSeleccionada = data.descripcionNombre;
+        } else {
+          _descNombreSeleccionada = 'Texto Infantil';
+        }
 
         _categoriaSeleccionada = _obtenerNombreCategoria(data.categoria);
         _estadoSeleccionado = data.activo ? 'Activo' : 'Desactivado';
@@ -121,7 +133,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
       likes: likes,
       sinopsis: _sinopsisSeleccionada == 'Sí',
       descripcionContenido: _descContenidoController.text,
-      descripcionNombre: _descNombreController.text,
+      descripcionNombre: _descNombreSeleccionada, 
       imagenUrl: _monumento!.imagenUrl,
       audioUrl: _monumento!.audioUrl,
     );
@@ -233,9 +245,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8F9FA),
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       appBar: AppBarPrincipal(
         isDarkMode: isDarkMode,
         onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
@@ -264,26 +274,24 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               latController: _latController,
                               lonController: _lonController,
                               likesController: _likesController,
-                              descNombreController: _descNombreController, 
                               descContenidoController: _descContenidoController, 
                               categoria: _categoriaSeleccionada,
                               estado: _estadoSeleccionado,
                               sinopsis: _sinopsisSeleccionada, 
+                              descNombre: _descNombreSeleccionada, 
+                              opcionesDescNombre: _opcionesDescNombre, 
                               imagenesUrls: _monumento?.imagenUrl != null ? [_monumento!.imagenUrl!] : [],
                               onCategoriaChanged: (val) {
-                                if (val != null) {
-                                  setState(() => _categoriaSeleccionada = val);
-                                }
+                                if (val != null) setState(() => _categoriaSeleccionada = val);
                               },
                               onEstadoChanged: (val) {
-                                if (val != null) {
-                                  setState(() => _estadoSeleccionado = val);
-                                }
+                                if (val != null) setState(() => _estadoSeleccionado = val);
                               },
                               onSinopsisChanged: (val) { 
-                                if (val != null) {
-                                  setState(() => _sinopsisSeleccionada = val);
-                                }
+                                if (val != null) setState(() => _sinopsisSeleccionada = val);
+                              },
+                              onDescNombreChanged: (val) { 
+                                if (val != null) setState(() => _descNombreSeleccionada = val);
                               },
                             ),
                           ),
@@ -321,9 +329,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: BorderSide(color: cancelBorderColor),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Text('Cancelar', style: TextStyle(color: cancelTextColor)),
             ),
@@ -335,16 +341,11 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: const BorderSide(color: Colors.redAccent),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: const Text(
                 'Eliminar Monumento',
-                style: TextStyle(
-                  color: Colors.redAccent,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -355,17 +356,12 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008F68),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 elevation: 0,
               ),
               child: const Text(
                 'Guardar Cambios',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -381,16 +377,18 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController latController;
   final TextEditingController lonController;
   final TextEditingController likesController;
-  final TextEditingController descNombreController;
   final TextEditingController descContenidoController;
 
   final String categoria;
   final String estado;
   final String sinopsis; 
+  final String descNombre; 
+  final List<String> opcionesDescNombre; 
 
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
   final ValueChanged<String?> onSinopsisChanged;
+  final ValueChanged<String?> onDescNombreChanged; 
 
   const _FormularioMonumento({
     required this.isDarkMode,
@@ -398,15 +396,17 @@ class _FormularioMonumento extends StatelessWidget {
     required this.latController,
     required this.lonController,
     required this.likesController,
-    required this.descNombreController,
     required this.descContenidoController,
     required this.categoria,
     required this.estado,
     required this.sinopsis,
+    required this.descNombre,
+    required this.opcionesDescNombre,
     this.imagenesUrls = const [],
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
     required this.onSinopsisChanged,
+    required this.onDescNombreChanged,
   });
 
   final List<String> imagenesUrls;
@@ -442,10 +442,7 @@ class _FormularioMonumento extends StatelessWidget {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  imagenesUrls[index],
-                                  fit: BoxFit.contain,
-                                ),
+                                child: Image.network(imagenesUrls[index], fit: BoxFit.contain),
                               ),
                               Positioned(
                                 top: 16,
@@ -468,9 +465,7 @@ class _FormularioMonumento extends StatelessWidget {
                         width: 120,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          height: 120,
-                          width: 120,
-                          color: _fieldFill,
+                          height: 120, width: 120, color: _fieldFill,
                           child: Center(
                             child: Icon(Icons.broken_image, size: 30, color: _hintColor),
                           ),
@@ -486,10 +481,7 @@ class _FormularioMonumento extends StatelessWidget {
         ],
         const LabelCampo(label: 'Nombre del Monumento'),
         const SizedBox(height: 8),
-        _buildTextField(
-          textoGuia: 'Ej: Castillo de la Peña',
-          controller: nombreController,
-        ),
+        _buildTextField(textoGuia: 'Ej: Castillo de la Peña', controller: nombreController),
         const SizedBox(height: 20),
 
         Row(
@@ -502,12 +494,7 @@ class _FormularioMonumento extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildDropdown(
                     value: categoria,
-                    items: const [
-                      'Monumentos Históricos',
-                      'Iglesias',
-                      'Fuentes',
-                      'Parques',
-                    ],
+                    items: const ['Monumentos Históricos', 'Iglesias', 'Fuentes', 'Parques'],
                     onChanged: onCategoriaChanged,
                   ),
                 ],
@@ -540,9 +527,11 @@ class _FormularioMonumento extends StatelessWidget {
                 children: [
                   const LabelCampo(label: 'Nombre de la Descripción'),
                   const SizedBox(height: 8),
-                  _buildTextField(
-                    textoGuia: 'Ej: Sinopsis Española',
-                    controller: descNombreController,
+                  // MODIFICADO: Cambiado el cuadro de texto libre por el DropdownButton estricto
+                  _buildDropdown(
+                    value: descNombre,
+                    items: opcionesDescNombre,
+                    onChanged: onDescNombreChanged,
                   ),
                 ],
               ),
@@ -578,21 +567,9 @@ class _FormularioMonumento extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(
-              child: _buildTextField(
-                textoGuia: '37.7214',
-                prefix: 'Lat',
-                controller: latController,
-              ),
-            ),
+            Expanded(child: _buildTextField(textoGuia: '37.7214', prefix: 'Lat', controller: latController)),
             const SizedBox(width: 16),
-            Expanded(
-              child: _buildTextField(
-                textoGuia: '-4.0321',
-                prefix: 'Lon',
-                controller: lonController,
-              ),
-            ),
+            Expanded(child: _buildTextField(textoGuia: '-4.0321', prefix: 'Lon', controller: lonController)),
           ],
         ),
         const SizedBox(height: 20),
@@ -630,35 +607,17 @@ class _FormularioMonumento extends StatelessWidget {
       },
       decoration: InputDecoration(
         prefixIcon: prefix != null
-            ? Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(prefix, style: TextStyle(color: _hintColor)),
-              )
+            ? Padding(padding: const EdgeInsets.all(12), child: Text(prefix, style: TextStyle(color: _hintColor)))
             : null,
         hintText: textoGuia,
         hintStyle: TextStyle(color: _hintColor, fontSize: 14),
         filled: true,
         fillColor: _fieldFill,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: _fieldBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF008F68)),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.redAccent),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: _fieldBorder)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF008F68))),
+        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.redAccent)),
+        focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.redAccent, width: 2)),
       ),
     );
   }
@@ -672,22 +631,14 @@ class _FormularioMonumento extends StatelessWidget {
       initialValue: value,
       dropdownColor: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
-      items: items
-          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-          .toList(),
+      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
         filled: true,
         fillColor: _fieldFill,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: _fieldBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF008F68)),
-        ),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: _fieldBorder)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF008F68))),
       ),
     );
   }

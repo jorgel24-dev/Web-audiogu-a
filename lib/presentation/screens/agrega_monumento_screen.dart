@@ -22,7 +22,6 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   final _likesController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
-  final _descNombreController = TextEditingController();
   final _descContenidoController = TextEditingController();
 
   String _categoriaSeleccionada = 'Monumentos Históricos';
@@ -30,6 +29,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   String _paraNinosSeleccionado = 'No';
   String _idiomaSeleccionado = 'Español';
   String _sinopsisSeleccionada = 'No'; 
+  String _descNombreSeleccionada = 'Texto Infantil'; 
 
   final Map<String, String> _categoriasMap = {
     'Monumentos Históricos': '1',
@@ -44,7 +44,6 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
     _likesController.dispose();
     _latController.dispose();
     _lonController.dispose();
-    _descNombreController.dispose(); 
     _descContenidoController.dispose(); 
     super.dispose();
   }
@@ -71,7 +70,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
       likes: likes,
       sinopsis: _sinopsisSeleccionada == 'Sí',
       descripcionContenido: _descContenidoController.text,
-      descripcionNombre: _descNombreController.text,
+      descripcionNombre: _descNombreSeleccionada, 
     );
 
     final exito = await context
@@ -105,9 +104,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
     final dividerColor = isDarkMode ? Colors.white12 : Colors.grey[200]!;
 
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8F9FA),
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
       appBar: AppBarPrincipal(
         isDarkMode: isDarkMode,
         onToggleDarkMode: () => context.read<TemaProvider>().toggleDarkMode(),
@@ -135,46 +132,35 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                         likesController: _likesController,
                         latController: _latController,
                         lonController: _lonController,
-                        descNombreController: _descNombreController,
                         descContenidoController: _descContenidoController,
                         categoria: _categoriaSeleccionada,
                         estado: _estadoSeleccionado,
                         paraNinos: _paraNinosSeleccionado,
                         idioma: _idiomaSeleccionado,
-                        sinopsis: _sinopsisSeleccionada,
+                        sinopsis: _sinopsisSeleccionada, 
+                        descNombre: _descNombreSeleccionada, 
                         onCategoriaChanged: (val) {
-                          if (val != null) {
-                            setState(() => _categoriaSeleccionada = val);
-                          }
+                          if (val != null) setState(() => _categoriaSeleccionada = val);
                         },
                         onEstadoChanged: (val) {
-                          if (val != null) {
-                            setState(() => _estadoSeleccionado = val);
-                          }
+                          if (val != null) setState(() => _estadoSeleccionado = val);
                         },
                         onParaNinosChanged: (val) {
-                          if (val != null) {
-                            setState(() => _paraNinosSeleccionado = val);
-                          }
+                          if (val != null) setState(() => _paraNinosSeleccionado = val);
                         },
                         onIdiomaChanged: (val) {
-                          if (val != null) {
-                            setState(() => _idiomaSeleccionado = val);
-                          }
+                          if (val != null) setState(() => _idiomaSeleccionado = val);
                         },
                         onSinopsisChanged: (val) {
-                          if (val != null) {
-                            setState(() => _sinopsisSeleccionada = val);
-                          }
+                          if (val != null) setState(() => _sinopsisSeleccionada = val);
+                        },
+                        onDescNombreChanged: (val) { 
+                          if (val != null) setState(() => _descNombreSeleccionada = val);
                         },
                       ),
                     ),
                   ),
-                  _buildFooter(
-                    context,
-                    isDarkMode,
-                    nuevoMonumentoProv.isSaving,
-                  ),
+                  _buildFooter(context, isDarkMode, nuevoMonumentoProv.isSaving),
                 ],
               ),
             ),
@@ -187,12 +173,8 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   Widget _buildFooter(BuildContext context, bool isDarkMode, bool isSaving) {
     final footerBg = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final footerBorder = isDarkMode ? Colors.white12 : Colors.grey[200]!;
-    final cancelTextColor = isDarkMode
-        ? Colors.grey[300]!
-        : const Color(0xFF495057);
-    final cancelBorderColor = isDarkMode
-        ? Colors.white24
-        : const Color(0xFFDEE2E6);
+    final cancelTextColor = isDarkMode ? Colors.grey[300]! : const Color(0xFF495057);
+    final cancelBorderColor = isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -207,17 +189,13 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
               onPressed: isSaving
                   ? null
                   : () {
-                      context
-                          .read<GestionMonumentoProvider>()
-                          .limpiarArchivos();
+                      context.read<GestionMonumentoProvider>().limpiarArchivos();
                       context.go('/dashboard');
                     },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: BorderSide(color: cancelBorderColor),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Text('Cancelar', style: TextStyle(color: cancelTextColor)),
             ),
@@ -229,24 +207,16 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF008F68),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 elevation: 0,
               ),
               child: isSaving
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
-                  : const Text(
-                      'Guardar Monumento',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                  : const Text('Guardar Monumento', style: TextStyle(color: Colors.white)),
             ),
           ),
         ],
@@ -261,20 +231,21 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController likesController;
   final TextEditingController latController;
   final TextEditingController lonController;
-  final TextEditingController descNombreController;
   final TextEditingController descContenidoController;
   
   final String categoria;
   final String estado;
   final String paraNinos;
   final String idioma;
-  final String sinopsis;
+  final String sinopsis; 
+  final String descNombre; 
 
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
   final ValueChanged<String?> onParaNinosChanged;
   final ValueChanged<String?> onIdiomaChanged;
-  final ValueChanged<String?> onSinopsisChanged;
+  final ValueChanged<String?> onSinopsisChanged; 
+  final ValueChanged<String?> onDescNombreChanged; 
 
   const _FormularioMonumento({
     required this.isDarkMode,
@@ -282,24 +253,23 @@ class _FormularioMonumento extends StatelessWidget {
     required this.likesController,
     required this.latController,
     required this.lonController,
-    required this.descNombreController,
     required this.descContenidoController,
     required this.categoria,
     required this.estado,
     required this.paraNinos,
     required this.idioma,
     required this.sinopsis,
+    required this.descNombre,
     required this.onCategoriaChanged,
     required this.onEstadoChanged,
     required this.onParaNinosChanged,
     required this.onIdiomaChanged,
     required this.onSinopsisChanged,
+    required this.onDescNombreChanged,
   });
 
-  Color get _fieldFill =>
-      isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
-  Color get _fieldBorder =>
-      isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
+  Color get _fieldFill => isDarkMode ? const Color(0xFF1E2A3A) : const Color(0xFFF8F9FA);
+  Color get _fieldBorder => isDarkMode ? Colors.white24 : const Color(0xFFDEE2E6);
   Color get _uploadBoxBg => isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
   Color get _hintColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
   Color get _subtextColor => isDarkMode ? Colors.grey[500]! : Colors.grey;
@@ -315,9 +285,7 @@ class _FormularioMonumento extends StatelessWidget {
         const SizedBox(height: 8),
         _buildUploadBox(
           icon: Icons.image_outlined,
-          label:
-              nuevoMonumentoProv.imagenNombre ??
-              'Subir un archivo o arrastrar y soltar',
+          label: nuevoMonumentoProv.imagenNombre ?? 'Subir un archivo o arrastrar y soltar',
           sublabel: 'PNG, JPG, GIF hasta 10MB',
           onTap: () => nuevoMonumentoProv.seleccionarImagen(),
           hasFile: nuevoMonumentoProv.imagenNombre != null,
@@ -326,10 +294,7 @@ class _FormularioMonumento extends StatelessWidget {
 
         const LabelCampo(label: 'Nombre del Monumento'),
         const SizedBox(height: 8),
-        _buildTextField(
-          textoGuia: 'Ej: Castillo de la Peña',
-          controller: nombreController,
-        ),
+        _buildTextField(textoGuia: 'Ej: Castillo de la Peña', controller: nombreController),
         const SizedBox(height: 20),
 
         Row(
@@ -342,12 +307,7 @@ class _FormularioMonumento extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildDropdown(
                     value: categoria,
-                    items: [
-                      'Monumentos Históricos',
-                      'Iglesias',
-                      'Fuentes',
-                      'Parques',
-                    ],
+                    items: ['Monumentos Históricos', 'Iglesias', 'Fuentes', 'Parques'],
                     onChanged: onCategoriaChanged,
                   ),
                 ],
@@ -373,11 +333,7 @@ class _FormularioMonumento extends StatelessWidget {
         const SizedBox(height: 20),
         const LabelCampo(label: 'Número de Me Gustas'),
         const SizedBox(height: 8),
-        _buildTextField(
-          textoGuia: 'Ej: 145',
-          controller: likesController,
-          keyboardType: TextInputType.number,
-        ),
+        _buildTextField(textoGuia: 'Ej: 145', controller: likesController, keyboardType: TextInputType.number),
         const SizedBox(height: 20),
         Row(
           children: [
@@ -409,7 +365,7 @@ class _FormularioMonumento extends StatelessWidget {
                   ),
                 ],
               ),
-                ),
+            ),
           ],
         ),
         const SizedBox(height: 24),
@@ -423,9 +379,16 @@ class _FormularioMonumento extends StatelessWidget {
                 children: [
                   const LabelCampo(label: 'Nombre de la Descripción'),
                   const SizedBox(height: 8),
-                  _buildTextField(
-                    textoGuia: 'Ej: Sinopsis Española',
-                    controller: descNombreController,
+                  _buildDropdown(
+                    value: descNombre,
+                    items: [
+                      'Texto Infantil',
+                      'Sinopsis Esp',
+                      'English Audio Text',
+                      'Texto Audio',
+                      'English Sinopsis'
+                    ],
+                    onChanged: onDescNombreChanged,
                   ),
                 ],
               ),
@@ -457,12 +420,12 @@ class _FormularioMonumento extends StatelessWidget {
           maxLines: 4,
         ),
         const SizedBox(height: 24),
+
         const LabelCampo(label: 'Archivos de Audio'),
         const SizedBox(height: 8),
         _buildUploadBox(
           icon: Icons.mic_none_outlined,
-          label:
-              nuevoMonumentoProv.audioNombre ?? 'Subir audios o notas de voz',
+          label: nuevoMonumentoProv.audioNombre ?? 'Subir audios o notas de voz',
           sublabel: 'MP3, WAV hasta 20MB',
           onTap: () => nuevoMonumentoProv.seleccionarAudio(),
           hasFile: nuevoMonumentoProv.audioNombre != null,
@@ -509,8 +472,7 @@ class _FormularioMonumento extends StatelessWidget {
       maxLines: maxLines,
       keyboardType: keyboardType,
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
-      validator: (value) =>
-          value == null || value.isEmpty ? 'Este campo es obligatorio' : null,
+      validator: (value) => value == null || value.isEmpty ? 'Este campo es obligatorio' : null,
       decoration: InputDecoration(
         prefixIcon: prefix != null
             ? Padding(
@@ -522,10 +484,7 @@ class _FormularioMonumento extends StatelessWidget {
         hintStyle: TextStyle(color: _hintColor, fontSize: 14),
         filled: true,
         fillColor: _fieldFill,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: _fieldBorder),
@@ -555,9 +514,7 @@ class _FormularioMonumento extends StatelessWidget {
       initialValue: value,
       dropdownColor: isDarkMode ? const Color(0xFF1E2A3A) : Colors.white,
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
-      items: items
-          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-          .toList(),
+      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
         filled: true,
@@ -598,29 +555,18 @@ class _FormularioMonumento extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: hasFile ? const Color(0xFF008F68) : _hintColor,
-              size: 40,
-            ),
+            Icon(icon, color: hasFile ? const Color(0xFF008F68) : _hintColor, size: 40),
             const SizedBox(height: 12),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: hasFile
-                        ? 'Archivo seleccionado: '
-                        : 'Subir un archivo ',
-                    style: const TextStyle(
-                      color: Color(0xFF008F68),
-                      fontWeight: FontWeight.bold,
-                    ),
+                    text: hasFile ? 'Archivo seleccionado: ' : 'Subir un archivo ',
+                    style: const TextStyle(color: Color(0xFF008F68), fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
-                    text: hasFile
-                        ? label
-                        : label.replaceFirst('Subir un archivo', ''),
+                    text: hasFile ? label : label.replaceFirst('Subir un archivo', ''),
                     style: TextStyle(
                       color: isDarkMode ? Colors.white70 : Colors.black87,
                       fontWeight: hasFile ? FontWeight.w500 : FontWeight.normal,
@@ -630,10 +576,7 @@ class _FormularioMonumento extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              sublabel,
-              style: TextStyle(color: _subtextColor, fontSize: 12),
-            ),
+            Text(sublabel, style: TextStyle(color: _subtextColor, fontSize: 12)),
           ],
         ),
       ),
