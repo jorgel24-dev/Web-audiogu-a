@@ -4,12 +4,12 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:provider/provider.dart';
 import '../../provider/noticia_provider.dart';
 import '../../provider/tema_provider.dart';
-import '../../widgets/app_bar_principal.dart';
-import '../../widgets/menu_lateral.dart';
-import '../../widgets/noticia_tarjeta.dart';
-import '../../widgets/editor_toolbar.dart';
-import '../../widgets/chip_filtro.dart';
-import '../../widgets/label_campo.dart';
+import '../widgets/app_bar_principal.dart';
+import '../widgets/menu_lateral.dart';
+import '../widgets/noticia_tarjeta.dart';
+import '../widgets/editor_toolbar.dart';
+import '../widgets/chip_filtro.dart';
+import '../widgets/label_campo.dart';
 
 class NoticiasPage extends StatefulWidget {
   const NoticiasPage({super.key});

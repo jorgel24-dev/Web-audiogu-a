@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../provider/auth_provider.dart';
+import '../../provider/auth_provider.dart';
 import 'item_menu_lateral.dart';
 
 class _ItemMenu {

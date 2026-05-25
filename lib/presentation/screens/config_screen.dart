@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../provider/tema_provider.dart';
 import '../../provider/config_provider.dart';
-import '../../widgets/app_bar_principal.dart';
-import '../../widgets/menu_lateral.dart';
+import '../widgets/app_bar_principal.dart';
+import '../widgets/menu_lateral.dart';
 
 class ConfiguracionPage extends StatefulWidget {
   const ConfiguracionPage({super.key});

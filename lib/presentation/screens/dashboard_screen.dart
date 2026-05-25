@@ -3,10 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../provider/tema_provider.dart';
 import '../../provider/dashboard_provider.dart';
-import '../../widgets/app_bar_principal.dart';
-import '../../widgets/menu_lateral.dart';
-import '../../widgets/tarjeta_estadisticas.dart';
-import '../../widgets/tarjeta_modulo.dart';
+import '../widgets/app_bar_principal.dart';
+import '../widgets/menu_lateral.dart';
+import '../widgets/tarjeta_estadisticas.dart';
+import '../widgets/tarjeta_modulo.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

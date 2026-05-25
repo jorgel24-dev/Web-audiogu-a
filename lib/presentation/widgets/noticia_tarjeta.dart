@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/noticia_model.dart';
+import '../../model/noticia_model.dart';
 
 class NoticiaTarjeta extends StatelessWidget {
   final Noticia noticia;

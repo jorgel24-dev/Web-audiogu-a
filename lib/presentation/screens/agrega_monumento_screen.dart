@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../provider/tema_provider.dart';
 import '../../model/monumento_model.dart';
-import '../../widgets/app_bar_principal.dart';
-import '../../widgets/menu_lateral.dart';
-import '../../widgets/label_campo.dart';
+import '../widgets/app_bar_principal.dart';
+import '../widgets/menu_lateral.dart';
+import '../widgets/label_campo.dart';
 
 class AgregaMonumentoPage extends StatefulWidget {
   const AgregaMonumentoPage({super.key});

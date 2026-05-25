@@ -1,9 +1,9 @@
 import 'package:audioguia_web/model/monumento_model.dart';
 import 'package:audioguia_web/provider/monumentos_provider.dart';
 import 'package:audioguia_web/provider/tema_provider.dart';
-import 'package:audioguia_web/widgets/app_bar_principal.dart';
-import 'package:audioguia_web/widgets/label_campo.dart';
-import 'package:audioguia_web/widgets/menu_lateral.dart';
+import 'package:audioguia_web/presentation/widgets/app_bar_principal.dart';
+import 'package:audioguia_web/presentation/widgets/label_campo.dart';
+import 'package:audioguia_web/presentation/widgets/menu_lateral.dart';
 import 'package:flutter/material.dart';
 import 'package:audioguia_web/service/api_service.dart';
 import 'package:go_router/go_router.dart';
