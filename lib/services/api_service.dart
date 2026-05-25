@@ -71,10 +71,8 @@ class ApiService {
 
   Future<bool> crearMonumento({
     required Monumento monumento,
-    required Uint8List? imagenBytes, 
-    required String? imagenNombre,
+    String? imagenUrl,
     required Uint8List? audioBytes,  
-    required String? audioNombre,
   }) async {
     try {
       final uri = Uri.parse('$_baseUrl/admin/monuments');
@@ -84,20 +82,27 @@ class ApiService {
 
       final Map<String, dynamic> bodyJson = {
         'name': monumento.nombre,
-        'description': [], // El backend espera un List<Description> según el modelo
-        'lat': double.tryParse(monumento.latitud.toString()) ?? 0.0,
-        'lon': double.tryParse(monumento.longitud.toString()) ?? 0.0,
+        'description': [], 
+        "coordenates": {
+          "lon": monumento.longitud,
+          "lat": monumento.latitud
+        },
         'accessibility': monumento.accesible,
         'isActive': monumento.activo, 
         'maps_url': 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
         'tag': {
           'id': int.tryParse(monumento.categoria) ?? 1 // Pasa el objeto Tag con su ID correspondiente
         },
-        'picture': [], // List<Picture> en blanco por ahora
+        "picture": imagenUrl != null ? [
+            {
+              "created_at" : fechaActual,
+              "last_modified" : fechaActual,
+              "url" : imagenUrl
+            } 
+          ] : [],
         'audio': [],   // List<Audio> en blanco por ahora
         'localidad_id': 1, // Añade el id de localidad si tu tabla lo requiere obligatoriamente
-        'NLikes': 0,
-        'n_likes': 0,
+        'NLikes': monumento.likes,
         'created_at': fechaActual, 
         'last_modified': fechaActual
       };
@@ -146,8 +151,7 @@ Future<bool> editarMonumento(Monumento monumento) async {
     "picture": [],
     "audio": [],
     "localidad_id": 1, // Ajusta el ID según corresponda a tu lógica
-    'NLikes': 0,
-    'n_likes': 0,
+    'NLikes': monumento.likes,
     'last_modified': fechaActual
   };
 

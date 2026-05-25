@@ -9,6 +9,7 @@ class Monumento {
   final double longitud;
   final String? imagenUrl;
   final String? audioUrl;
+  final int likes;
 
   Monumento({
     this.id,
@@ -21,6 +22,7 @@ class Monumento {
     required this.longitud,
     this.imagenUrl,
     this.audioUrl,
+    this.likes = 0,
   });
 
   // Este método genera la estructura exacta que espera tu Spring Boot

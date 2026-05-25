@@ -1,4 +1,5 @@
 import 'package:audioguia_web/services/api_service.dart';
+import 'package:audioguia_web/services/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
@@ -6,6 +7,7 @@ import '../models/monumento_model.dart';
 
 class NuevoMonumentoProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
+  final SupabaseService _supabaseService = SupabaseService();
 
   bool _isSaving = false;
   bool get isSaving => _isSaving;
@@ -65,12 +67,20 @@ class NuevoMonumentoProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      String? urlImagenSubida;
+
+      // 1. Subir la imagen a Supabase si el usuario seleccionó una
+      if (_imagenBytes != null && _imagenNombre != null) {
+        urlImagenSubida = await _supabaseService.subirImagen(_imagenBytes!, _imagenNombre!);
+        if (urlImagenSubida == null) {
+          throw Exception("Error al subir la imagen a Supabase");
+        }
+      }
+
       final exito = await _apiService.crearMonumento(
         monumento: monumento,
-        imagenBytes: _imagenBytes,
-        imagenNombre: _imagenNombre,
-        audioBytes: _audioBytes,
-        audioNombre: _audioNombre,
+        imagenUrl: urlImagenSubida,
+        audioBytes: _audioBytes
       );
       
       if (exito) limpiarArchivos();

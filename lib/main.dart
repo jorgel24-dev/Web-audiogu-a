@@ -7,8 +7,18 @@ import 'package:audioguia_web/config/routes/app_router.dart';
 import 'package:audioguia_web/providers/noticias_provider.dart';
 import 'package:audioguia_web/providers/tema_provider.dart';
 import 'package:audioguia_web/providers/config_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+void main() async {
+  // 1. Obligatorio para asegurar que Flutter esté listo antes de inicializar servicios externos
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 2. Inicializamos Supabase con las credenciales de tu proyecto
+  await Supabase.initialize(
+    url: 'https://axhthfoqdxickibsblrq.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4aHRoZm9xZHhpY2tpYnNibHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3NDkwMTEsImV4cCI6MjA4OTMyNTAxMX0.3ZDRL88ElYlUOyf4T5N_YX3OeT4mHXhT9SCGPndzPGc',
+  );
+  
   runApp(
     MultiProvider(
       providers: [
