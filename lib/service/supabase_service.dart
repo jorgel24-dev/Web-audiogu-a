@@ -4,7 +4,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   final SupabaseClient _client = Supabase.instance.client;
 
-  Future<String?> subirImagen(Uint8List bytes, String nombreArchivo, {String carpeta = 'noticias'}) async {
+  Future<String?> subirImagen(
+    Uint8List bytes,
+    String nombreArchivo, {
+    String carpeta = 'noticias',
+  }) async {
     try {
       final extension = nombreArchivo.split('.').last;
       final timestamp = DateTime.now().millisecondsSinceEpoch;

@@ -56,11 +56,9 @@ class NoticiaProvider extends ChangeNotifier {
     }
 
     if (_filtroActivo == 'publicado') {
-      resultado =
-          resultado.where((n) => n.estado == 1).toList();
+      resultado = resultado.where((n) => n.estado == 1).toList();
     } else if (_filtroActivo == 'borrador') {
-      resultado =
-          resultado.where((n) => n.estado == 0).toList();
+      resultado = resultado.where((n) => n.estado == 0).toList();
     }
 
     return resultado;
@@ -166,7 +164,10 @@ class NoticiaProvider extends ChangeNotifier {
 
     if (imagenBytes != null && imagenNombre != null) {
       final supabaseService = SupabaseService();
-      final url = await supabaseService.subirImagen(imagenBytes!, imagenNombre!);
+      final url = await supabaseService.subirImagen(
+        imagenBytes!,
+        imagenNombre!,
+      );
       if (url != null) {
         imagenUrl = url;
         imagenBytes = null;
@@ -235,7 +236,10 @@ class NoticiaProvider extends ChangeNotifier {
     notifyListeners();
 
     final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
-    final ok = await _noticiasService.eliminar(_noticiaSeleccionada!.id, authHeader);
+    final ok = await _noticiasService.eliminar(
+      _noticiaSeleccionada!.id,
+      authHeader,
+    );
 
     if (ok) {
       _noticias.removeWhere((n) => n.id == _noticiaSeleccionada!.id);

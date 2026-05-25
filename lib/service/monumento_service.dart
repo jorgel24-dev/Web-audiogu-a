@@ -3,16 +3,21 @@ import 'package:http/http.dart' as http;
 import '../model/monumento_model.dart';
 
 class MonumentoService {
-  final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/monuments';
+  final String _urlPublic =
+      'https://backend-tfg.fly.dev/api/v1/public/monuments';
   final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/monuments';
 
   Future<List<MonumentoModel>?> obtenerTodos() async {
     try {
       final response = await http.get(Uri.parse(_urlPublic));
       if (response.statusCode == 200) {
-        final List<dynamic> lista = json.decode(utf8.decode(response.bodyBytes));
+        final List<dynamic> lista = json.decode(
+          utf8.decode(response.bodyBytes),
+        );
         return lista
-            .map((item) => MonumentoModel.fromJson(item as Map<String, dynamic>))
+            .map(
+              (item) => MonumentoModel.fromJson(item as Map<String, dynamic>),
+            )
             .toList();
       }
       return null;

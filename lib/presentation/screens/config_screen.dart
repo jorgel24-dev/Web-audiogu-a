@@ -209,7 +209,7 @@ class _CardConfiguracion extends StatelessWidget {
             ),
           ),
           Divider(height: 1, color: dividerColor),
-          
+
           ConfigExpansionItem(
             isDarkMode: isDarkMode,
             color: const Color(0xFF4CAF50),
@@ -219,21 +219,25 @@ class _CardConfiguracion extends StatelessWidget {
                 'Habilita la sección de rutas recomendadas. Permite a los usuarios visualizar, seguir y descargar itinerarios turísticos predefinidos.',
             value: config.rutasTuristicas,
             onChanged: config.toggleRutas,
-            children: config.rutas.map((r) => SwitchListTile(
-              title: Text(
-                r.name,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black87,
-                  fontSize: 13,
-                ),
-              ),
-              value: r.isActive,
-              onChanged: (v) => config.toggleRuta(r.id, v),
-              activeThumbColor: const Color(0xFF4CAF50),
-              contentPadding: const EdgeInsets.only(left: 70, right: 24),
-            )).toList(),
+            children: config.rutas
+                .map(
+                  (r) => SwitchListTile(
+                    title: Text(
+                      r.name,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                        fontSize: 13,
+                      ),
+                    ),
+                    value: r.isActive,
+                    onChanged: (v) => config.toggleRuta(r.id, v),
+                    activeThumbColor: const Color(0xFF4CAF50),
+                    contentPadding: const EdgeInsets.only(left: 70, right: 24),
+                  ),
+                )
+                .toList(),
           ),
-          
+
           Divider(height: 1, color: dividerColor),
           ConfigItem(
             isDarkMode: isDarkMode,
@@ -245,7 +249,7 @@ class _CardConfiguracion extends StatelessWidget {
             value: config.asistenteIA,
             onChanged: config.toggleAsistenteIA,
           ),
-          
+
           Divider(height: 1, color: dividerColor),
           ConfigExpansionItem(
             isDarkMode: isDarkMode,
@@ -256,21 +260,25 @@ class _CardConfiguracion extends StatelessWidget {
                 'Muestra el mapa detallado con puntos de interés (POIs), geolocalización del usuario y filtros por categorías.',
             value: config.mapasInteractivos,
             onChanged: config.toggleMapas,
-            children: config.monumentos.map((m) => SwitchListTile(
-              title: Text(
-                m.name,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black87,
-                  fontSize: 13,
-                ),
-              ),
-              value: m.isActive,
-              onChanged: (v) => config.toggleMonumento(m.id, v),
-              activeThumbColor: const Color(0xFF2196F3),
-              contentPadding: const EdgeInsets.only(left: 70, right: 24),
-            )).toList(),
+            children: config.monumentos
+                .map(
+                  (m) => SwitchListTile(
+                    title: Text(
+                      m.name,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                        fontSize: 13,
+                      ),
+                    ),
+                    value: m.isActive,
+                    onChanged: (v) => config.toggleMonumento(m.id, v),
+                    activeThumbColor: const Color(0xFF2196F3),
+                    contentPadding: const EdgeInsets.only(left: 70, right: 24),
+                  ),
+                )
+                .toList(),
           ),
-          
+
           Divider(height: 1, color: dividerColor),
           ConfigItem(
             isDarkMode: isDarkMode,
@@ -421,9 +429,14 @@ class ConfigExpansionItem extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.02),
+              color: isDarkMode
+                  ? Colors.white.withValues(alpha: 0.02)
+                  : Colors.black.withValues(alpha: 0.02),
               border: Border(
-                top: BorderSide(color: isDarkMode ? Colors.white10 : Colors.black12, width: 1),
+                top: BorderSide(
+                  color: isDarkMode ? Colors.white10 : Colors.black12,
+                  width: 1,
+                ),
               ),
             ),
             child: Column(
@@ -446,30 +459,43 @@ class ConfigExpansionItem extends StatelessWidget {
                   activeThumbColor: color,
                   contentPadding: const EdgeInsets.only(left: 70, right: 24),
                 ),
-                  Divider(height: 1, indent: 70, color: isDarkMode ? Colors.white10 : Colors.black12),
-                  if (children.isNotEmpty)
-                    ...children
-                  else
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                      child: Row(
-                        children: [
-                          Icon(Icons.warning_amber_rounded, color: Colors.orange[400], size: 22),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'No se han podido cargar los elementos desde el servidor. Comprueba la conexión o la configuración.',
-                              style: TextStyle(
-                                color: isDarkMode ? Colors.white70 : Colors.black54,
-                                fontSize: 12,
-                                fontStyle: FontStyle.italic,
-                              ),
+                Divider(
+                  height: 1,
+                  indent: 70,
+                  color: isDarkMode ? Colors.white10 : Colors.black12,
+                ),
+                if (children.isNotEmpty)
+                  ...children
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 20,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.orange[400],
+                          size: 22,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'No se han podido cargar los elementos desde el servidor. Comprueba la conexión o la configuración.',
+                            style: TextStyle(
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.black54,
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                ],
+                  ),
+              ],
             ),
           ),
         ],

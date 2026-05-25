@@ -15,8 +15,12 @@ class _ItemMenu {
 }
 
 const _itemsMenu = [
-  _ItemMenu(icon: Icons.article,         label: 'Noticias',        ruta: '/noticias'),
-  _ItemMenu(icon: Icons.settings,        label: 'Configuración',   ruta: '/configuracion'),
+  _ItemMenu(icon: Icons.article, label: 'Noticias', ruta: '/noticias'),
+  _ItemMenu(
+    icon: Icons.settings,
+    label: 'Configuración',
+    ruta: '/configuracion',
+  ),
 ];
 
 class MenuLateral extends StatelessWidget {

@@ -70,12 +70,12 @@ class ConfiguracionProvider extends ChangeNotifier {
 
     if (listaMonumentos != null) {
       monumentos = listaMonumentos;
-      _originalMonumentosState = { for (var m in monumentos) m.id : m.isActive };
+      _originalMonumentosState = {for (var m in monumentos) m.id: m.isActive};
     }
 
     if (listaRutas != null) {
       rutas = listaRutas;
-      _originalRutasState = { for (var r in rutas) r.id : r.isActive };
+      _originalRutasState = {for (var r in rutas) r.id: r.isActive};
     }
 
     _hayPendientes = false;
@@ -98,7 +98,11 @@ class ConfiguracionProvider extends ChangeNotifier {
     final index = monumentos.indexWhere((m) => m.id == id);
     if (index != -1) {
       final old = monumentos[index];
-      monumentos[index] = MonumentoModel(id: old.id, name: old.name, isActive: v);
+      monumentos[index] = MonumentoModel(
+        id: old.id,
+        name: old.name,
+        isActive: v,
+      );
       _hayPendientes = true;
       notifyListeners();
     }
@@ -123,10 +127,26 @@ class ConfiguracionProvider extends ChangeNotifier {
     final List<Future<dynamic>> promesas = [];
 
     promesas.addAll([
-      _controlService.actualizarEstado(ControlService.nombreRutas, rutasTuristicas, authHeader),
-      _controlService.actualizarEstado(ControlService.nombreIA, asistenteIA, authHeader),
-      _controlService.actualizarEstado(ControlService.nombreMonumentos, mapasInteractivos, authHeader),
-      _controlService.actualizarEstado(ControlService.nombreNoticias, noticias, authHeader),
+      _controlService.actualizarEstado(
+        ControlService.nombreRutas,
+        rutasTuristicas,
+        authHeader,
+      ),
+      _controlService.actualizarEstado(
+        ControlService.nombreIA,
+        asistenteIA,
+        authHeader,
+      ),
+      _controlService.actualizarEstado(
+        ControlService.nombreMonumentos,
+        mapasInteractivos,
+        authHeader,
+      ),
+      _controlService.actualizarEstado(
+        ControlService.nombreNoticias,
+        noticias,
+        authHeader,
+      ),
     ]);
 
     for (var m in monumentos) {
@@ -147,8 +167,8 @@ class ConfiguracionProvider extends ChangeNotifier {
 
     if (exito) {
       _hayPendientes = false;
-      _originalMonumentosState = { for (var m in monumentos) m.id : m.isActive };
-      _originalRutasState = { for (var r in rutas) r.id : r.isActive };
+      _originalMonumentosState = {for (var m in monumentos) m.id: m.isActive};
+      _originalRutasState = {for (var r in rutas) r.id: r.isActive};
     } else {
       _error = 'Error al guardar alguna configuración en el servidor.';
     }

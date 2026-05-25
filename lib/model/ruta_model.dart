@@ -3,11 +3,7 @@ class RutaModel {
   final String name;
   final bool isActive;
 
-  RutaModel({
-    required this.id,
-    required this.name,
-    required this.isActive,
-  });
+  RutaModel({required this.id, required this.name, required this.isActive});
 
   factory RutaModel.fromJson(Map<String, dynamic> json) {
     return RutaModel(

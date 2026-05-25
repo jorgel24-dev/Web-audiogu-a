@@ -255,9 +255,7 @@ class _PanelEditorState extends State<_PanelEditor> {
     super.initState();
     _quillController = _buildQuillController(widget.initialContenido);
     _quillController.addListener(() {
-      final delta = jsonEncode(
-        _quillController.document.toDelta().toJson(),
-      );
+      final delta = jsonEncode(_quillController.document.toDelta().toJson());
       context.read<NoticiaProvider>().setContenido(delta);
     });
   }
@@ -485,23 +483,15 @@ class _PanelEditorState extends State<_PanelEditor> {
                               _BotonEstado(
                                 label: 'Borrador',
                                 color: Colors.orange,
-                                activo:
-                                    noticiaProvider.estadoEditor ==
-                                    0,
-                                onTap: () => noticiaProvider.cambiarEstado(
-                                  0,
-                                ),
+                                activo: noticiaProvider.estadoEditor == 0,
+                                onTap: () => noticiaProvider.cambiarEstado(0),
                               ),
                               const SizedBox(width: 8),
                               _BotonEstado(
                                 label: 'Publicado',
                                 color: Colors.green,
-                                activo:
-                                    noticiaProvider.estadoEditor ==
-                                    1,
-                                onTap: () => noticiaProvider.cambiarEstado(
-                                  1,
-                                ),
+                                activo: noticiaProvider.estadoEditor == 1,
+                                onTap: () => noticiaProvider.cambiarEstado(1),
                               ),
                               const SizedBox(width: 12),
                               OutlinedButton.icon(
@@ -604,7 +594,9 @@ class _PanelEditorState extends State<_PanelEditor> {
   InputDecoration _inputDecoration({required String hint}) {
     final borderColor = widget.isDarkMode ? Colors.white24 : Colors.grey[300]!;
     final hintColor = widget.isDarkMode ? Colors.grey[500]! : Colors.grey;
-    final fillColor = widget.isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
+    final fillColor = widget.isDarkMode
+        ? const Color(0xFF1E2A3A)
+        : Colors.white;
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(color: hintColor, fontSize: 13),
@@ -753,7 +745,9 @@ class _SelectorImagen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final noticiaProvider = Provider.of<NoticiaProvider>(context);
-    final hasImage = noticiaProvider.imagenUrl != null || noticiaProvider.imagenBytes != null;
+    final hasImage =
+        noticiaProvider.imagenUrl != null ||
+        noticiaProvider.imagenBytes != null;
     final borderColor = isDarkMode ? Colors.white24 : Colors.grey[300]!;
     final fillColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
 
@@ -783,12 +777,11 @@ class _SelectorImagen extends StatelessWidget {
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          Container(
-                            height: 150,
-                            color: Colors.grey[300],
-                            child: const Center(child: Icon(Icons.broken_image)),
-                          ),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 150,
+                        color: Colors.grey[300],
+                        child: const Center(child: Icon(Icons.broken_image)),
+                      ),
                     ),
             ),
             const SizedBox(height: 12),
@@ -800,7 +793,9 @@ class _SelectorImagen extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFF2D6A4F),
               side: const BorderSide(color: Color(0xFF2D6A4F)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           ),
           if (noticiaProvider.imagenNombre != null) ...[
@@ -815,4 +810,3 @@ class _SelectorImagen extends StatelessWidget {
     );
   }
 }
-

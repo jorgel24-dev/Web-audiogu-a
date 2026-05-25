@@ -5,7 +5,6 @@ import '../model/noticia_model.dart';
 class NoticiaService {
   final String _url = 'https://backend-tfg.fly.dev/api/v1';
 
-
   Future<List<Noticia>?> obtenerTodas() async {
     try {
       final response = await get(
@@ -24,7 +23,6 @@ class NoticiaService {
     }
   }
 
-
   Future<Noticia?> obtenerPorId(String id) async {
     try {
       final response = await get(
@@ -39,7 +37,6 @@ class NoticiaService {
       return null;
     }
   }
-
 
   Future<Noticia?> crear(
     String titulo,
@@ -62,7 +59,8 @@ class NoticiaService {
           "subtitulo": subtitulo,
           "contenido": contenido,
           "estado": estado,
-          if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
+          if (fechaPublicacion != null)
+            "fecha_publicacion": fechaPublicacion.toIso8601String(),
           if (imagenUrl != null) "imagen_url": imagenUrl,
         }),
       );
@@ -97,7 +95,8 @@ class NoticiaService {
           "subtitulo": subtitulo,
           "contenido": contenido,
           "estado": estado,
-          if (fechaPublicacion != null) "fecha_publicacion": fechaPublicacion.toIso8601String(),
+          if (fechaPublicacion != null)
+            "fecha_publicacion": fechaPublicacion.toIso8601String(),
           if (imagenUrl != null) "imagen_url": imagenUrl,
         }),
       );
@@ -109,7 +108,6 @@ class NoticiaService {
       return null;
     }
   }
-
 
   Future<bool> eliminar(String id, String authHeader) async {
     try {

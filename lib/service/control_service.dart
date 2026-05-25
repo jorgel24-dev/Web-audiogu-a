@@ -11,7 +11,6 @@ class ControlService {
   static const String nombreIA = 'IA_Chatbox';
   static const String nombreNoticias = 'News';
 
-
   Future<List<ControlModel>?> obtenerTodos() async {
     try {
       final response = await get(
@@ -19,7 +18,9 @@ class ControlService {
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
-        final List<dynamic> lista = json.decode(utf8.decode(response.bodyBytes));
+        final List<dynamic> lista = json.decode(
+          utf8.decode(response.bodyBytes),
+        );
         return lista
             .map((item) => ControlModel.fromJson(item as Map<String, dynamic>))
             .toList();
@@ -29,7 +30,6 @@ class ControlService {
       return null;
     }
   }
-
 
   Future<bool?> obtenerEstado(String nombre) async {
     try {
@@ -50,8 +50,11 @@ class ControlService {
     }
   }
 
-
-  Future<ControlModel?> actualizarEstado(String nombre, bool activo, String authHeader) async {
+  Future<ControlModel?> actualizarEstado(
+    String nombre,
+    bool activo,
+    String authHeader,
+  ) async {
     try {
       final response = await put(
         Uri.parse('$_urlAdmin/$nombre'),
@@ -63,7 +66,8 @@ class ControlService {
       );
       if (response.statusCode == 200) {
         return ControlModel.fromJson(
-            json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>);
+          json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>,
+        );
       }
       return null;
     } catch (e) {

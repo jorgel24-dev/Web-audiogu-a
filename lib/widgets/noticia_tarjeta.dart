@@ -97,9 +97,9 @@ class _EtiquetaEstado extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (Color color, String texto) = switch (estado) {
-      0  => (Colors.orange, 'BORRADOR'),
-      1 => (Colors.green,  'PUBLICADO'),
-      _ => (Colors.grey,   'ARCHIVADO'),
+      0 => (Colors.orange, 'BORRADOR'),
+      1 => (Colors.green, 'PUBLICADO'),
+      _ => (Colors.grey, 'ARCHIVADO'),
     };
 
     return Container(

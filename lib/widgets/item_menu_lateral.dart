@@ -19,10 +19,8 @@ class ItemMenuLateral extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const activeColor = Color(0xFF2D6A4F);
-    final inactiveIconColor =
-        isDarkMode ? Colors.grey[500] : Colors.grey[600];
-    final inactiveTextColor =
-        isDarkMode ? Colors.grey[300] : Colors.grey[800];
+    final inactiveIconColor = isDarkMode ? Colors.grey[500] : Colors.grey[600];
+    final inactiveTextColor = isDarkMode ? Colors.grey[300] : Colors.grey[800];
 
     return ListTile(
       leading: Icon(
@@ -34,8 +32,7 @@ class ItemMenuLateral extends StatelessWidget {
         label,
         style: TextStyle(
           fontSize: 13,
-          fontWeight:
-              seleccionado ? FontWeight.w600 : FontWeight.normal,
+          fontWeight: seleccionado ? FontWeight.w600 : FontWeight.normal,
           color: seleccionado ? activeColor : inactiveTextColor,
         ),
       ),
@@ -43,9 +40,7 @@ class ItemMenuLateral extends StatelessWidget {
       selectedTileColor: activeColor.withValues(
         alpha: isDarkMode ? 0.15 : 0.08,
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       dense: true,
       onTap: onTap,
