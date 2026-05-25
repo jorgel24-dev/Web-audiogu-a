@@ -746,7 +746,8 @@ class _SelectorImagen extends StatelessWidget {
   Widget build(BuildContext context) {
     final noticiaProvider = Provider.of<NoticiaProvider>(context);
     final hasImage =
-        noticiaProvider.imagenUrl != null ||
+        (noticiaProvider.imagenUrl != null &&
+            noticiaProvider.imagenUrl!.isNotEmpty) ||
         noticiaProvider.imagenBytes != null;
     final borderColor = isDarkMode ? Colors.white24 : Colors.grey[300]!;
     final fillColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;

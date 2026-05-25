@@ -254,7 +254,9 @@ class _RendimientoContenido extends StatelessWidget {
             String? imagenUrl;
             try {
               final configProvider = context.read<ConfiguracionProvider>();
-              final mon = configProvider.monumentos.firstWhere((m) => m.id == monumento.id);
+              final mon = configProvider.monumentos.firstWhere(
+                (m) => m.id == monumento.id,
+              );
               imagenUrl = mon.imagenUrl;
             } catch (_) {}
 
@@ -304,6 +306,7 @@ class _RendimientoContenido extends StatelessWidget {
                     child: Image.network(
                       imagenUrl,
                       fit: BoxFit.cover,
+                      cacheWidth: 120,
                       errorBuilder: (context, error, stackTrace) => Icon(
                         Icons.image_not_supported,
                         color: _textSecondary,
