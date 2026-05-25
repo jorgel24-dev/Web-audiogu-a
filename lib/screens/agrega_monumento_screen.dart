@@ -64,16 +64,14 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
     // Estructuramos el modelo con los datos recolectados
     final nuevoMonumento = Monumento(
       nombre: _nombreController.text,
-      descripcion: '', // Enviamos vacío ya que se quitó el campo de texto largo de la UI
       categoria: tagIdId, 
       accesible: false,   
       activo: _estadoSeleccionado == 'Publicado', 
+      paraNinos: _paraNinosSeleccionado == 'Sí',
+      idioma: codigoIdioma,
       latitud: lat,
       longitud: lon,
-      likes: likes, // Pasamos los likes que recuperamos (mapeado con tu api_service)
-      // NOTA: Si tu modelo de Dart ya soporta "kids" e "idioma" a nivel raíz, puedes descomentar estas líneas:
-      // paraNinos: _paraNinosSeleccionado == 'Sí',
-      // idioma: codigoIdioma,
+      likes: likes,
     );
 
     // Despachamos la petición HTTP mediante el Provider correcto configurado en main.dart

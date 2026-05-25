@@ -76,8 +76,6 @@ class ApiService {
   }) async {
     try {
       final uri = Uri.parse('$_baseUrl/admin/monuments');
-
-      // Generamos la fecha actual en el formato ISO estándar que entiende Spring Boot
       final String fechaActual = DateTime.now().toIso8601String().substring(0, 19); // Cortamos a 'YYYY-MM-DDTHH:MM:SS'
 
       final Map<String, dynamic> bodyJson = {
@@ -129,46 +127,46 @@ class ApiService {
   }
 
   // Editar (PUT)
-Future<bool> editarMonumento(Monumento monumento) async {
-  final uri = Uri.parse('$_baseUrl/admin/monuments/${monumento.id}');
+  Future<bool> editarMonumento(Monumento monumento) async {
+    final uri = Uri.parse('$_baseUrl/admin/monuments/${monumento.id}');
 
-  final String fechaActual = DateTime.now().toIso8601String().substring(0, 19);
-  
-  // Mapeamos el modelo al formato JSON exacto que reconoce el Backend
-  final bodyMapeado = {
-    "name": monumento.nombre,
-    "coordenates": {
-      "lon": monumento.longitud,
-      "lat": monumento.latitud
-    },
-    "accessibility": monumento.accesible,
-    "isActive": monumento.activo,
-    "tag": {
-      "id": int.tryParse(monumento.categoria) ?? 1 // Convertimos el ID string a int
-    },
-    "maps_url": 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
-    "description": [], // Si tu backend espera listas vacías por ahora
-    "picture": [],
-    "audio": [],
-    "localidad_id": 1, // Ajusta el ID según corresponda a tu lógica
-    'NLikes': monumento.likes,
-    'last_modified': fechaActual
-  };
-
-  try {
-    final response = await http.put(
-      uri,
-      headers: _headers,
-      body: jsonEncode(bodyMapeado),
-    );
+    final String fechaActual = DateTime.now().toIso8601String().substring(0, 19);
     
-    // Retorna true si es 200 (OK) o 204 (No Content) dependiendo de tu Spring Boot
-    return response.statusCode == 200 || response.statusCode == 204;
-  } catch (e) {
-    print("Error en editarMonumento HTTP: \$e");
-    return false;
+    // Mapeamos el modelo con los datos exactos que procesa el formulario
+    final bodyMapeado = {
+      "name": monumento.nombre,
+      "coordenates": {
+        "lon": monumento.longitud,
+        "lat": monumento.latitud
+      },
+      "accessibility": monumento.accesible,
+      "isActive": monumento.activo,
+      "tag": {
+        "id": int.tryParse(monumento.categoria) ?? 1 
+      },
+      "maps_url": 'https://www.google.com/maps?q=${monumento.latitud},${monumento.longitud}',
+      "description": [], 
+      "picture": [], // Se mantienen vacíos al haber eliminado la carga de imágenes
+      "audio": [],   // Se mantienen vacíos al haber eliminado la carga de audios
+      "localidad_id": 1, 
+      "NLikes": monumento.likes,
+      "last_modified": fechaActual
+    };
+
+    try {
+      final response = await http.put(
+        uri,
+        headers: _headers,
+        body: jsonEncode(bodyMapeado),
+      );
+      
+      // Retorna true si el backend de Spring Boot responde con un 200 OK o 204 No Content
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      print("Error en editarMonumento HTTP: $e");
+      return false;
+    }
   }
-}
 
   // Eliminar (DELETE)
   Future<bool> eliminarMonumento(String id) async {
