@@ -24,14 +24,12 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
   bool _isLoading = true;
   String _categoriaSeleccionada = 'Monumentos Históricos';
   String _estadoSeleccionado = 'Activo';
-  String _sinopsisSeleccionada = 'No'; // NUEVO
+  String _sinopsisSeleccionada = 'No';
 
   final _nombreController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
   final _likesController = TextEditingController();
-  
-  // NUEVOS CONTROLADORES: Campos de descripción
   final _descNombreController = TextEditingController();
   final _descContenidoController = TextEditingController();
 
@@ -54,8 +52,8 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
     _latController.dispose();
     _lonController.dispose();
     _likesController.dispose();
-    _descNombreController.dispose(); // NUEVO
-    _descContenidoController.dispose(); // NUEVO
+    _descNombreController.dispose(); 
+    _descContenidoController.dispose(); 
     super.dispose();
   }
 
@@ -69,8 +67,6 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
         _latController.text = data.latitud.toString();
         _lonController.text = data.longitud.toString();
         _likesController.text = data.likes.toString();
-        
-        // ASIGNACIÓN: Precargamos los datos de descripción existentes
         _descNombreController.text = data.descripcionNombre;
         _descContenidoController.text = data.descripcionContenido;
         _sinopsisSeleccionada = data.sinopsis == true ? 'Sí' : 'No';
@@ -123,11 +119,9 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
       latitud: lat,
       longitud: lon,
       likes: likes,
-      // ASIGNACIÓN: Inyectamos los valores actualizados de la descripción
       sinopsis: _sinopsisSeleccionada == 'Sí',
       descripcionContenido: _descContenidoController.text,
       descripcionNombre: _descNombreController.text,
-      // Conservamos las URLs que ya tenía adjuntas el monumento
       imagenUrl: _monumento!.imagenUrl,
       audioUrl: _monumento!.audioUrl,
     );
@@ -270,11 +264,11 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                               latController: _latController,
                               lonController: _lonController,
                               likesController: _likesController,
-                              descNombreController: _descNombreController, // NUEVO
-                              descContenidoController: _descContenidoController, // NUEVO
+                              descNombreController: _descNombreController, 
+                              descContenidoController: _descContenidoController, 
                               categoria: _categoriaSeleccionada,
                               estado: _estadoSeleccionado,
-                              sinopsis: _sinopsisSeleccionada, // NUEVO
+                              sinopsis: _sinopsisSeleccionada, 
                               imagenesUrls: _monumento?.imagenUrl != null ? [_monumento!.imagenUrl!] : [],
                               onCategoriaChanged: (val) {
                                 if (val != null) {
@@ -286,7 +280,7 @@ class _EditaMonumentoScreenState extends State<EditaMonumentoScreen> {
                                   setState(() => _estadoSeleccionado = val);
                                 }
                               },
-                              onSinopsisChanged: (val) { // NUEVO
+                              onSinopsisChanged: (val) { 
                                 if (val != null) {
                                   setState(() => _sinopsisSeleccionada = val);
                                 }
@@ -387,18 +381,16 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController latController;
   final TextEditingController lonController;
   final TextEditingController likesController;
-  
-  // NUEVOS CONTROLADORES
   final TextEditingController descNombreController;
   final TextEditingController descContenidoController;
 
   final String categoria;
   final String estado;
-  final String sinopsis; // NUEVO
+  final String sinopsis; 
 
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
-  final ValueChanged<String?> onSinopsisChanged; // NUEVO
+  final ValueChanged<String?> onSinopsisChanged;
 
   const _FormularioMonumento({
     required this.isDarkMode,
@@ -539,10 +531,6 @@ class _FormularioMonumento extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-
-        // ==========================================
-        // NUEVA SECCIÓN: Campos de Descripción (JPA)
-        // ==========================================
         Row(
           children: [
             Expanded(
@@ -583,11 +571,9 @@ class _FormularioMonumento extends StatelessWidget {
         _buildTextField(
           textoGuia: 'Escribe aquí la sinopsis completa o la información detallada del monumento...',
           controller: descContenidoController,
-          maxLines: 4, // Habilitado el soporte multilínea
+          maxLines: 4, 
         ),
         const SizedBox(height: 20),
-        // ==========================================
-
         const LabelCampo(label: 'Ubicación'),
         const SizedBox(height: 8),
         Row(
@@ -627,7 +613,7 @@ class _FormularioMonumento extends StatelessWidget {
     required String textoGuia,
     required TextEditingController controller,
     String? prefix,
-    int maxLines = 1, // Añadida la propiedad para descripciones largas
+    int maxLines = 1, 
     TextInputType keyboardType = TextInputType.text,
   }) {
     return TextFormField(

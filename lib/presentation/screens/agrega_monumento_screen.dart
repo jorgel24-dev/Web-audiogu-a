@@ -22,8 +22,6 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   final _likesController = TextEditingController();
   final _latController = TextEditingController();
   final _lonController = TextEditingController();
-  
-  // NUEVOS CONTROLERES: Campos de descripción
   final _descNombreController = TextEditingController();
   final _descContenidoController = TextEditingController();
 
@@ -31,7 +29,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
   String _estadoSeleccionado = 'Activo';
   String _paraNinosSeleccionado = 'No';
   String _idiomaSeleccionado = 'Español';
-  String _sinopsisSeleccionada = 'No'; // NUEVO: Mapeará a 'complete' (bool)
+  String _sinopsisSeleccionada = 'No'; 
 
   final Map<String, String> _categoriasMap = {
     'Monumentos Históricos': '1',
@@ -46,8 +44,8 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
     _likesController.dispose();
     _latController.dispose();
     _lonController.dispose();
-    _descNombreController.dispose(); // NUEVO
-    _descContenidoController.dispose(); // NUEVO
+    _descNombreController.dispose(); 
+    _descContenidoController.dispose(); 
     super.dispose();
   }
 
@@ -71,7 +69,6 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
       latitud: lat,
       longitud: lon,
       likes: likes,
-      // ASIGNACIÓN: Inyección de los nuevos campos al modelo
       sinopsis: _sinopsisSeleccionada == 'Sí',
       descripcionContenido: _descContenidoController.text,
       descripcionNombre: _descNombreController.text,
@@ -138,13 +135,13 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                         likesController: _likesController,
                         latController: _latController,
                         lonController: _lonController,
-                        descNombreController: _descNombreController, // NUEVO
-                        descContenidoController: _descContenidoController, // NUEVO
+                        descNombreController: _descNombreController,
+                        descContenidoController: _descContenidoController,
                         categoria: _categoriaSeleccionada,
                         estado: _estadoSeleccionado,
                         paraNinos: _paraNinosSeleccionado,
                         idioma: _idiomaSeleccionado,
-                        sinopsis: _sinopsisSeleccionada, // NUEVO
+                        sinopsis: _sinopsisSeleccionada,
                         onCategoriaChanged: (val) {
                           if (val != null) {
                             setState(() => _categoriaSeleccionada = val);
@@ -165,7 +162,7 @@ class _AgregaMonumentoPageState extends State<AgregaMonumentoPage> {
                             setState(() => _idiomaSeleccionado = val);
                           }
                         },
-                        onSinopsisChanged: (val) { // NUEVO
+                        onSinopsisChanged: (val) {
                           if (val != null) {
                             setState(() => _sinopsisSeleccionada = val);
                           }
@@ -264,7 +261,6 @@ class _FormularioMonumento extends StatelessWidget {
   final TextEditingController likesController;
   final TextEditingController latController;
   final TextEditingController lonController;
-  // NUEVOS CONTROLLERES EN SUBFORMULARIO
   final TextEditingController descNombreController;
   final TextEditingController descContenidoController;
   
@@ -272,13 +268,13 @@ class _FormularioMonumento extends StatelessWidget {
   final String estado;
   final String paraNinos;
   final String idioma;
-  final String sinopsis; // NUEVO
+  final String sinopsis;
 
   final ValueChanged<String?> onCategoriaChanged;
   final ValueChanged<String?> onEstadoChanged;
   final ValueChanged<String?> onParaNinosChanged;
   final ValueChanged<String?> onIdiomaChanged;
-  final ValueChanged<String?> onSinopsisChanged; // NUEVO
+  final ValueChanged<String?> onSinopsisChanged;
 
   const _FormularioMonumento({
     required this.isDarkMode,
@@ -461,8 +457,6 @@ class _FormularioMonumento extends StatelessWidget {
           maxLines: 4,
         ),
         const SizedBox(height: 24),
-        // ==========================================
-
         const LabelCampo(label: 'Archivos de Audio'),
         const SizedBox(height: 8),
         _buildUploadBox(
