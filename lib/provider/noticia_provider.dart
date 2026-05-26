@@ -167,6 +167,7 @@ class NoticiaProvider extends ChangeNotifier {
     if (imagenBytes != null && imagenNombre != null) {
       final supabaseService = SupabaseService();
       final url = await supabaseService.subirImagen(
+        'noticias',
         imagenBytes!,
         imagenNombre!,
       );
