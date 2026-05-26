@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/ruta_model.dart';
+import '../config/api_config.dart';
 
 class RutaService {
-  final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/route';
-  final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/route';
+  String get _urlPublic => '${ApiConfig.baseUrl}/public/route';
+  String get _urlAdmin => '${ApiConfig.baseUrl}/admin/route';
 
   Future<List<RutaModel>?> obtenerTodas() async {
     try {

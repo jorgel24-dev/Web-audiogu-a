@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart';
 import '../model/noticia_model.dart';
+import '../config/api_config.dart';
 
 class NoticiaService {
-  final String _url = 'https://backend-tfg.fly.dev/api/v1';
+  String get _url => ApiConfig.baseUrl;
 
   Future<List<Noticia>?> obtenerTodas() async {
     try {

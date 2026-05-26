@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:audioguia_web/presentation/screens/login_screen.dart';
 import 'package:audioguia_web/presentation/screens/dashboard_screen.dart';
 import 'package:audioguia_web/presentation/screens/noticias_screen.dart';
@@ -9,6 +10,20 @@ import 'package:audioguia_web/presentation/screens/edita_monumento_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/login',
+  redirect: (context, state) {
+    final session = Supabase.instance.client.auth.currentSession;
+    final isLoggingIn = state.matchedLocation == '/login';
+
+    if (session == null && !isLoggingIn) {
+      return '/login';
+    }
+
+    if (session != null && isLoggingIn) {
+      return '/dashboard';
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/login',

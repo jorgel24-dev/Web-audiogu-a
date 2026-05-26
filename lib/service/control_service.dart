@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart';
 import '../model/control_model.dart';
+import '../config/api_config.dart';
 
 class ControlService {
-  final String _urlPublic = 'https://backend-tfg.fly.dev/api/v1/public/control';
-  final String _urlAdmin = 'https://backend-tfg.fly.dev/api/v1/admin/control';
+  String get _urlPublic => '${ApiConfig.baseUrl}/public/control';
+  String get _urlAdmin => '${ApiConfig.baseUrl}/admin/control';
 
   static const String nombreMonumentos = 'monuments';
   static const String nombreRutas = 'routes';

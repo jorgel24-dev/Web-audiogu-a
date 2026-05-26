@@ -3,9 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../model/dashboard_model.dart';
 import '../provider/auth_provider.dart';
+import '../config/api_config.dart';
 
 class DashboardService {
-  static const String baseUrlHttp = 'https://backend-tfg.fly.dev/api/v1';
+  static String get baseUrlHttp => ApiConfig.baseUrl;
 
   Future<DashboardStats> obtenerStats() async {
     final anioActual = DateTime.now().year.toString();
