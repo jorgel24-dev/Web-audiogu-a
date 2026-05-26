@@ -87,6 +87,13 @@ class TarjetaEstadistica extends StatelessWidget {
                     color: trendBg,
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  child: Icon(
+                    esIncremento
+                        ? Icons.trending_up_rounded
+                        : Icons.trending_down_rounded,
+                    color: colorTendencia,
+                    size: 14,
+                  ),
                 ),
               ],
             ),

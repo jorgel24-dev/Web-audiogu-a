@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class ControlModel {
   int id;
   String name;
@@ -14,11 +12,6 @@ class ControlModel {
     required this.createdAt,
     required this.lastModified,
   });
-
-  factory ControlModel.fromRawJson(String str) =>
-      ControlModel.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
 
   factory ControlModel.fromJson(Map<String, dynamic> json) => ControlModel(
     id: json["id"] ?? 0,

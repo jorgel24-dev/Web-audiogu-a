@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../model/dashboard_model.dart';
 import '../provider/auth_provider.dart';
@@ -25,10 +24,6 @@ class DashboardService {
     final respMonumentos = resultados[0];
     final respNoticias = resultados[1];
     final respStats = resultados[2];
-
-    debugPrint('MONUMENTOS: ${respMonumentos.statusCode}');
-    debugPrint('NOTICIAS: ${respNoticias.statusCode} → ${respNoticias.body}');
-    debugPrint('STATS: ${respStats.statusCode} → ${respStats.body}');
 
     int totalMonumentos = 0;
     int totalNoticias = 0;

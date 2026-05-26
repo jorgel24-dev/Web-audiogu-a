@@ -1,10 +1,10 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'dart:typed_data';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import '../model/noticia_model.dart';
 import '../service/noticia_service.dart';
 import '../service/supabase_service.dart';
+import '../config/api_config.dart';
 
 class NoticiaProvider extends ChangeNotifier {
   final NoticiaService _noticiasService = NoticiaService();
@@ -142,11 +142,13 @@ class NoticiaProvider extends ChangeNotifier {
   }
 
   Future<void> seleccionarImagen() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      imagenBytes = await image.readAsBytes();
-      imagenNombre = image.name;
+    final result = await FilePicker.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null && result.files.single.bytes != null) {
+      imagenBytes = result.files.single.bytes;
+      imagenNombre = result.files.single.name;
       notifyListeners();
     }
   }
@@ -160,7 +162,7 @@ class NoticiaProvider extends ChangeNotifier {
     notifyListeners();
 
     bool exito = false;
-    final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
+    final authHeader = ApiConfig.basicAuthHeader;
 
     if (imagenBytes != null && imagenNombre != null) {
       final supabaseService = SupabaseService();
@@ -235,7 +237,7 @@ class NoticiaProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
 
-    final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
+    final authHeader = ApiConfig.basicAuthHeader;
     final ok = await _noticiasService.eliminar(
       _noticiaSeleccionada!.id,
       authHeader,

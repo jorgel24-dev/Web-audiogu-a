@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/monumento_model.dart';
@@ -88,16 +87,10 @@ class MonumentoService {
         'NLikes': monumento.likes,
       };
 
-      debugPrint("Enviando JSON completo y corregido al backend...");
-
       final response = await http.post(
         uri,
         headers: _headers,
         body: jsonEncode(bodyJson),
-      );
-
-      debugPrint(
-        "Respuesta servidor crear: ${response.statusCode} - ${response.body}",
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
@@ -106,7 +99,6 @@ class MonumentoService {
         throw Exception('Error al crear monumento: ${response.body}');
       }
     } catch (e) {
-      debugPrint("Excepción en crearMonumento: $e");
       rethrow;
     }
   }
@@ -168,7 +160,6 @@ class MonumentoService {
 
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
-      debugPrint("Error en editarMonumento HTTP: $e");
       return false;
     }
   }

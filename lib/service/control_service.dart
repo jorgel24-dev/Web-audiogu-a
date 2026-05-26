@@ -32,25 +32,6 @@ class ControlService {
     }
   }
 
-  Future<bool?> obtenerEstado(String nombre) async {
-    try {
-      final response = await get(
-        Uri.parse('$_urlPublic/$nombre/status'),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        final body = json.decode(utf8.decode(response.bodyBytes));
-        if (body is bool) return body;
-        if (body is Map<String, dynamic>) {
-          return body['active'] ?? body['activo'] ?? body['isActive'];
-        }
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
-  }
-
   Future<ControlModel?> actualizarEstado(
     String nombre,
     bool activo,

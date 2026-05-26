@@ -9,7 +9,6 @@
 import 'package:app_links_web/app_links_web.dart';
 import 'package:file_picker/src/platform/web/file_picker_web.dart';
 import 'package:flutter_keyboard_visibility_temp_fork/flutter_keyboard_visibility_web.dart';
-import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:quill_native_bridge_web/quill_native_bridge_web.dart';
 import 'package:shared_preferences_web/shared_preferences_web.dart';
 import 'package:url_launcher_web/url_launcher_web.dart';
@@ -20,7 +19,6 @@ void registerPlugins([final Registrar? pluginRegistrar]) {
   AppLinksPluginWeb.registerWith(registrar);
   FilePickerWeb.registerWith(registrar);
   FlutterKeyboardVisibilityTempForkWeb.registerWith(registrar);
-  ImagePickerPlugin.registerWith(registrar);
   QuillNativeBridgeWeb.registerWith(registrar);
   SharedPreferencesPlugin.registerWith(registrar);
   UrlLauncherPlugin.registerWith(registrar);

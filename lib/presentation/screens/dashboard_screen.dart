@@ -32,7 +32,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final bgColor = isDarkMode
         ? const Color(0xFF121212)
         : const Color(0xFFF8F9FA);
-    final cardColor = isDarkMode ? const Color(0xFF1E2A3A) : Colors.white;
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final subTextColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
 
@@ -70,11 +69,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildHeader(
-                              context,
-                              textColor,
-                              subTextColor,
-                              cardColor,
+                            Text(
+                              'Resumen de actividad.',
+                              style: TextStyle(
+                                color: subTextColor,
+                                fontSize: 14,
+                              ),
                             ),
                             const SizedBox(height: 30),
 
@@ -165,7 +165,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           'Añade nuevas ubicaciones históricas a tu catálogo de la app.',
                                       textoEstado: '$totalMonumentos Activos',
                                       textoAccion: 'Gestionar',
-                                      widgetsInferiores: _buildAvatarStack(),
+                                      widgetsInferiores: const [
+                                        Icon(
+                                          Icons.people_outline,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
+                                      ],
                                       alPulsarAccion: () =>
                                           context.go('/monumentos/agregar'),
                                       isDarkMode: isDarkMode,
@@ -240,38 +246,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    Color textColor,
-    Color? subTextColor,
-    Color cardColor,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Panel de Control',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Resumen de actividad hoy.',
-              style: TextStyle(color: subTextColor, fontSize: 14),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  List<Widget> _buildAvatarStack() {
-    return [const Icon(Icons.people_outline, size: 16, color: Colors.grey)];
-  }
 }
+

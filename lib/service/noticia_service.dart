@@ -24,21 +24,6 @@ class NoticiaService {
     }
   }
 
-  Future<Noticia?> obtenerPorId(String id) async {
-    try {
-      final response = await get(
-        Uri.parse('$_url/public/news/$id'),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        return Noticia.fromRawJson(response.body);
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
-  }
-
   Future<Noticia?> crear(
     String titulo,
     String subtitulo,

@@ -13,7 +13,6 @@ class ApiConfig {
   static Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'Access-Control-Allow-Origin': '*',
   };
 
   static Map<String, String> get adminHeaders => {

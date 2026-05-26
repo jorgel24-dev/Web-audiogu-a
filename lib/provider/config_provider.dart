@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../service/control_service.dart';
 import '../service/monumento_service.dart';
 import '../service/ruta_service.dart';
 import '../model/monumento_model.dart';
 import '../model/ruta_model.dart';
+import '../config/api_config.dart';
 
 class ConfiguracionProvider extends ChangeNotifier {
   final ControlService _controlService = ControlService();
@@ -95,8 +95,7 @@ class ConfiguracionProvider extends ChangeNotifier {
   void toggleRutas(bool v) {
     _toggle(v, (val) => rutasTuristicas = val);
     for (int i = 0; i < rutas.length; i++) {
-      final old = rutas[i];
-      rutas[i] = RutaModel(id: old.id, name: old.name, isActive: v);
+      rutas[i] = rutas[i].copyWith(isActive: v);
     }
     notifyListeners();
   }
@@ -106,21 +105,7 @@ class ConfiguracionProvider extends ChangeNotifier {
   void toggleMapas(bool v) {
     _toggle(v, (val) => mapasInteractivos = val);
     for (int i = 0; i < monumentos.length; i++) {
-      final old = monumentos[i];
-      monumentos[i] = Monumento(
-        id: old.id,
-        nombre: old.nombre,
-        categoria: old.categoria,
-        accesible: old.accesible,
-        latitud: old.latitud,
-        longitud: old.longitud,
-        paraNinos: old.paraNinos,
-        idioma: old.idioma,
-        activo: v,
-        imagenUrl: old.imagenUrl,
-        audioUrl: old.audioUrl,
-        likes: old.likes,
-      );
+      monumentos[i] = monumentos[i].copyWith(activo: v);
     }
     notifyListeners();
   }
@@ -130,21 +115,7 @@ class ConfiguracionProvider extends ChangeNotifier {
   void toggleMonumento(String id, bool v) {
     final index = monumentos.indexWhere((m) => m.id == id);
     if (index != -1) {
-      final old = monumentos[index];
-      monumentos[index] = Monumento(
-        id: old.id,
-        nombre: old.nombre,
-        categoria: old.categoria,
-        accesible: old.accesible,
-        latitud: old.latitud,
-        longitud: old.longitud,
-        paraNinos: old.paraNinos,
-        idioma: old.idioma,
-        activo: v,
-        imagenUrl: old.imagenUrl,
-        audioUrl: old.audioUrl,
-        likes: old.likes,
-      );
+      monumentos[index] = monumentos[index].copyWith(activo: v);
       _hayPendientes = true;
       notifyListeners();
     }
@@ -165,7 +136,7 @@ class ConfiguracionProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
 
-    final authHeader = 'Basic ${base64Encode(utf8.encode('admin:admin123'))}';
+    final authHeader = ApiConfig.basicAuthHeader;
     final List<Future<dynamic>> promesas = [];
 
     promesas.addAll([
