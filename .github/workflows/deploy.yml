@@ -3,17 +3,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - AhmedMerge
       - main
   workflow_dispatch:
 
-# Permisos necesarios para que GitHub Actions pueda desplegar la web
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Permite solo un despliegue concurrente
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -25,16 +22,24 @@ jobs:
       - name: Clonar el repositorio
         uses: actions/checkout@v4
 
+      - name: Crear archivo .env desde Secrets
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> .env
+          echo "API_ADMIN_USER=${{ secrets.API_ADMIN_USER }}" >> .env
+          echo "API_ADMIN_PASS=${{ secrets.API_ADMIN_PASS }}" >> .env
+
       - name: Configurar Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          
+
       - name: Instalar dependencias
         run: flutter pub get
 
       - name: Compilar para Web
-        run: flutter build web --release --base-href "/WEB-AUDIOGUIA-TFG/"
+        run: flutter build web --release --base-href "/WEB-AUDIOGUIA_TFG-AHMED/"
 
       - name: Subir los archivos compilados
         uses: actions/upload-pages-artifact@v3
