@@ -166,17 +166,17 @@ class NoticiaProvider extends ChangeNotifier {
 
     if (imagenBytes != null && imagenNombre != null) {
       final supabaseService = SupabaseService();
-      final url = await supabaseService.subirImagen(
-        'noticias',
-        imagenBytes!,
-        imagenNombre!,
-      );
-      if (url != null) {
+      try {
+        final url = await supabaseService.subirImagen(
+          'noticias',
+          imagenBytes!,
+          imagenNombre!,
+        );
         imagenUrl = url;
         imagenBytes = null;
         imagenNombre = null;
-      } else {
-        _error = 'Error al subir la imagen a Supabase.';
+      } catch (e) {
+        _error = 'Error Supabase: $e';
         _cargando = false;
         notifyListeners();
         return false;

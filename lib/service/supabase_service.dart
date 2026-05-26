@@ -30,7 +30,8 @@ class SupabaseService {
       final urlPublica = _client.storage.from(bucket).getPublicUrl(ruta);
       return urlPublica;
     } catch (e) {
-      return null;
+      print('=== ERROR SUPABASE ===: $e');
+      throw Exception(e.toString());
     }
   }
 
