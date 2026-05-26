@@ -5,6 +5,7 @@ on:
     branches:
       - AhmedMerge
       - main
+  workflow_dispatch:
 
 # Permisos necesarios para que GitHub Actions pueda desplegar la web
 permissions:
